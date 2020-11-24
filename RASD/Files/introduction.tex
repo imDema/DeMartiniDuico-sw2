@@ -1,29 +1,5 @@
 \subsection{Purpose}
-{ \color{green} % TODO
-This document represents the Requirement Analysis and Specification Document (RASD).
-Goals of this document are to completely describe the system in terms of functional and non-
-functional requirements, analyze the real needs of the customer in order to model the system,
-show the constraints and the limit of the software and indicate the typical use cases that will
-occur after the release. This document is addressed to the developers who have to implement
-the requirements and could be used as a contractual basis.
-}
-\subsubsection{Goals}
 
-\begin{description}
-    \item [G1]  Users shall be able to enqueue in the waiting list for the Shop
-    \item [G2]  Users shall be able to book a visit to the Shop
-    \item [G3]  Users shall be provided with an estimate of the waiting time for a Shop
-    \item [G4]  Users should be reminded about considering the time needed to travel to the Shop
-    \item [G5]  Users shall be able to specify the categories of items they intend to buy 
-    
-    \item [G6]  Third parties shall be able to add Users to the waiting list for the Shop on their behalf
-    \item [G7]  Third parties shall be able to book a visit to the Shop on the Users' behalf
-    \item [G8]  Third parties shall be able to verify the presence of a User in the current waiting list, or in the bookings for the current time slot
-    \item [G9]  Third parties shall be able to monitor the number of visits to the Shops, to ensure compliance with the laws
-    \item [G10] Third parties shall be able to retrieve data about booked visits, including the categories of items requested by each User 
-    
-\end{description}
-\subsection{Scope}
 During the COVID-19 pandemic in order to reduce the of transmission of the virus governments have introduced various measures aimed to reduce to a minimum close contacts between people, these measures include social distancing and lockdowns.
 
 During lockdowns people can leave their habitations only for essential needs such as grocery shopping, which makes supermarkets a gathering spot where the virus could spread and potential danger for the people visiting.
@@ -43,6 +19,33 @@ The product will also allow store managers to effectively monitor the entrances 
 Additionally to the lining up mechanism the application will allow customers to book a visit in the future, which will improve the distribution of customers during the day and the week, since they will be able to choose a less crowded time slot.
 
 CLup will also allow users to choose the approximate time of their visit and the category of items they wish to buy, which allows making more accurate predictions of the waiting times and, by knowing the areas that they will visit, to better utilize the space in the building, while respecting health and safety measures.
+
+\subsubsection{Goals}
+
+\begin{description}
+    \item [G1]  Users shall be able to enqueue in the waiting list for the Shop
+    \item [G2]  Users shall be able to book a visit to the Shop
+    \item [G3]  Users shall be provided with an estimate of the waiting time for a Shop
+    \item [G4]  Users should be reminded about considering the time needed to travel to the Shop
+    \item [G5]  Users shall be able to specify the categories of items they intend to buy 
+    
+    \item [G6]  Third parties shall be able to add Users to the waiting list for the Shop on their behalf
+    \item [G7]  Third parties shall be able to book a visit to the Shop on the Users' behalf
+    \item [G8]  Third parties shall be able to verify the presence of a User in the current waiting list, or in the bookings for the current time slot
+    \item [G9]  Third parties shall be able to monitor the number of visits to the Shops, to ensure compliance with the laws
+    \item [G10] Third parties shall be able to retrieve data about booked visits, including the categories of items requested by each User 
+    
+\end{description}
+\subsection{Scope}
+
+Using the "The World and The Machine" model by M. Jackson we can give an overall description of the events involved in the project realization, both those which cannot be observed by the system "The World" and those strictly related to the system "The Machine", but also those in common between the two.
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=.85\textwidth]{Images/world-machine.pdf}
+    \caption{\label{fig:world_machine} World Machine diagram}
+\end{figure}
+
 
 \subsection{Definitions, Acronyms, Abbreviations}
 \subsubsection{Definitions}
