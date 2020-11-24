@@ -1,4 +1,3 @@
-
 \subsection{Purpose}
 { \color{green} % TODO
 This document represents the Requirement Analysis and Specification Document (RASD).
@@ -10,10 +9,20 @@ the requirements and could be used as a contractual basis.
 }
 \subsubsection{Goals}
 
-G1
-G2
-G3
-
+\begin{description}
+    \item [G1]  Users shall be able to enqueue in the waiting list for the Shop
+    \item [G2]  Users shall be able to book a visit to the Shop
+    \item [G3]  Users shall be provided with an estimate of the waiting time for a Shop
+    \item [G4]  Users should be reminded about considering the time needed to travel to the Shop
+    \item [G5]  Users shall be able to specify the categories of items they intend to buy 
+    
+    \item [G6]  Third parties shall be able to add Users to the waiting list for the Shop on their behalf
+    \item [G7]  Third parties shall be able to book a visit to the Shop on the Users' behalf
+    \item [G8]  Third parties shall be able to verify the presence of a User in the current waiting list, or in the bookings for the current time slot
+    \item [G9]  Third parties shall be able to monitor the number of visits to the Shops, to ensure compliance with the laws
+    \item [G10] Third parties shall be able to retrieve data about booked visits, including the categories of items requested by each User 
+    
+\end{description}
 \subsection{Scope}
 During the COVID-19 pandemic in order to reduce the of transmission of the virus governments have introduced various measures aimed to reduce to a minimum close contacts between people, these measures include social distancing and lockdowns.
 
@@ -34,7 +43,57 @@ The product will also allow store managers to effectively monitor the entrances 
 Additionally to the lining up mechanism the application will allow customers to book a visit in the future, which will improve the distribution of customers during the day and the week, since they will be able to choose a less crowded time slot.
 
 CLup will also allow users to choose the approximate time of their visit and the category of items they wish to buy, which allows making more accurate predictions of the waiting times and, by knowing the areas that they will visit, to better utilize the space in the building, while respecting health and safety measures.
+
 \subsection{Definitions, Acronyms, Abbreviations}
+\subsubsection{Definitions}
+\begin{description}
+    \item [Third party company] A company that wants to use our services.
+    {\todo
+        \item \huge TODO
+    }
+\end{description}
+\subsubsection{Acronyms}
+\begin{description}
+    \item [RASD] Requirement Analysis and Specification Document. 
+    \item [API] Application Programming Interface.
+    {\todo
+        \item \huge TODO
+    }
+\end{description}
+\subsubsection{Abbreviations}
+\begin{description}
+    \item [Third party] A company that wants to use our services.
+    \item [{[Gn]}] n-goal. 
+    \item [{[Dn]}] n-domain assumption. 
+    \item [{[Rn]}] n-functional requirement. 
+\end{description}
+
 \subsection{Revision history}
+{
+\todo
+\begin{description}
+    \item[v. 1.0 - 44/55/666] Initial release
+	\item[v. 1.1 - 44/55/666] Fixed return values in sequence diagrams; removed unnecessary Location class from class diagrams; removed unnecessary intermediate state for SpecificRequest and GroupRequest state diagrams
+	\item[v. 1.2 - 44/55/666] Adjusted User's fields in class diagrams; adjusted target Android API; removed a duplicate line in requirements
+\end{description}
+}
 \subsection{Reference documents}
+{\todo
+\begin{minipage}{\textwidth}
+    \begin{description}
+        \item [BEEP channel] - Mandatory Project Assignment
+        \item [The world \& the machine] - M. Jackson, P. Zave
+    \end{description}
+    \end{minipage}
+}
 \subsection{Document structure}
+This document is structured in four main chapters, that are as follows:
+\begin{enumerate}
+	\item The first chapter serves as an introduction and an overview to the project, describing the main reasons for its development, its goals together with a brief informal description of it.
+
+	\item The second chapter serves as a more formal description of the project: it includes class diagrams, state machine diagrams, and it gives details on the shared phenomena and domain models. Class diagrams give a big picture description on how the system should be structured, while state machine diagrams focus on the more relevant entities of the model. Here are also presented all the requirements and domain assumptions the system in project must fulfill and take into considerations, in order to achieve the goals; they are presented each one after the goal it is relevant to.
+
+	\item The third chapter presents the specific requirements: use cases and the design constraints the system must satisfy. The use cases are described using natural language, while the constraints are pictured with sequence/activity diagrams. A mockup is also shown as a general idea of how the end product should be, in terms of design and functionalities offered to the end user.
+
+	\item The fourth and last chapter is a formal analysis of the model, made through the use of the open source Alloy language and analyzer, including a graphic representation of it obtained from Alloy Tool.
+\end{enumerate}
