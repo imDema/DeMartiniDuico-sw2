@@ -23,18 +23,18 @@ CLup will also allow users to choose the approximate time of their visit and the
 \subsubsection{Goals}
 
 \begin{description}
-    \item [G1]  Users shall be able to enqueue in the waiting list for the Shop
-    \item [G2]  Users shall be able to book a visit to the Shop
-    \item [G3]  Users shall be provided with an estimate of the waiting time for a Shop
+    \item [G1]  Users shall be able to enter the Shop at the earliest occasion without waiting in line
+    \item [G2]  Users shall be provided with an estimate of the waiting time for a Shop
+    \item [G3]  Users shall be able to book a future visit to the Shop
     \item [G4]  Users should be reminded about considering the time needed to travel to the Shop
-    \item [G5]  Users shall be able to specify the categories of items they intend to buy 
+    \item [G5]  Users shall be able to specify the categories of items they intend to buy
     
-    \item [G6]  Third parties shall be able to add Users to the waiting list for the Shop on their behalf
-    \item [G7]  Third parties shall be able to book a visit to the Shop on the Users' behalf
-    \item [G8]  Third parties shall be able to verify the presence of a User in the current waiting list, or in the bookings for the current time slot
-    \item [G9]  Third parties shall be able to monitor the number of visits to the Shops, to ensure compliance with the laws
-    \item [G10] Third parties shall be able to retrieve data about booked visits, including the categories of items requested by each User 
-    
+    \item [G2]  Third Parties shall better exploit the departments of the Shop without breaking social distancing measures
+    \item [G6]  Third parties shall be able to grant access to the Shop to Users who are unable to use the service
+    \item [G7]  Third parties shall be able to verify the appropriate usage of the service by the users, before allowing them into the Shop
+    \item [G8]  Third parties shall be able to monitor the number of visits to the Shop, to ensure compliance with the laws
+    \item [G9] Third parties shall be able to retrieve data about booked visits, including the categories of items requested by each User
+
 \end{description}
 \subsection{Scope}
 
@@ -120,11 +120,11 @@ Using the "The World and The Machine" model by M. Jackson we can give an overall
 \subsection{Document structure}
 This document is structured in four main chapters, that are as follows:
 \begin{enumerate}
-	\item The first chapter serves as an introduction and an overview to the project, describing the main reasons for its development, its goals together with a brief informal description of it.
+	\item[Section 1] The first chapter serves as an introduction and an overview to the project, describing the main reasons for its development, its goals together with a brief informal description of it.
 
-	\item The second chapter serves as a more formal description of the project: it includes class diagrams, state machine diagrams, and it gives details on the shared phenomena and domain models. Class diagrams give a big picture description on how the system should be structured, while state machine diagrams focus on the more relevant entities of the model. Here are also presented all the requirements and domain assumptions the system in project must fulfill and take into considerations, in order to achieve the goals; they are presented each one after the goal it is relevant to.
+	\item[Section 2] The second chapter serves as a more formal description of the project: it includes class diagrams, state machine diagrams, and it gives details on the shared phenomena and domain models. Class diagrams give a big picture description on how the system should be structured, while state machine diagrams focus on the more relevant entities of the model. Here are also presented all the requirements and domain assumptions the system in project must fulfill and take into considerations, in order to achieve the goals; they are presented each one after the goal it is relevant to.
 
-	\item The third chapter presents the specific requirements: use cases and the design constraints the system must satisfy. The use cases are described using natural language, while the constraints are pictured with sequence/activity diagrams. A mockup is also shown as a general idea of how the end product should be, in terms of design and functionalities offered to the end user.
+	\item[Section 3] The third chapter presents the specific requirements: use cases and the design constraints the system must satisfy. The use cases are described using natural language, while the constraints are pictured with sequence/activity diagrams. A mockup is also shown as a general idea of how the end product should be, in terms of design and functionalities offered to the end user.
 
-	\item The fourth and last chapter is a formal analysis of the model, made through the use of the open source Alloy language and analyzer, including a graphic representation of it obtained from Alloy Tool.
+	\item[Section 4] The fourth and last chapter is a formal analysis of the model, made through the use of the open source Alloy language and analyzer, including a graphic representation of it obtained from Alloy Tool.
 \end{enumerate}

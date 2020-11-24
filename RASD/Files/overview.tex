@@ -1,25 +1,68 @@
-
 \subsection{Product perspective}
+\subsubsection{Class diagrams}
+The following pages present the class diagrams which give an overall description of the main elements through the use of a conceptual model. Only the relevant parts of the system are present for the sake of clarity.
+\begin{sidewaysfigure}
+\centering
+\includegraphics[width=\textwidth]{Images/11.png}
+\caption{\label{fig:metamodel}DICE DPIM metamodel.}
+\end{sidewaysfigure}
+
+\newpage
+\subsubsection{State machine diagrams}
+
+The evolution of the states for of the system is visualized using the state machine UML model.
+
+{\todo
+    \begin{figure}[H]
+        %\includegraphics[width=\linewidth]{rasd_statemachine_grpreq.jpg}
+        \caption{Statechart of a request for a group of cutsomers data}
+        \label{fig:statemachine_grpreq}
+    \end{figure}
+
+    \begin{figure}[H]
+        %\includegraphics[width=\linewidth]{rasd_statemachine_specreq.jpg}
+        \caption{Statechart of a request for a single cutsomer's data}
+        \label{fig:statemachine_specreq}
+    \end{figure}
+
+    \begin{figure}[H]
+        %\includegraphics[width=\linewidth]{rasd_statemachine_runevent.jpg}
+        \caption{Statechart of a running event}
+        \label{fig:statemachine_runevent}
+    \end{figure}
+}
+
 
 \subsection{Product functions}
+{
+    \todo
+    \noindent\emph{CLup} [...]
+\\Let's see more in the details the functions mentioned above:
+}
 
+\textbf{Basic User functions}
+\begin{itemize}
+    \item \textbf{Registration and Login}\\
+    \emph{CLup} must be able to recognize Users between requests, to display correct information and as means of authentication. Therefore, Users must be able to create an account. After creating an account, Users can login to access the undermentioned functions.
+    \item \textbf{Waiting list}\\
+    \emph{CLup} has a waiting list of the users who are currently waiting to enter the Shop. Registered Users are able to join the list via the App, thus obtaining an estimate of the waiting time. This operation is certified by a Ticket. Notifications can be sent to the Users' devices to remind them when their turn to enter the Store is upcoming.
+    \item\textbf{Booking a visit}\\
+    \emph{CLup} allows Users to book a visit to the Shop for a specific date in the future, via the App. This operation is certified by a Ticket, as well. Booking data is used to determine whether the next bookings should be accepted, in order to prevent congestion in the Shop.
+    Furthermore, Users can specify categories of products they intend to buy.
+    \end{itemize}  
+    
+    \textbf{Third Parties functions}
+    
+    \begin{itemize}
+    
+    \item\textbf{Substitute ticket distribution}\\
+    Third Parties shall be able to generate a ticket for those Users who do not have the required technologies, which allows them to join the waiting list. Booking is only allowed via the App, since it requires more detailed information.
+    \item\textbf{Ticket and booking validation}\\
+    \emph{CLup} allows Third Parties to check Users' tickets against those stored in the system.
+    \item\textbf{Store creation and configuration}\\
+    Third Parties shall be able to enlist their store in the \emph{CLup} system, specifiying opening hours and departments with the respective capacities.
+    \item\textbf{Store occupancy checking}\\
+    \emph{CLup} allows Third Parties to monitor entrances.
+\end{itemize}
 \subsection{User characteristics}
-
 \subsection{Assumptions, dependencies and constraints}
-
-
-% \begin{sidewaysfigure}
-% \centering
-% \includegraphics[width=\textwidth]{Images/11.png}
-% \caption{\label{fig:metamodel}DICE DPIM metamodel.}
-% \end{sidewaysfigure}
-
-% \begin{figure}
-% \centering
-% \includegraphics[width=\textwidth]{Images/11.png}
-% \caption{\label{fig:metamodel2}DICE DPIM metamodel in portrait form.}
-% \end{figure}
-
-% Here is the command to refer to another element (section, figure, table, ...) in the document: \emph{As discussed in Section~\ref{sect:overview} and as shown in Figure~\ref{fig:metamodel}, ...}. Here is how to introduce a bibliographic citation~\cite{DAM}. Bibliographic references should be included in a \texttt{.bib} file. 
-
-% Table generation is a bit complicated in Latex. You will soon become proficient, but to start you can rely on tools or external services. See for instance this \href{https://www.tablesgenerator.com}{https://www.tablesgenerator.com}. 
