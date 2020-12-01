@@ -1,35 +1,34 @@
 \subsection{Product perspective}
 \subsubsection{Class diagrams}
 The following pages present the class diagrams which give an overall description of the main elements through the use of a conceptual model. Only the relevant parts of the system are present for the sake of clarity.
-\begin{figure}[h]
-\centering
-\includegraphics{Images/main-class-diag.pdf}
-\caption{\label{fig:metamodel}High level class diagram}
+\begin{figure}[H]
+    \centering
+    \includegraphics{Images/main-class-diag.pdf}
+    \caption{\label{fig:metamodel}High level class diagram}
 \end{figure}
 
 \newpage
 \subsubsection{State machine diagrams}
-{\todo
-The evolution of the states for of the system is visualized using the state machine UML model.
+The following diagrams represent a high level description of the evolution of the states of the system during its processes.
 
-    \begin{figure}[H]
-        %\includegraphics[width=\linewidth]{rasd_statemachine_grpreq.jpg}
-        \caption{Statechart of a request for a group of cutsomers data}
-        \label{fig:statemachine_grpreq}
-    \end{figure}
+\begin{figure}[H]
+    \includegraphics[width=\linewidth]{Images/state-diag-Booking.pdf}
+    \caption{Statechart of the lifetime of a Booking}
+    \label{fig:statechart_booking}
+\end{figure}
 
-    \begin{figure}[H]
-        \includegraphics[width=\linewidth]{Images/state-diag_Ticket.pdf}
-        \caption{Statechart of the lifetime of a Ticket}
-        \label{fig:statemachine_specreq}
-    \end{figure}
+\begin{figure}[H]
+    \includegraphics[width=\linewidth]{Images/state-diag_Ticket.pdf}
+    \caption{Statechart of the lifetime of a Ticket}
+    \label{fig:statechart_ticket}
+\end{figure}
 
-    \begin{figure}[H]
-        \includegraphics[width=\linewidth]{Images/state-diag_Manager.pdf}
-        \caption{Statechart of the Shop creation and configuration}
-        \label{fig:statemachine_runevent}
-    \end{figure}
-}
+\begin{figure}[H]
+    \includegraphics[width=\linewidth]{Images/state-diag_Manager.pdf}
+    \caption{Statechart of the Shop creation and configuration}
+    \label{fig:statechart_manager}
+\end{figure}
+
 
 
 \subsection{Product functions}
@@ -40,32 +39,52 @@ The configuration of Shop is handled by the Third Party, which is able to set th
 \paragraph{Basic User functions} These functions are available to all Users:
 \begin{itemize}
     \item \textbf{Registration and Login}\\
-    \emph{CLup} must be able to recognize Users between requests, to display correct information and as means of authentication. Therefore, Users should be able to create a personal account through the App. After creating an account, Users should login to access the functions described in the following paragraphs;
+          \emph{CLup} must be able to recognize Users between requests, to display correct information and as means of authentication. Therefore, Users should be able to create a personal account through the App. After creating an account, Users should login to access the functions described in the following paragraphs;
     \item \textbf{Obtaining a Ticket}\\
-    \emph{CLup} has a waiting list of the users who are currently waiting to enter the Shop. Registered Users are able to join the list via the App, thus obtaining an estimate of the waiting time. This operation is certified by a Ticket. Notifications can be sent to the Users' devices to remind them when it is their turn to enter the Store;
-    \item\textbf{Booking a visit}\\
-    \emph{CLup} allows Users to book a visit to the Shop for a specific date in the future, via the App. This operation is finalized by the emission of a Booking. This data is used to determine whether the next bookings should be accepted, in order to prevent congestion in the Shop;
-    \item\textbf{Specifying item categories}\\
-    Furthermore, Users can specify categories of products they intend to buy, when obtaining both a Ticket and a Booking.This makes possible to better optimize the capacity of the departments of the Shop.
-    \end{itemize}
-    
+          \emph{CLup} has a waiting list of the users who are currently waiting to enter the Shop. Registered Users are able to join the list via the App, thus obtaining an estimate of the waiting time. This operation is certified by a Ticket. Notifications can be sent to the Users' devices to remind them when it is their turn to enter the Store;
+    \item \textbf{Booking a visit}\\
+          \emph{CLup} allows Users to book a visit to the Shop for a specific date in the future, via the App. This operation is finalized by the emission of a Booking. This data is used to determine whether the next bookings should be accepted, in order to prevent congestion in the Shop;
+    \item \textbf{Specifying item categories}\\
+          Furthermore, Users can specify categories of products they intend to buy, when obtaining both a Ticket and a Booking.This makes possible to better optimize the capacity of the departments of the Shop.
+\end{itemize}
+
 \paragraph{Third Parties base functions}
-    These functions should be accessible to all the employees of the Third Party, since they are required for the proper working of the system, at an operational level:
+These functions should be accessible to all the employees of the Third Party, since they are required for the proper working of the system, at an operational level:
 \begin{itemize}
     \item\textbf{Login}\\
-    Third Parties clerks and managers shall be provided with valid credentials to login into the system.
+          Third Parties clerks and managers shall be provided with valid credentials to login into the system.
     \item\textbf{Substitute ticket distribution}\\
-    Third Parties shall be able to generate a ticket for Users who do not have the required technologies, which allows them to join the waiting list. Booking is only allowed via the App, since it requires more detailed information;
-    \item\textbf{Ticket and Booking validation}\\
-    \emph{CLup} allows Third Parties to check Users' tickets against those stored in the system. This is fundamental to deny forged tickets.
-\end{itemize}    
+          Third Parties shall be able to generate a ticket for Users who do not have the required technologies, which allows them to join the waiting list. Booking is only allowed via the App, since it requires more detailed information;
+    \item \textbf{Ticket and Booking validation}\\
+          \emph{CLup} allows Third Parties to check Users' tickets against those stored in the system. This is fundamental to deny forged tickets.
+\end{itemize}
 \paragraph{Third Parties administration functions}
 These functions must only be accessible to the managers of the Third Party, since they control administrative aspects of the service, which handle sensible or critical data:
 \begin{itemize}
     \item\textbf{Shop creation and configuration}\\
-    Third Parties shall be able to enlist their store in the \emph{CLup} system, specifiying opening hours and departments with the respective capacities. This is only possible with a manager account, while the clerks should only be allowed to;
+          Third Parties shall be able to enlist their store in the \emph{CLup} system, specifiying opening hours and departments with the respective capacities. This is only possible with a manager account, while the clerks should only be allowed to;
     \item\textbf{Shop occupancy checking}\\
-    \emph{CLup} allows Third Parties to monitor entrances, to ensure all of the imposed restrictions are being followed. These data are also a source of useful insights in a business perspective.
+          \emph{CLup} allows Third Parties to monitor entrances, to ensure all of the imposed restrictions are being followed. These data are also a source of useful insights in a business perspective.
 \end{itemize}
 \subsection{User characteristics}
+
+CLup is meant to be accessible for users of all demographics.
+
+\subsubsection{Actors}
+\begin{itemize}
+    \item \textbf{User}: people who need to go shopping
+    \item \textbf{Shop manager}: someone who owns a retail commercial activity which needs to operate at limited capacity
+    \item \textbf{Clerks}: staff of a shop which needs to operate at limited capacity
+\end{itemize}
+
 \subsection{Assumptions, dependencies and constraints}
+\begin{description}
+    \item[D1] Each user creates only one account
+    \item[D2] The information provided by the manager is correct
+    \item[D3] The maximum capacity provided by the manager is compliant to active health and safety measures 
+    \item[D4] Most of the users that take a ticket or book a visit will actually visit the shop
+    \item[D5] Most of the users will be punctual
+    \item[D6] The staff will validate tickets and bookings on entry and exit
+    \item[D7] Transgressors will be handled by the staff
+    \item[D8] Clients will be instructed to use the applicative if possible
+\end{description}
