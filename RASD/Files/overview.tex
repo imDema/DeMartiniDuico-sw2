@@ -19,25 +19,23 @@ The evolution of the states for of the system is visualized using the state mach
     \end{figure}
 
     \begin{figure}[H]
-        %\includegraphics[width=\linewidth]{rasd_statemachine_specreq.jpg}
-        \caption{Statechart of a request for a single cutsomer's data}
+        \includegraphics[width=\linewidth]{Images/state-diag_Ticket.pdf}
+        \caption{Statechart of the lifetime of a Ticket}
         \label{fig:statemachine_specreq}
     \end{figure}
 
     \begin{figure}[H]
-        %\includegraphics[width=\linewidth]{rasd_statemachine_runevent.jpg}
-        \caption{Statechart of a running event}
+        \includegraphics[width=\linewidth]{Images/state-diag_Manager.pdf}
+        \caption{Statechart of the Shop creation and configuration}
         \label{fig:statemachine_runevent}
     \end{figure}
 }
 
 
 \subsection{Product functions}
-{
-    \todo
-    \noindent\emph{CLup} [...]
-\\Let's see more in the details the functions mentioned above:
-}
+\emph{CLup} offers the Users two ways of accessing a Third Party Shop: they can request a Ticket to for an immediate visit, or make a Booking for a future visit. The proofs of reservation (Ticket or Booking) must be validated before entering the Shop. An alternative must be guaranteed on-location for users who cannot access the service.
+The configuration of Shop is handled by the Third Party, which is able to set the opening times and the departments. When \emph{CLup} is operative, the Third Party can monitor the occupancy of the Shop, detailed into the various departments.
+\\Here is an overview of \emph{CLup} functions, subdivided into three sets, related to the Users, the Third Party clerks and the Third Party managers:
 
 \paragraph{Basic User functions} These functions are available to all Users:
 \begin{itemize}
@@ -52,8 +50,10 @@ The evolution of the states for of the system is visualized using the state mach
     \end{itemize}
     
 \paragraph{Third Parties base functions}
-    These functions should be accessible to the clerks of the Third Party, since they are required for the proper working of the system, at an operational level:
+    These functions should be accessible to all the employees of the Third Party, since they are required for the proper working of the system, at an operational level:
 \begin{itemize}
+    \item\textbf{Login}\\
+    Third Parties clerks and managers shall be provided with valid credentials to login into the system.
     \item\textbf{Substitute ticket distribution}\\
     Third Parties shall be able to generate a ticket for Users who do not have the required technologies, which allows them to join the waiting list. Booking is only allowed via the App, since it requires more detailed information;
     \item\textbf{Ticket and Booking validation}\\
@@ -62,10 +62,10 @@ The evolution of the states for of the system is visualized using the state mach
 \paragraph{Third Parties administration functions}
 These functions must only be accessible to the managers of the Third Party, since they control administrative aspects of the service, which handle sensible or critical data:
 \begin{itemize}
-    \item\textbf{Store creation and configuration}\\
+    \item\textbf{Shop creation and configuration}\\
     Third Parties shall be able to enlist their store in the \emph{CLup} system, specifiying opening hours and departments with the respective capacities. This is only possible with a manager account, while the clerks should only be allowed to;
-    \item\textbf{Store occupancy checking}\\
-    \emph{CLup} allows Third Parties to monitor entrances, to ensure all of the imposed restrictions are being followed. These data are also a source of useful insights for a business perspective.
+    \item\textbf{Shop occupancy checking}\\
+    \emph{CLup} allows Third Parties to monitor entrances, to ensure all of the imposed restrictions are being followed. These data are also a source of useful insights in a business perspective.
 \end{itemize}
 \subsection{User characteristics}
 \subsection{Assumptions, dependencies and constraints}
