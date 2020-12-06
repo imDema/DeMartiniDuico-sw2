@@ -21,17 +21,43 @@ Although not strictly required, the devices used by the staff should have a came
 \end{itemize}
 The system shall use the HTTPS protocol to provide secure communication from the client to the server.
 \subsection{Functional requirements}
+\subsubsection{Scenarios}
+\textbf{Scenario 1}
+
+Maria is gathering ingredients to bake a cake, but she realizes she doesn't have any milk.
+Maria lives near to a grocery shop so she opens the web app, she looks up the grocery and gets a ticket \todo{specifying she wants milk stuff}.
+CLup shows that Maria's turn will be in about 10 minutes. Five minutes later she checks back on the app and the approximate time is now 5 minutes, so she leaves and she goes to the shop.
+At the shop Giovanni, a memeber of the staff, is at the entrance waiting for customers. Maria is welcomed by Giovanni, she opens the application and \todo{(how she finds the token)} then she shows him the ticket, Giovanni scans the ticket with his phone, Maria is just in time, so she can enter the shop and do her groceries.
+At the exit she is invited by Marco, another member of the staff to scan her ticket, she shows the ticket one last time, then she leaves the shop and returns home ready to bake a cake.
+
+\subsubsection{Use cases}
+% Use case name
+% Find the actors (concrete names)
+% Flow of events with natural language
+% Focus on entry and exit condition
+% Exceptions
+
+\begin{table}[h]
+    \begin{tabular}{|l|l|}
+    \hline
+    Name           & \todo{\#}    \\ \hline
+    Actor          & \todo{\#} \\ \hline
+    Entry codition & \todo{\#}   \\ \hline
+    Event flow     & \todo{\#}    \\ \hline
+    \end{tabular}
+    \end{table}
+
 
 \subsection{Performance Requirements}
-\begin{itemize} 
-\item Validating a token must be done as soon as possible and in no more than 5 seconds from when the token was acquired by the staff. This is required to achieve sufficient throughput and prevent queues from forming at the entrance.
-\item When obtaining a token the user shall receive a response from the server within 15 seconds, since in this case time is not critical.
-\item Tokens shall be added to the system as soon as possible within 30 seconds.
+\begin{itemize}
+    \item Validating a token must be done as soon as possible and in no more than 5 seconds from when the token was acquired by the staff. This is required to achieve sufficient throughput and prevent queues from forming at the entrance.
+    \item When obtaining a token the user shall receive a response from the server within 15 seconds, since in this case time is not critical.
+    \item Tokens shall be added to the system as soon as possible within 30 seconds.
 \end{itemize}
 \subsection{Design constraints}
 \subsubsection{Standards compliance}
-The device where the \emph{CLup} application is installed must run an HTML5 compatible browser, with Javascript ES6 (or above) support.
-Data will be exchanged using the HTTP protocol.
+The web server shall comply to the HTTPS\footnote{\href{https://tools.ietf.org/html/rfc2818}{RFC2818: HTTP Over TLS}} protocol and target the HTTP/2\footnote{\href{https://tools.ietf.org/html/rfc7540}{RFC7540: Hypertext Transfer Protocol Version 2 (HTTP/2)}} standard for communication and the HTML5\footnote{\href{https://www.w3.org/TR/2017/REC-html52-20171214/}{HTML 5.2 W3C Recommendation, 14 December 2017}} standard for web pages.
+
 \subsubsection{Hardware limitations}
 Running the app requires a smartphone that supports one of the modern web browser engines; older cellphones whose official support has been discontinued shall not be supported.
 To allow the validation of tickets by the Third Party Staff, the device should also be equipped with a camera of any resolution above 8 Megapixel.
@@ -39,17 +65,16 @@ To allow the validation of tickets by the Third Party Staff, the device should a
 
 \subsection{Software System Attributes}
 \subsubsection{Reliability}
-\textit{CLup} should be available 24/7 in order to allow Users to generate Bookings at any time of the day. However, in the night, it can be accepted to have periods of up to 2 hours during which the service is unavailable because of maintenance.
+\textit{CLup} should be available 24/7 in order to allow Users to generate Tokens at any time of the day. Downtime due to maintenance shall be during the night and no longer than 2 hours, furthermore, users and third parties shall be notified at least 3 days prior the scheduled downtime.
 \subsubsection{Availability}
-\emph{CLup} does not have a critical nature, but any downtime could cause serious problems to the management of the entrances to Shops. Hence, 99\% of availability during daytime is required for \emph{CLup} to be effective. At night time, the availability requirement can be relaxed, as long as it is not lower than 90\%, considering that Bookings should be possible at any hour.
+\emph{CLup} does not have a critical nature, however any downtime could cause serious problems to the management of the entrances to Shops. Hence, 99\% availability during daytime is required for \emph{CLup} to be effective. At night time, the availability requirement can be relaxed to 95\%.
 \subsubsection{Security}
-All connections must use HTTP over TLS (HTTPS), with a TLS version above 1.2, to guarantee a secure layer of communication.
-This is necessary to guarantee the authentication of the \emph{CLup} servers, the confidentiality and integrity of the information sent each way.
-Protocols and encryption algorithms will be discussed in detail in the Design Document.
+All communication should be over HTTPS protocol to provide privacy, data integrity and authentication.
+User passwords shall be stored in a salted hash format.
+The system should keep thorough logs of the activity of logged in users and of login attempts. The registration and login procedure should not disclose informations about existing users and repeated login attempts shall be limited.
+Further details about the cryptographic functions and protocols employed will be discussed in the Design Document.
 \subsubsection{Maintainability}
-The service must be implemented in a high-level language that allows unit testing and is open to corrections. In case of bugs, it should be possible to fix and update the running instance of the service within 1-2 days.
-The backend system must allow to run private instances on a testnet, to attest the proper functioning before deployment.
-The Application will be updated automatically by reloading the webpage, avoiding old versions of the frontend software to circulate.
+The system components shall be realized with high modularity and orthogonality between modules. This allows modifications to the code to be localized and leave the other components unaffected, minimizing the time required to fix problems with the system.
+The backend system shall be able to run a test instance of the service that can be used by developers to test out features before deploying them to the main instance.
 \subsubsection{Portability}
-\textit{Clup} should have the topmost grade of portability. It should be accessible via any device connected to the Internet, with support for a modern browser, since it will be built as a Web Application.
-%The backend, as well, should be easily moved to a different server: it must be clearly subdivided in independent units that can be .
+\textit{Clup} should be easily deployable on a dedicated machine, on a virtual private server or on a cloud hosting service. The server should be able to run both natively and in a containerized environment for maximum portability.
