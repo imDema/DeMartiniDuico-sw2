@@ -30,12 +30,26 @@ The system shall use the HTTPS protocol to provide secure communication from the
 \end{itemize}
 \subsection{Design constraints}
 \subsubsection{Standards compliance}
+The device where the \emph{CLup} application is installed must run an HTML5 compatible browser, with Javascript ES6 (or above) support.
+Data will be exchanged using the HTTP protocol.
 \subsubsection{Hardware limitations}
-\subsubsection{Other constraints}
+Running the app requires a smartphone that supports one of the modern web browser engines; older cellphones whose official support has been discontinued shall not be supported.
+To allow the validation of tickets by the Third Party Staff, the device should also be equipped with a camera of any resolution above 8 Megapixel.
+%\subsubsection{Other constraints}
 
 \subsection{Software System Attributes}
 \subsubsection{Reliability}
+\textit{CLup} should be available 24/7 in order to allow Users to generate Bookings at any time of the day. However, in the night, it can be accepted to have periods of up to 2 hours during which the service is unavailable because of maintenance.
 \subsubsection{Availability}
+\emph{CLup} does not have a critical nature, but any downtime could cause serious problems to the management of the entrances to Shops. Hence, 99\% of availability during daytime is required for \emph{CLup} to be effective. At night time, the availability requirement can be relaxed, as long as it is not lower than 90\%, considering that Bookings should be possible at any hour.
 \subsubsection{Security}
+All connections must use HTTP over TLS (HTTPS), with a TLS version above 1.2, to guarantee a secure layer of communication.
+This is necessary to guarantee the authentication of the \emph{CLup} servers, the confidentiality and integrity of the information sent each way.
+Protocols and encryption algorithms will be discussed in detail in the Design Document.
 \subsubsection{Maintainability}
+The service must be implemented in a high-level language that allows unit testing and is open to corrections. In case of bugs, it should be possible to fix and update the running instance of the service within 1-2 days.
+The backend system must allow to run private instances on a testnet, to attest the proper functioning before deployment.
+The Application will be updated automatically by reloading the webpage, avoiding old versions of the frontend software to circulate.
 \subsubsection{Portability}
+\textit{Clup} should have the topmost grade of portability. It should be accessible via any device connected to the Internet, with support for a modern browser, since it will be built as a Web Application.
+%The backend, as well, should be easily moved to a different server: it must be clearly subdivided in independent units that can be .
