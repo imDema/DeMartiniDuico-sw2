@@ -1,8 +1,56 @@
 \subsection{External interface Requirements}
-
-\emph{CLup} is a web application which can be accessed from web browsers.
+The \emph{CLup} frontend is a web application that can be accessed from web browsers. \todo{On modern smartphones, the App will also be installable as a native webapp.} The following section will give a comprehensive description in terms of hardware, software and communication interfaces.
 
 \subsubsection{User interfaces}
+\textbf{Registration}\\
+When first opening the application, the User is presented with a registration page. They are asked to provide only the essential information: an \emph{e-mail address} and a \emph{password}. The interface also shows a button to switch to the login page, in case the user has already signed in on another device or the session has expired.
+% \begin{figure}[h]
+%     \centering
+%     \includegraphics[scale=0.63]{Images/login_register2.png}
+%     \caption{Registration interface}
+% \end{figure}
+
+\textbf{Login}\\
+Registered Users are asked for their credentials either when they have not opened the application for a predefined time, e.g. 30 minutes, or when they choose to do so instead of Registering, which could be the case after changing device. The page is identical to the one for the Registration, except for the Login button. A small button gives the Users the ability to Register a new profile instead of logging in, which is needed in case multiple people share the same device.
+% \begin{figure}[h]
+%     \centering
+%     \includegraphics[scale=0.63]{Images/login_register2.png}
+%     \caption{Login interface}
+% \end{figure}
+
+\textbf{Shop selection page}\\
+After login/registration, the app displays a Shop search bar that dynamically updates its results while the Users are typing. After selecting a Shop from the results, the two buttons "Get a Ticket" and "Make a Booking" are enabled, which are linked to the Ticket form and Booking form, respectively.
+% \begin{figure}[h]
+%     \centering
+%     \includegraphics[scale=0.63]{Images/login_register2.png}
+%     \caption{Shop search interface}
+% \end{figure}
+
+\textbf{Ticket form}\\
+This page prompts Users for an optional choice of categories they want to buy. Users can confirm the Ticket request by pressing the "Submit" button. In both the Ticket form and the Booking form, Users are always given option to reset the app back to the Shop selection page.
+% \begin{figure}[h]
+%     \centering
+%     \includegraphics[scale=0.63]{Images/login_register2.png}
+%     \caption{Ticket form}
+% \end{figure}
+
+\textbf{Booking form}\\
+This page is identical to the previous, except for the added time selection. A table with days as columns and hours as rows shows the time slots with lower occupancy. When Users select the preferred day, the visualization updates with specific data for the day, giving an in-depth visualization of restricted to the opening hours. Given this, Users can easily choose a time for their visit. As in the Ticket form, Users can confirm the Booking request by pressing the "Submit" button.
+% \begin{figure}[h]
+%     \centering
+%     \includegraphics[scale=0.63]{Images/login_register2.png}
+%     \caption{Booking form}
+% \end{figure}
+
+\textbf{Token display}\\
+After generating a Ticket or a Booking, and until its expiration, the app will display the token as a fullscreen QR code right after opening, or after Login (if the login timeout has passed).
+This makes it very quick to have the Token scanned by the clerks outside of a shop.
+% \begin{figure}[h]
+%     \centering
+%     \includegraphics[scale=0.63]{Images/login_register2.png}
+%     \caption{Token display}
+% \end{figure}
+
 \subsubsection{Hardware interfaces}
 The \emph{CLup} client shall be available for devices capable of rendering a web page with javascript and internet access, this includes smartphones, tablets and personal computers.
 
@@ -45,8 +93,9 @@ At the exit she is invited by Marco, another member of the staff to scan her tic
     Entry codition & \todo{\#}   \\ \hline
     Event flow     & \todo{\#}    \\ \hline
     \end{tabular}
-    \end{table}
+\end{table}
 
+\subsubsection{Sequence diagrams}
 
 \subsection{Performance Requirements}
 \begin{itemize}
