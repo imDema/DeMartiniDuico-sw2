@@ -2,16 +2,14 @@
 The \emph{CLup} frontend is a web application that can be accessed from web browsers. \todo{On modern smartphones, the App will also be installable as a native webapp.} The following section will give a comprehensive description in terms of hardware, software and communication interfaces.
 
 \subsubsection{User interfaces}
-\textbf{Registration}\\
-When first opening the application, the User is presented with a registration page. They are asked to provide only the essential information: an \emph{e-mail address} and a \emph{password}. The interface also shows a button to switch to the login page, in case the user has already signed in on another device or the session has expired.
+\textbf{Login and Registration}\\
+When first opening the application, Users are presented with a registration page. They are asked to provide only the essential information: an \emph{e-mail address} and a \emph{password}. The interface also shows a small button to switch to the login page, in case the user has already signed in on another device or the session has expired. The page is identical to the one for the Registration, except for the Login button. In this case, the small button gives the Users the ability to switch back to the registration page, which is needed if multiple people share the same device.
 % \begin{figure}[h]
 %     \centering
 %     \includegraphics[scale=0.63]{Images/login_register2.png}
 %     \caption{Registration interface}
 % \end{figure}
 
-\textbf{Login}\\
-Registered Users are asked for their credentials either when they have not opened the application for a predefined time, e.g. 30 minutes, or when they choose to do so instead of Registering, which could be the case after changing device. The page is identical to the one for the Registration, except for the Login button. A small button gives the Users the ability to Register a new profile instead of logging in, which is needed in case multiple people share the same device.
 % \begin{figure}[h]
 %     \centering
 %     \includegraphics[scale=0.63]{Images/login_register2.png}
@@ -84,6 +82,18 @@ At the exit she is invited by Marco, another member of the staff to scan her tic
 % Flow of events with natural language
 % Focus on entry and exit condition
 % Exceptions
+
+% Use Case Diagrams
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.7\textwidth]{Images/usecasediagram-user.pdf}
+    \caption{Use Case Diagram: User}
+\end{figure}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.7\textwidth]{Images/usecasediagram-staff.pdf}
+    \caption{Use Case Diagram: Authority}
+\end{figure}
 
 \begin{table}[h]
     \begin{tabular}{|l|l|}
