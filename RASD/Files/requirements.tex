@@ -68,13 +68,18 @@ Although not strictly required, the devices used by the staff should have a came
 The system shall use the HTTPS protocol to provide secure communication from the client to the server.
 \subsection{Functional requirements}
 \subsubsection{Scenarios}
-\textbf{Scenario 1}
-
+\textbf{Scenario 1}\\
 Maria is gathering ingredients to bake a cake, but she realizes she doesn't have any milk.
-Maria lives near to a grocery shop so she opens the web app, she looks up the grocery and gets a ticket \todo{specifying she wants milk stuff}.
+Maria lives near to a grocery shop so she opens the web app, she writes the shop name in the search bar and she is presented with the most relevant matches. She clicks on the shop and then she chooses \todo{\emph{"Get a Ticket"}}. Now she checks the dairy section and confirms, receiving her ticket.
 CLup shows that Maria's turn will be in about 10 minutes. Five minutes later she checks back on the app and the approximate time is now 5 minutes, so she leaves and she goes to the shop.
-At the shop Giovanni, a memeber of the staff, is at the entrance waiting for customers. Maria is welcomed by Giovanni, she opens the application and \todo{(how she finds the token)} then she shows him the ticket, Giovanni scans the ticket with his phone, Maria is just in time, so she can enter the shop and do her groceries.
-At the exit she is invited by Marco, another member of the staff to scan her ticket, she shows the ticket one last time, then she leaves the shop and returns home ready to bake a cake.
+At the shop Giovanni, a memeber of the staff, is at the entrance waiting for customers. Maria is welcomed by Giovanni, she opens the application and she shows him the ticket, Giovanni scans the ticket with his phone, Maria is just in time, so she can enter the shop and do her groceries.
+At the exit she is invited by Mario, another member of the staff to scan her ticket, she shows the ticket one last time, then she leaves the shop and returns home ready to bake a cake.
+
+\textbf{Scenario 2}\\
+Marco has a busy schedule for the week and he needs to go and get a suit for an important meeting. He looks at his schedule and finds a spot on thursday, so he opens the web app, he writes the shop name in the search bar and she is presented with the most relevant matches. He clicks on the shop and then he chooses \todo{\emph{"Book a visit"}}. Then he checks the clothing section and clicks on thursday on the calendar luckily there is a free time slot. So he inputs the time and confirms, the app responds with the token for the booking. On thursday Marco goes to the shop in time for his booking, he is welcomed by Francesca, a staff member, and shows her the QR code associated with his booking, she scans it using her phone and Marco is allowed in. At the exit he is invited to scan his booking one last time before leaving.
+
+\textbf{Scenario 3}\\
+Attilio was never a fan of technology and he does not have a smartphone, unfortuanately his grandchild Matteo is not around to get a ticket for him, so he picks up his bicycle and goes to the grocery shop. At the entrance to the shop Francesco, a staff member, informs Attilio about the new procedure to enter the shop, since Attilio does not have a smartphone Fancesco uses his device to create a substitute ticket and prints it. Francesco hands Attilio the ticket, then he tells him that there are already 5 people waiting, so he will have to wait for about 10 minutes. Ten minutes later Attilio goes back to the entrance where Francesco scans the ticket letting Attilio go in. At the exit he is invited to scan the ticket one last time before heading home.
 
 \subsubsection{Use cases}
 % Use case name
@@ -96,13 +101,23 @@ At the exit she is invited by Marco, another member of the staff to scan her tic
 \end{figure}
 
 \begin{table}[h]
-    \begin{tabular}{|l|l|}
+    \begin{tabularx}{\textwidth}{|X|p{0.75\textwidth}|}
     \hline
-    Name           & \todo{\#}    \\ \hline
-    Actor          & \todo{\#} \\ \hline
-    Entry codition & \todo{\#}   \\ \hline
-    Event flow     & \todo{\#}    \\ \hline
-    \end{tabular}
+    Name           & User creates an account   \\ \hline
+    Actor          & Unregistered User \\ \hline
+    Entry condition & \begin{itemize}
+        \item User has not created an account yet
+    \end{itemize}\\ \hline
+    Event flow     & \begin{enumerate}
+        \item User opens the web app
+        \item The app asks for login or registration
+        \item The User clicks on register
+        \item The User inserts their email and password
+        \item The User clicks on confirm
+        \item The app prompts the User to check their email for a confirmation linked
+        \item The User clicks on the confirmation link
+    \end{enumerate} \\ \hline
+    \end{tabularx}
 \end{table}
 
 \subsubsection{Sequence diagrams}
