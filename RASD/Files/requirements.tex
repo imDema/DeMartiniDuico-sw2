@@ -3,6 +3,7 @@ The \emph{CLup} frontend is a web application that can be accessed from web brow
 
 \subsubsection{User interfaces}
 \textbf{Login and Registration}\\
+\label{page:login}
 When first opening the application, Users are presented with a registration page. They are asked to provide only the essential information: an \emph{e-mail address} and a \emph{password}. The interface also shows a small button to switch to the login page, in case the user has already signed in on another device or the session has expired. The page is identical to the one for the Registration, except for the Login button. In this case, the small button gives the Users the ability to switch back to the registration page, which is needed if multiple people share the same device.
 % \begin{figure}[h]
 %     \centering
@@ -17,6 +18,7 @@ When first opening the application, Users are presented with a registration page
 % \end{figure}
 
 \textbf{Shop selection page}\\
+\label{page:home}
 After login/registration, the app displays a Shop search bar that dynamically updates its results while the Users are typing. After selecting a Shop from the results, the two buttons "Get a Ticket" and "Make a Booking" are enabled, which are linked to the Ticket form and Booking form, respectively.
 % \begin{figure}[h]
 %     \centering
@@ -25,6 +27,7 @@ After login/registration, the app displays a Shop search bar that dynamically up
 % \end{figure}
 
 \textbf{Ticket form}\\
+\label{page:ticket_form}
 This page prompts Users for an optional choice of categories they want to buy. Users can confirm the Ticket request by pressing the "Submit" button. In both the Ticket form and the Booking form, Users are always given option to reset the app back to the Shop selection page.
 % \begin{figure}[h]
 %     \centering
@@ -33,6 +36,7 @@ This page prompts Users for an optional choice of categories they want to buy. U
 % \end{figure}
 
 \textbf{Booking form}\\
+\label{page:booking_form}
 This page is identical to the previous, except for the added time selection. A table with days as columns and hours as rows shows the time slots with lower occupancy. When Users select the preferred day, the visualization updates with specific data for the day, giving an in-depth visualization of restricted to the opening hours. Given this, Users can easily choose a time for their visit. As in the Ticket form, Users can confirm the Booking request by pressing the "Submit" button.
 % \begin{figure}[h]
 %     \centering
@@ -41,6 +45,7 @@ This page is identical to the previous, except for the added time selection. A t
 % \end{figure}
 
 \textbf{Token display}\\
+\label{page:token_show}
 After generating a Ticket or a Booking, and until its expiration, the app will display the token as a fullscreen QR code right after opening, or after Login (if the login timeout has passed).
 This makes it very quick to have the Token scanned by the clerks outside of a shop.
 % \begin{figure}[h]
@@ -100,22 +105,133 @@ Attilio was never a fan of technology and he does not have a smartphone, unfortu
     \caption{Use Case Diagram: Authority}
 \end{figure}
 
-\begin{table}[h]
+\begin{table}[H]
     \begin{tabularx}{\textwidth}{|X|p{0.75\textwidth}|}
     \hline
     Name           & User creates an account   \\ \hline
-    Actor          & Unregistered User \\ \hline
+    Actor          & User \\ \hline
     Entry condition & \begin{itemize}
-        \item User has not created an account yet
+        \item The User has not created an account yet
     \end{itemize}\\ \hline
     Event flow     & \begin{enumerate}
-        \item User opens the web app
+        \item The User opens the web app
         \item The app asks for login or registration
         \item The User clicks on register
         \item The User inserts their email and password
         \item The User clicks on confirm
         \item The app prompts the User to check their email for a confirmation linked
         \item The User clicks on the confirmation link
+    \end{enumerate} \\ \hline
+    Exit condition & \begin{itemize}
+        \item User account is added to the database
+        \item The User can login
+    \end{itemize}\\ \hline
+    Exceptions & \begin{itemize}
+        \item The User already exists
+        \item The User does not click confirmation link
+    \end{itemize} \\ \hline
+    \end{tabularx}
+\end{table}
+
+\begin{table}[H]
+    \begin{tabularx}{\textwidth}{|X|p{0.75\textwidth}|}
+    \hline
+    Name           & User logs in   \\ \hline
+    Actor          & Registered User \\ \hline
+    Entry condition & \begin{itemize}
+        \item The User has an account
+    \end{itemize}\\ \hline
+    Event flow     & \begin{enumerate}
+        \item The User opens the web app
+        \item The app asks for login or registration
+        \item The User inserts their email and password
+        \item The User clicks on confirm
+        \item The User receives confirmation from the server
+        \item The User is brought to the home page
+    \end{enumerate} \\ \hline
+    Exit condition & \begin{itemize}
+        \item The User is logged in
+        \item The User can use other features
+    \end{itemize}\\ \hline
+    Exceptions & \begin{itemize}
+        \item Wrong credentials
+    \end{itemize} \\ \hline
+    \end{tabularx}
+\end{table}
+
+\begin{table}[H]
+    \begin{tabularx}{\textwidth}{|X|p{0.75\textwidth}|}
+    \hline
+    Name           & User creates a booking   \\ \hline
+    Actor          & User \\ \hline
+    Entry condition & \begin{itemize}
+        \item The User has logged in
+    \end{itemize}\\ \hline
+    Event flow     & \begin{enumerate}
+        \item The User types all or part of the shop name in the search bar
+        \item Results are dynamically updated
+        \item The User selects one of the results
+        \item The User clicks on "Make a booking"
+        \item The User is brought to the \emph{Booking form}
+        \item The User chooses a day from the calendar
+        \item The User inputs the desired time of visit
+        \item The User can choose the departments it will visit
+        \item The User clicks submit
+        \item The User receives confirmation from the server and is shown the new booking
+    \end{enumerate} \\ \hline
+    Exit condition & \begin{itemize}
+        \item Booking is added to the database
+        \item The User can now find the new token in his tokens
+    \end{itemize}\\ \hline
+    Exceptions & \begin{itemize}
+        \item Shop does not exist
+        \item Shop is already completely booked
+        \item The User tries to book an already full time slot 
+    \end{itemize} \\ \hline
+    \end{tabularx}
+\end{table}
+
+\begin{table}[H]
+    \begin{tabularx}{\textwidth}{|X|p{0.75\textwidth}|}
+    \hline
+    Name           & User creates a ticket   \\ \hline
+    Actor          & User \\ \hline
+    Entry condition & \begin{itemize}
+        \item The User has logged in
+    \end{itemize}\\ \hline
+    Event flow     & \begin{enumerate}
+        \item The User types all or part of the shop name in the search bar
+        \item Results are dynamically updated
+        \item The User selects one of the results
+        \item The User clicks on "Get a Ticket"
+        \item The User is brought to the \emph{Get ticket form}
+        \item The User clicks submit
+        \item The User receives confirmation from the server and is shown the new ticket
+    \end{enumerate} \\ \hline
+    Exit condition & \begin{itemize}
+        \item Ticket is added to the database
+        \item The User can now find the new token in his tokens
+    \end{itemize}\\ \hline
+    Exceptions & \begin{itemize}
+        \item Shop does not exist
+        \item Shop is closed for the day
+        \item Shop is queue is full
+    \end{itemize} \\ \hline
+    \end{tabularx}
+\end{table}
+
+\begin{table}[H]
+    \begin{tabularx}{\textwidth}{|X|p{0.75\textwidth}|}
+    \hline
+    Name           & User shows a token   \\ \hline
+    Actor          & User \\ \hline
+    Entry condition & \begin{itemize}
+        \item The User has logged in
+        \item The User has created at least one token
+    \end{itemize}\\ \hline
+    Event flow     & \begin{enumerate}
+        \item The User clicks on \todo{"My Tokens"}
+        \item The user selects one of the tokens in the list
     \end{enumerate} \\ \hline
     \end{tabularx}
 \end{table}
