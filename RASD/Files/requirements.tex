@@ -106,134 +106,262 @@ Attilio was never a fan of technology and he does not have a smartphone, unfortu
 \end{figure}
 
 \begin{table}[H]
-    \begin{tabularx}{\textwidth}{|X|p{0.75\textwidth}|}
-    \hline
-    Name           & User creates an account   \\ \hline
-    Actor          & User \\ \hline
-    Entry condition & \begin{itemize}
-        \item The User has not created an account yet
-    \end{itemize}\\ \hline
-    Event flow     & \begin{enumerate}
-        \item The User opens the web app
-        \item The app asks for login or registration
-        \item The User clicks on register
-        \item The User inserts their email and password
-        \item The User clicks on confirm
-        \item The app prompts the User to check their email for a confirmation linked
-        \item The User clicks on the confirmation link
-    \end{enumerate} \\ \hline
-    Exit condition & \begin{itemize}
-        \item User account is added to the database
-        \item The User can login
-    \end{itemize}\\ \hline
-    Exceptions & \begin{itemize}
-        \item The User already exists
-        \item The User does not click confirmation link
-    \end{itemize} \\ \hline
-    \end{tabularx}
+    \begin{tabu} to \textwidth {|X|X[4]|}
+        \hline
+        Name            & User creates an account   \\ \hline
+        Actor           & User                      \\ \hline
+        Entry condition & \begin{itemize}
+            \item The User has not created an account yet
+        \end{itemize} \\ \hline
+        Event flow      & \begin{enumerate}
+            \item The User opens the web app
+            \item The app asks for login or registration
+            \item The User clicks on register
+            \item The User inserts their email and password
+            \item The User clicks on confirm
+            \item The app prompts the User to check their email for a confirmation linked
+            \item The User clicks on the confirmation link
+        \end{enumerate} \\ \hline
+        Exit condition  & \begin{itemize}
+            \item User account is added to the database
+            \item The User can login
+        \end{itemize} \\ \hline
+        Exceptions      & \begin{itemize}
+            \item The User already exists
+            \item The User does not click confirmation link
+        \end{itemize} \\ \hline
+    \end{tabu}
 \end{table}
 
 \begin{table}[H]
-    \begin{tabularx}{\textwidth}{|X|p{0.75\textwidth}|}
-    \hline
-    Name           & User logs in   \\ \hline
-    Actor          & Registered User \\ \hline
-    Entry condition & \begin{itemize}
-        \item The User has an account
-    \end{itemize}\\ \hline
-    Event flow     & \begin{enumerate}
-        \item The User opens the web app
-        \item The app asks for login or registration
-        \item The User inserts their email and password
-        \item The User clicks on confirm
-        \item The User receives confirmation from the server
-        \item The User is brought to the home page
-    \end{enumerate} \\ \hline
-    Exit condition & \begin{itemize}
-        \item The User is logged in
-        \item The User can use other features
-    \end{itemize}\\ \hline
-    Exceptions & \begin{itemize}
-        \item Wrong credentials
-    \end{itemize} \\ \hline
-    \end{tabularx}
+    \begin{tabu} to \textwidth {|X|X[4]|}
+        \hline
+        Name            & User logs in               \\ \hline
+        Actor           & Registered User            \\ \hline
+        Entry condition & \begin{itemize}
+            \item The User has an account
+        \end{itemize}  \\ \hline
+        Event flow      & \begin{enumerate}
+            \item The User opens the web app
+            \item The app asks for login or registration
+            \item The User inserts their email and password
+            \item The User clicks on confirm
+            \item The User receives confirmation from the server
+            \item The User is brought to the home page
+        \end{enumerate} \\ \hline
+        Exit condition  & \begin{itemize}
+            \item The User is logged in
+            \item The User can use other features
+        \end{itemize} \\ \hline
+        Exceptions      & \begin{itemize}
+            \item Wrong credentials
+        \end{itemize} \\ \hline
+    \end{tabu}
 \end{table}
 
 \begin{table}[H]
-    \begin{tabularx}{\textwidth}{|X|p{0.75\textwidth}|}
-    \hline
-    Name           & User creates a booking   \\ \hline
-    Actor          & User \\ \hline
-    Entry condition & \begin{itemize}
-        \item The User has logged in
-    \end{itemize}\\ \hline
-    Event flow     & \begin{enumerate}
-        \item The User types all or part of the shop name in the search bar
-        \item Results are dynamically updated
-        \item The User selects one of the results
-        \item The User clicks on "Make a booking"
-        \item The User is brought to the \emph{Booking form}
-        \item The User chooses a day from the calendar
-        \item The User inputs the desired time of visit
-        \item The User can choose the departments it will visit
-        \item The User clicks submit
-        \item The User receives confirmation from the server and is shown the new booking
-    \end{enumerate} \\ \hline
-    Exit condition & \begin{itemize}
-        \item Booking is added to the database
-        \item The User can now find the new token in his tokens
-    \end{itemize}\\ \hline
-    Exceptions & \begin{itemize}
-        \item Shop does not exist
-        \item Shop is already completely booked
-        \item The User tries to book an already full time slot 
-    \end{itemize} \\ \hline
-    \end{tabularx}
+    \begin{tabu} to \textwidth {|X|X[4]|}
+        \hline
+        Name            & User creates a booking     \\ \hline
+        Actor           & User                       \\ \hline
+        Entry condition & \begin{itemize}
+            \item The User has logged in
+        \end{itemize} \\ \hline
+        Event flow      & \begin{enumerate}
+            \item The User types all or part of the shop name in the search bar
+            \item Results are dynamically updated
+            \item The User selects one of the results
+            \item The User clicks on "Make a booking"
+            \item The User is brought to the \emph{Booking form}
+            \item The User chooses a day from the calendar
+            \item The User inputs the desired time of visit
+            \item The User can choose the departments it will visit
+            \item The User clicks submit
+            \item The User receives confirmation from the server and is shown the new booking
+        \end{enumerate} \\ \hline
+        Exit condition  & \begin{itemize}
+            \item Booking is added to the database
+            \item The User can now find the new token in his tokens
+        \end{itemize} \\ \hline
+        Exceptions      & \begin{itemize}
+            \item Shop does not exist
+            \item Shop is already completely booked
+            \item The User tries to book an already full time slot
+        \end{itemize} \\ \hline
+    \end{tabu}
 \end{table}
 
 \begin{table}[H]
-    \begin{tabularx}{\textwidth}{|X|p{0.75\textwidth}|}
-    \hline
-    Name           & User creates a ticket   \\ \hline
-    Actor          & User \\ \hline
-    Entry condition & \begin{itemize}
-        \item The User has logged in
-    \end{itemize}\\ \hline
-    Event flow     & \begin{enumerate}
-        \item The User types all or part of the shop name in the search bar
-        \item Results are dynamically updated
-        \item The User selects one of the results
-        \item The User clicks on "Get a Ticket"
-        \item The User is brought to the \emph{Get ticket form}
-        \item The User clicks submit
-        \item The User receives confirmation from the server and is shown the new ticket
-    \end{enumerate} \\ \hline
-    Exit condition & \begin{itemize}
-        \item Ticket is added to the database
-        \item The User can now find the new token in his tokens
-    \end{itemize}\\ \hline
-    Exceptions & \begin{itemize}
-        \item Shop does not exist
-        \item Shop is closed for the day
-        \item Shop is queue is full
-    \end{itemize} \\ \hline
-    \end{tabularx}
+    \begin{tabu} to \textwidth {|X|X[4]|}
+        \hline
+        Name            & User creates a ticket      \\ \hline
+        Actor           & User                       \\ \hline
+        Entry condition & \begin{itemize}
+            \item The User has logged in
+        \end{itemize} \\ \hline
+        Event flow      & \begin{enumerate}
+            \item The User types all or part of the shop name in the search bar
+            \item Results are dynamically updated
+            \item The User selects one of the results
+            \item The User clicks on "Get a Ticket"
+            \item The User is brought to the \emph{Get ticket form}
+            \item The User clicks submit
+            \item The User receives confirmation from the server and is shown the new ticket
+        \end{enumerate} \\ \hline
+        Exit condition  & \begin{itemize}
+            \item Ticket is added to the database
+            \item The User can now find the new token in his tokens
+        \end{itemize} \\ \hline
+        Exceptions      & \begin{itemize}
+            \item Shop does not exist
+            \item Shop is closed for the day
+            \item Shop is queue is full
+        \end{itemize} \\ \hline
+    \end{tabu}
 \end{table}
 
 \begin{table}[H]
-    \begin{tabularx}{\textwidth}{|X|p{0.75\textwidth}|}
-    \hline
-    Name           & User shows a token   \\ \hline
-    Actor          & User \\ \hline
-    Entry condition & \begin{itemize}
-        \item The User has logged in
-        \item The User has created at least one token
-    \end{itemize}\\ \hline
-    Event flow     & \begin{enumerate}
-        \item The User clicks on \todo{"My Tokens"}
-        \item The user selects one of the tokens in the list
-    \end{enumerate} \\ \hline
-    \end{tabularx}
+    \begin{tabu} to \textwidth {|X|X[4]|}
+        \hline
+        Name            & User shows a token         \\ \hline
+        Actor           & User                       \\ \hline
+        Entry condition & \begin{itemize}
+            \item The User has logged in
+            \item The User has created at least one token
+        \end{itemize} \\ \hline
+        Event flow      & \begin{enumerate}
+            \item The User clicks on \todo{"My Tokens"}
+            \item The User selects one of the tokens in the list
+            \item A QR code and associated text code are shown, either of which can be scanned with the staff applicative
+        \end{enumerate} \\ \hline
+    \end{tabu}
+\end{table}
+
+\begin{table}[H]
+    \begin{tabu} to \textwidth {|X|X[4]|}
+        \hline
+        Name            & Manager adds a shop      \\ \hline
+        Actor           & Staff                       \\ \hline
+        Entry condition & \begin{itemize}
+            \item \todo{Logged in with Manager account}
+        \end{itemize} \\ \hline
+        Event flow      & \begin{enumerate}
+            \item The Manager opens the \todo{\emph{Manage Shops}} section
+            \item The Manager clicks on add a Shop
+            \item The Manager inserts the Shop name and location
+            \item The Manager adds departments to the Shop and specifies the max capacity of each
+            \item The Manager specifies the opening hours 
+            \item The Manager clicks on submit
+            \item The Manager receives confirmation from the server
+        \end{enumerate} \\ \hline
+        Exit condition  & \begin{itemize}
+            \item The new Shop is added to the database
+            \item Users can find the Shop in hteir search results
+        \end{itemize} \\ \hline
+        Exceptions      & \begin{itemize}
+            \item The Shop already exists
+        \end{itemize} \\ \hline
+    \end{tabu}
+\end{table}
+
+\begin{table}[H]
+    \begin{tabu} to \textwidth {|X|X[4]|}
+        \hline
+        Name            & Staff scans a valid token\\ \hline
+        Actor           & Staff                       \\ \hline
+        Entry condition & \begin{itemize}
+            \item The Staff member is Logged in
+            \item The Staff member selected one of the shops they have access to
+            \item \todo{A User shows a token in its valid time frame}
+        \end{itemize} \\ \hline
+        Event flow      & \begin{enumerate}
+            \item The Staff member opens the scan token section
+            \item The Staff member uses the camera of the device to scan the token from an User or inputs the code as text
+            \item The token is sent to the server for validation
+            \item The Staff member receives positive confirmation from the server
+            \item The User is allowed in
+        \end{enumerate} \\ \hline
+        Exit condition  & \begin{itemize}
+            \item The token is marked as used
+            \item The store occupancy statistics are updated
+        \end{itemize} \\ \hline
+        Exceptions      & \begin{itemize}
+            \item The token is for another shop
+        \end{itemize} \\ \hline
+    \end{tabu}
+\end{table}
+
+\begin{table}[H]
+    \begin{tabu} to \textwidth {|X|X[4]|}
+        \hline
+        Name            & Staff scans an invalid token\\ \hline
+        Actor           & Staff                       \\ \hline
+        Entry condition & \begin{itemize}
+            \item The Staff member is Logged in
+            \item The Staff member selected one of the shops they have access to
+            \item \todo{A User shows a token which is either expired or not yet valid}
+        \end{itemize} \\ \hline
+        Event flow      & \begin{enumerate}
+            \item The Staff member opens the scan token section
+            \item The Staff member uses the camera of the device to scan the token from an User or inputs the code as text
+            \item The token is sent to the server for validation
+            \item The Staff member receives a negative response from the server
+            \item The User informed that either their ticket is expired or that it's too early
+            \item The User is not allowed in
+        \end{enumerate} \\ \hline
+        Exit condition  & \begin{itemize}
+            \item The token is marked as used
+            \item The store occupancy statistics are updated
+        \end{itemize} \\ \hline
+        Exceptions      & \begin{itemize}
+            \item The token is for another shop
+        \end{itemize} \\ \hline
+    \end{tabu}
+\end{table}
+
+\begin{table}[H]
+    \begin{tabu} to \textwidth {|X|X[4]|}
+        \hline
+        Name            & Staff creates a substitute ticket \\ \hline
+        Actor           & Staff                       \\ \hline
+        Entry condition & \begin{itemize}
+            \item The Staff member is Logged in
+            \item The Staff member selected one of the shops they have access to
+            \item A User without the applicative asks for a ticket
+        \end{itemize} \\ \hline
+        Event flow      & \begin{enumerate}
+            \item The Staff member opens the create substitute ticket section
+            \item The Staff member asks the User and inputs the departments they wish to visit
+            \item The Staff member clicks on submit
+            \item The Staff member prints the token and hands it to the User
+            \item The Staff member reads the esimated wait time to the User
+        \end{enumerate} \\ \hline
+        Exit condition  & \begin{itemize}
+            \item The substitute ticket is added to the database
+            \item The User can use the token to access the Shop when it's their turn in the queue
+        \end{itemize} \\ \hline
+        Exceptions      & \begin{itemize}
+            \item The queue is full
+        \end{itemize} \\ \hline
+    \end{tabu}
+\end{table}
+
+\begin{table}[H]
+    \begin{tabu} to \textwidth {|X|X[4]|}
+        \hline
+        Name            & Manager checks shop occupancy     \\ \hline
+        Actor           & Staff                       \\ \hline
+        Entry condition & \begin{itemize}
+            \item \todo{Logged in with Manager account}
+        \end{itemize} \\ \hline
+        Event flow      & \begin{enumerate}
+            \item The Manager selects a Shop from those available
+            \item The system shows the available occupancy statistcs
+        \end{enumerate} \\ \hline
+        Exceptions      & \begin{itemize}
+            \item The Manager does not have any listed shop
+        \end{itemize} \\ \hline
+    \end{tabu}
 \end{table}
 
 \subsubsection{Sequence diagrams}
