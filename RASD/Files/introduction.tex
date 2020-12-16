@@ -20,22 +20,6 @@ Additionally to the lining up mechanism the application will allow customers to 
 
 CLup will also allow users to choose the approximate time of their visit and the category of items they wish to buy, which allows making more accurate predictions of the waiting times and, by knowing the areas that they will visit, to better utilize the space in the building, while respecting health and safety measures.
 
-\subsubsection{Goals}
-
-\begin{description}
-    \item [G1]  Users shall be able to enter the Shop at the earliest occasion without waiting in line
-    \item [G2]  Users shall be provided with an estimate of the waiting time for a Shop
-    \item [G3]  Users shall be able to book a future visit to the Shop
-    \item [G4]  Users should be reminded about considering the time needed to travel to the Shop
-    \item [G5]  Users shall be able to specify the categories of items they intend to buy
-    
-    \item [G2]  Third Parties shall better exploit the departments of the Shop without breaking social distancing measures
-    \item [G6]  Third parties shall be able to grant access to the Shop to Users who are unable to use the service
-    \item [G7]  Third parties shall be able to verify the appropriate usage of the service by the users, before allowing them into the Shop
-    \item [G8]  Third parties shall be able to monitor the number of visits to the Shop, to ensure compliance with the laws
-    \item [G9] Third parties shall be able to retrieve data about booked visits, including the categories of items requested by each User
-
-\end{description}
 \subsection{Scope}
 
 Using the "The World and The Machine" model by M. Jackson we can give an overall description of the events involved in the project realization, those which cannot be observed by the system: "The World", those strictly related to the system: "The Machine", and those in common between the two.
@@ -43,45 +27,69 @@ Using the "The World and The Machine" model by M. Jackson we can give an overall
 \begin{figure}[h]
     \centering
     \includegraphics[width=.85\textwidth]{Images/world-machine.pdf}
-    \caption{\label{fig:world_machine} World Machine diagram}
+    \caption{\label{fig:world_machine} World Machine diagram \todo{\huge Update}}
 \end{figure}
 
-\textbf{World phenomena}
+\subsubsection{World phenomena}
 \begin{itemize}
-    \item Customers shopping
-    \item Customers waiting
+    \item User enters a Shop
+    \item User goes to a department
+    \item User exits a Shop
+    \item User waits for their turn
+    \item User travels to the shop
     \item Social distancing
     \item Store occuapancy
 \end{itemize}
 
-\textbf{Machine phenomena}
+\subsubsection{Machine phenomena}
 \begin{itemize}
     \item User data storage
     \item Ticket queue
-    \item Prenotation data
-    \item Department occupation computation
+    \item Booking data
+    \item Department occupancy computation
 \end{itemize}
 
-\textbf{Shared phenomena}
+\subsubsection{Shared phenomena}
+
+\paragraph{Controlled by the World}
 \begin{itemize}
-    \item Registration and login
-    \item Store creation and configuration
-    \item Ticket distribution
-    \item Substitute ticket distribution
-    \item Visit booking
-    \item Ticket check
-    \item Prenotation check
-    \item Store capacity check
+    \item User Registration and login
+    \item Manager adds a Shop
+    \item Manager configures a Shop
+    \item User books a visit
+    \item User gets a ticket
+    \item Staff checks a token
+    \item Staff emits a substitute ticket
+    \item Manager checks Shop occupancy
 \end{itemize}
 
+\paragraph{Controlled by the Machine}
+\begin{itemize}
+    \item System sends a reminder to the User
+\end{itemize}
+
+\subsubsection{Goals}
+
+\begin{description}
+    \item [G1] Users shall be able to acquire a ticket which grants them access to the Shop
+    \item [G2]  Users shall be able to book a future visit to the Shop
+    \item [G3]  Users shall be able to enter the Shop at the earliest occasion without waiting in line
+    \item [G4]  Users shall be provided with an estimate of the waiting time for a Shop
+    \item [G5]  Users shall be reminded about considering the time needed to travel to the Shop
+    \item [G6]  Users shall be able to specify the categories of items they intend to buy \todo{Requirement}
+    \item [G7]  Third Parties shall better exploit the departments of the Shop without breaking social distancing measures
+    \item [G8]  Third parties shall be able to monitor the number of visits to the Shop, to ensure compliance with the laws
+    \item [G9] Third parties shall be able to retrieve data about booked visits, including the categories of items requested by each User \todo{Requirement}
+
+\end{description}
 
 \subsection{Definitions, Acronyms, Abbreviations}
 \subsubsection{Definitions}
 \begin{description}
-    \item [Third party company] A company that wants to use our services.
+    \item [Third party company] A company that wants to use our services
     \item [Ticket] A digital proof of presence in the waiting list
     \item [Booking] A digital proof of reservation for a visit to the Shop in a specific time slot
-    \item [Token] \todo{Either a ticket or a booking}
+    \item [Token] Either a ticket or a booking, it's associated with a code which can also be represented as a QR code
     \item [Staff] Company personnel which is responsible of checking entrances
     {\todo
         \item \huge TODO
@@ -89,8 +97,10 @@ Using the "The World and The Machine" model by M. Jackson we can give an overall
 \end{description}
 \subsubsection{Acronyms}
 \begin{description}
-    \item [RASD] Requirement Analysis and Specification Document. 
-    \item [API] Application Programming Interface.
+    \item [RASD] Requirement Analysis and Specification Document
+    \item [API] Application Programming Interface
+    \item [HTTP] Hypertext Transfer Protocol
+    \item [HTML] Hypertext Markup Language
     {\todo
         \item \huge TODO
     }

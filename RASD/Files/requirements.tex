@@ -240,8 +240,8 @@ Attilio was never a fan of technology and he does not have a smartphone, unfortu
 \begin{table}[H]
     \begin{tabu} to \textwidth {|X|X[4]|}
         \hline
-        Name            & Manager adds a shop      \\ \hline
-        Actor           & Staff                       \\ \hline
+        Name            & Manager adds a shop        \\ \hline
+        Actor           & Staff                      \\ \hline
         Entry condition & \begin{itemize}
             \item \todo{Logged in with Manager account}
         \end{itemize} \\ \hline
@@ -250,7 +250,7 @@ Attilio was never a fan of technology and he does not have a smartphone, unfortu
             \item The Manager clicks on add a Shop
             \item The Manager inserts the Shop name and location
             \item The Manager adds departments to the Shop and specifies the max capacity of each
-            \item The Manager specifies the opening hours 
+            \item The Manager specifies the opening hours
             \item The Manager clicks on submit
             \item The Manager receives confirmation from the server
         \end{enumerate} \\ \hline
@@ -267,8 +267,8 @@ Attilio was never a fan of technology and he does not have a smartphone, unfortu
 \begin{table}[H]
     \begin{tabu} to \textwidth {|X|X[4]|}
         \hline
-        Name            & Staff scans a valid token\\ \hline
-        Actor           & Staff                       \\ \hline
+        Name            & Staff scans a valid token  \\ \hline
+        Actor           & Staff                      \\ \hline
         Entry condition & \begin{itemize}
             \item The Staff member is Logged in
             \item The Staff member selected one of the shops they have access to
@@ -294,13 +294,13 @@ Attilio was never a fan of technology and he does not have a smartphone, unfortu
 \begin{table}[H]
     \begin{tabu} to \textwidth {|X|X[4]|}
         \hline
-        Name            & Staff scans an invalid token\\ \hline
-        Actor           & Staff                       \\ \hline
+        Name            & Staff scans an invalid token \\ \hline
+        Actor           & Staff                        \\ \hline
         Entry condition & \begin{itemize}
             \item The Staff member is Logged in
             \item The Staff member selected one of the shops they have access to
             \item \todo{A User shows a token which is either expired or not yet valid}
-        \end{itemize} \\ \hline
+        \end{itemize}   \\ \hline
         Event flow      & \begin{enumerate}
             \item The Staff member opens the scan token section
             \item The Staff member uses the camera of the device to scan the token from an User or inputs the code as text
@@ -308,14 +308,14 @@ Attilio was never a fan of technology and he does not have a smartphone, unfortu
             \item The Staff member receives a negative response from the server
             \item The User informed that either their ticket is expired or that it's too early
             \item The User is not allowed in
-        \end{enumerate} \\ \hline
+        \end{enumerate}   \\ \hline
         Exit condition  & \begin{itemize}
             \item The token is marked as used
             \item The store occupancy statistics are updated
-        \end{itemize} \\ \hline
+        \end{itemize}   \\ \hline
         Exceptions      & \begin{itemize}
             \item The token is for another shop
-        \end{itemize} \\ \hline
+        \end{itemize}   \\ \hline
     \end{tabu}
 \end{table}
 
@@ -323,44 +323,44 @@ Attilio was never a fan of technology and he does not have a smartphone, unfortu
     \begin{tabu} to \textwidth {|X|X[4]|}
         \hline
         Name            & Staff creates a substitute ticket \\ \hline
-        Actor           & Staff                       \\ \hline
+        Actor           & Staff                             \\ \hline
         Entry condition & \begin{itemize}
             \item The Staff member is Logged in
             \item The Staff member selected one of the shops they have access to
             \item A User without the applicative asks for a ticket
-        \end{itemize} \\ \hline
+        \end{itemize}        \\ \hline
         Event flow      & \begin{enumerate}
             \item The Staff member opens the create substitute ticket section
             \item The Staff member asks the User and inputs the departments they wish to visit
             \item The Staff member clicks on submit
             \item The Staff member prints the token and hands it to the User
             \item The Staff member reads the esimated wait time to the User
-        \end{enumerate} \\ \hline
+        \end{enumerate}        \\ \hline
         Exit condition  & \begin{itemize}
             \item The substitute ticket is added to the database
             \item The User can use the token to access the Shop when it's their turn in the queue
-        \end{itemize} \\ \hline
+        \end{itemize}        \\ \hline
         Exceptions      & \begin{itemize}
             \item The queue is full
-        \end{itemize} \\ \hline
+        \end{itemize}        \\ \hline
     \end{tabu}
 \end{table}
 
 \begin{table}[H]
     \begin{tabu} to \textwidth {|X|X[4]|}
         \hline
-        Name            & Manager checks shop occupancy     \\ \hline
-        Actor           & Staff                       \\ \hline
+        Name            & Manager checks shop occupancy \\ \hline
+        Actor           & Staff                         \\ \hline
         Entry condition & \begin{itemize}
             \item \todo{Logged in with Manager account}
-        \end{itemize} \\ \hline
+        \end{itemize}    \\ \hline
         Event flow      & \begin{enumerate}
             \item The Manager selects a Shop from those available
             \item The system shows the available occupancy statistcs
-        \end{enumerate} \\ \hline
+        \end{enumerate}    \\ \hline
         Exceptions      & \begin{itemize}
             \item The Manager does not have any listed shop
-        \end{itemize} \\ \hline
+        \end{itemize}    \\ \hline
     \end{tabu}
 \end{table}
 
