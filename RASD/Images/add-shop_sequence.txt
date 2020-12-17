@@ -1,0 +1,38 @@
+actor "Manager" as User
+participant Clup
+participant User
+ref over User,Clup: Login
+
+User->Clup: get(manageShops)
+activate User
+activate Clup
+Clup-->>User: show(manageShops)
+deactivate Clup
+
+User->Clup: addShop()
+activate Clup
+Clup-->>User: show(shopForm)
+deactivate Clup
+User->Clup: setName()
+activate Clup
+Clup-->>User:
+deactivate Clup
+User->Clup: setLocation()
+activate Clup
+Clup-->>User: list(departments)
+deactivate Clup
+loop
+User->Clup: addDepartment(name)
+activate Clup
+Clup-->>User:
+deactivate Clup
+end
+User->Clup: setOpeningHours()
+activate Clup
+Clup-->>User:
+deactivate Clup
+User->Clup: submit()
+activate Clup
+Clup-->>User: confirm()
+deactivateafter User
+deactivate Clup

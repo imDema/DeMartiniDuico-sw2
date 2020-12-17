@@ -1,0 +1,31 @@
+actor "Customer" as User
+participant Clup
+participant User
+ref over User,Clup: Login
+loop
+User->Clup: search(shopName)
+activate User
+activate Clup
+Clup-->>User: showResults(shopName)
+deactivate Clup
+end
+User->Clup: getTicket(shop)
+activate Clup
+Clup-->>User: list(departments)
+deactivate Clup
+opt
+User->Clup: select(departments)
+activate Clup
+Clup-->User: confim(departments)
+deactivate Clup
+end
+User->Clup: submit()
+activate Clup
+Clup->Clup: checkOccupancy()
+alt shop available
+Clup-->>User: send(token)
+else shop queue is full
+Clup-->>User: fullOccupancy(shop)
+end
+deactivateafter User
+deactivate Clup

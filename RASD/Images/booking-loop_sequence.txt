@@ -1,0 +1,35 @@
+actor "Customer" as User
+participant Clup
+participant User
+ref over User,Clup: Login
+loop
+User->Clup: search(shopName)
+activate User
+activate Clup
+Clup-->>User: showResults(shopName)
+deactivate Clup
+end
+User->Clup: select(shop)
+activate Clup
+Clup-->>User: show(bookingForm)
+deactivate Clup
+User->Clup: select(date)
+activate Clup
+Clup-->>User: show(timeTable)
+deactivate Clup
+User->Clup: select(time)
+activate Clup
+Clup-->>User: list(departments)
+deactivate Clup
+opt
+User->Clup: select(departments)
+activate Clup
+Clup-->User: confim(departments)
+deactivate Clup
+end
+
+User->Clup: submit()
+activate Clup
+Clup-->>User: send(token)
+deactivateafter User
+deactivate Clup

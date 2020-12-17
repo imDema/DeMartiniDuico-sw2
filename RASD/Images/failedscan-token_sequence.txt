@@ -1,0 +1,25 @@
+actor "Customer" as C
+actor "Staff" as Staff
+participant Clup
+ref over Staff,Clup: Login
+
+
+Staff->Clup: get(scanPage)
+activate Staff
+activate Clup
+Clup-->>Staff: show(scanPage)
+deactivate Clup
+
+loop
+C->Staff: show(Token)
+activate C
+Staff->Clup: scan(Token)
+activate Clup
+Clup->Clup: validate(token)
+Clup-->>Staff: notifyInvalid(token)
+deactivate Clup
+Staff-->>C: blockAccess()
+deactivate C
+destroyafter C
+end
+deactivate Staff

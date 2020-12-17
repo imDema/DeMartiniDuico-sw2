@@ -1,0 +1,38 @@
+actor Customer
+participant Clup
+Customer->Clup: openApp()
+activate Customer
+activate Clup
+Clup-->>Customer: show(loginForm)
+deactivate Customer
+deactivate Clup
+
+Customer->Clup: get(registrationForm)
+activate Customer
+activate Clup
+Clup-->>Customer: show(registrationForm)
+#deactivate Customer
+deactivate Clup
+
+Customer->Clup: register(credentials)
+deactivate Customer
+#activate Customer
+activate Clup
+Clup->Clup:validate(credentials)
+Clup-->>Customer:sendEmail(confirmationLink)
+deactivate Clup
+Customer->Clup: send(confirmationLink)
+activate Customer
+activate Clup
+Clup->Clup: validate(confirmationLink)
+Clup->Clup: commitRegistration()
+Clup-->>Customer: confirmRegistration()
+deactivate Clup
+deactivate Customer
+neg user does not click link
+activate Clup
+
+Clup->Clup: deleteRegistration()
+deactivate Clup
+destroy Customer
+end

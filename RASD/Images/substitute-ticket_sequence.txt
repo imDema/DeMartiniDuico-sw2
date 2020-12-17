@@ -1,0 +1,36 @@
+actor Customer
+actor Staff
+participant Clup
+ref over Staff,Clup: Login
+Staff->Clup: get(substituteTicketPage)
+activate Staff
+activate Clup
+Clup-->>Staff: show(substituteTicketPage)
+deactivate Clup
+Staff->Clup: getTicket(shop)
+activate Clup
+Clup-->>Staff: list(departments)
+deactivate Clup
+
+opt
+Staff->Customer: askDepartments()
+activate Customer
+Customer-->>Staff: choose(departments)
+deactivate Customer
+Staff->Clup: select(departments)
+activate Clup
+Clup-->>Staff: confim(departments)
+deactivate Clup
+end
+Staff->Clup: submit()
+activate Clup
+alt queue is not full
+Clup-->>Staff: send(token)
+Staff->>Customer: print(token)
+else queue is full
+Clup-->>Staff: fullQueue()
+deactivate Clup
+
+Staff->>Customer: reject()
+end
+deactivateafter Staff

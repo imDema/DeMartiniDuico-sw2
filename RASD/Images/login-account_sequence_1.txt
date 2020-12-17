@@ -1,0 +1,23 @@
+actor "Registered Customer" as User
+participant Clup
+participant User
+User->Clup: openApp()
+activate User
+activate Clup
+loop not logged-in
+Clup-->>User: show(loginForm)
+deactivate Clup
+User->Clup: login(credentials)
+activate Clup
+Clup->Clup:verify(credentials)
+
+alt invalid credentials
+Clup-->>User: notifyError(credentials)
+else valid credentials
+Clup-->>User:confirmLogin()
+Clup-->>User:show(homepage)
+deactivate Clup
+end
+end
+deactivate User
+deactivate Clup

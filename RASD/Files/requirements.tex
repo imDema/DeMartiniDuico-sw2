@@ -119,7 +119,7 @@ Attilio was never a fan of technology and he does not have a smartphone, unfortu
             \item The User clicks on register
             \item The User inserts their email and password
             \item The User clicks on confirm
-            \item The app prompts the User to check their email for a confirmation linked
+            \item The app prompts the User to check their email for a confirmation link
             \item The User clicks on the confirmation link
         \end{enumerate} \\ \hline
         Exit condition  & \begin{itemize}
@@ -215,7 +215,7 @@ Attilio was never a fan of technology and he does not have a smartphone, unfortu
         Exceptions      & \begin{itemize}
             \item Shop does not exist
             \item Shop is closed for the day
-            \item Shop is queue is full
+            \item Shop queue is full
         \end{itemize} \\ \hline
     \end{tabu}
 \end{table}
@@ -365,7 +365,13 @@ Attilio was never a fan of technology and he does not have a smartphone, unfortu
 \end{table}
 
 \subsubsection{Sequence diagrams}
+%% TODO: ADD THE .pdf_tex's
 
+% \begin{figure}[htbp]
+%     \centering
+%     \input{Images/scan-token_sequence_export.pdf_tex}
+%     \caption{Sequence Diagram of the registration of a Customer}
+% \end{figure}
 \subsection{Performance Requirements}
 \begin{itemize}
     \item Validating a token must be done as soon as possible and in no more than 5 seconds from when the token was acquired by the staff. This is required to achieve sufficient throughput and prevent queues from forming at the entrance.

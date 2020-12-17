@@ -1,0 +1,88 @@
+%% Creator: Inkscape 1.0.1 (3bc2e813f5, 2020-09-07), www.inkscape.org
+%% PDF/EPS/PS + LaTeX output extension by Johan Engelen, 2010
+%% Accompanies image file 'add-shop_sequence_export.pdf' (pdf, eps, ps)
+%%
+%% To include the image in your LaTeX document, write
+%%   \input{<filename>.pdf_tex}
+%%  instead of
+%%   \includegraphics{<filename>.pdf}
+%% To scale the image, write
+%%   \def\svgwidth{<desired width>}
+%%   \input{<filename>.pdf_tex}
+%%  instead of
+%%   \includegraphics[width=<desired width>]{<filename>.pdf}
+%%
+%% Images with a different path to the parent latex file can
+%% be accessed with the `import' package (which may need to be
+%% installed) using
+%%   \usepackage{import}
+%% in the preamble, and then including the image with
+%%   \import{<path to file>}{<filename>.pdf_tex}
+%% Alternatively, one can specify
+%%   \graphicspath{{<path to file>/}}
+%% 
+%% For more information, please see info/svg-inkscape on CTAN:
+%%   http://tug.ctan.org/tex-archive/info/svg-inkscape
+%%
+\begingroup%
+  \makeatletter%
+  \providecommand\color[2][]{%
+    \errmessage{(Inkscape) Color is used for the text in Inkscape, but the package 'color.sty' is not loaded}%
+    \renewcommand\color[2][]{}%
+  }%
+  \providecommand\transparent[1]{%
+    \errmessage{(Inkscape) Transparency is used (non-zero) for the text in Inkscape, but the package 'transparent.sty' is not loaded}%
+    \renewcommand\transparent[1]{}%
+  }%
+  \providecommand\rotatebox[2]{#2}%
+  \newcommand*\fsize{\dimexpr\f@size pt\relax}%
+  \newcommand*\lineheight[1]{\fontsize{\fsize}{#1\fsize}\selectfont}%
+  \ifx\svgwidth\undefined%
+    \setlength{\unitlength}{275.25bp}%
+    \ifx\svgscale\undefined%
+      \relax%
+    \else%
+      \setlength{\unitlength}{\unitlength * \real{\svgscale}}%
+    \fi%
+  \else%
+    \setlength{\unitlength}{\svgwidth}%
+  \fi%
+  \global\let\svgwidth\undefined%
+  \global\let\svgscale\undefined%
+  \makeatother%
+  \begin{picture}(1,2.57201559)%
+    \lineheight{1}%
+    \setlength\tabcolsep{0pt}%
+    \put(0,0){\includegraphics[width=\unitlength,page=1]{add-shop_sequence_export.pdf}}%
+    \put(0.14491855,2.34568179){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}Manager\end{tabular}}}}%
+    \put(0,0){\includegraphics[width=\unitlength,page=2]{add-shop_sequence_export.pdf}}%
+    \put(0.73945738,2.37683884){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}Clup\end{tabular}}}}%
+    \put(0,0){\includegraphics[width=\unitlength,page=3]{add-shop_sequence_export.pdf}}%
+    \put(0.22700147,2.20770049){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}\textbf{ref}\end{tabular}}}}%
+    \put(0.45309951,2.13076164){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}Login\end{tabular}}}}%
+    \put(0,0){\includegraphics[width=\unitlength,page=4]{add-shop_sequence_export.pdf}}%
+    \put(0.33454614,1.98069906){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}get(manageShops)\end{tabular}}}}%
+    \put(0,0){\includegraphics[width=\unitlength,page=5]{add-shop_sequence_export.pdf}}%
+    \put(0.31609184,1.8560708){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}show(manageShops)\end{tabular}}}}%
+    \put(0,0){\includegraphics[width=\unitlength,page=6]{add-shop_sequence_export.pdf}}%
+    \put(0.40875968,1.7314425){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}addShop()\end{tabular}}}}%
+    \put(0,0){\includegraphics[width=\unitlength,page=7]{add-shop_sequence_export.pdf}}%
+    \put(0.3542142,1.60681428){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}show(shopForm)\end{tabular}}}}%
+    \put(0,0){\includegraphics[width=\unitlength,page=8]{add-shop_sequence_export.pdf}}%
+    \put(0.40942848,1.48218606){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}setName()\end{tabular}}}}%
+    \put(0,0){\includegraphics[width=\unitlength,page=9]{add-shop_sequence_export.pdf}}%
+    \put(0.38743196,1.23292954){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}setLocation()\end{tabular}}}}%
+    \put(0,0){\includegraphics[width=\unitlength,page=10]{add-shop_sequence_export.pdf}}%
+    \put(0.35453622,1.10830124){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}list(departments)\end{tabular}}}}%
+    \put(0,0){\includegraphics[width=\unitlength,page=11]{add-shop_sequence_export.pdf}}%
+    \put(0.30415228,0.86349572){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}addDepartment(name)\end{tabular}}}}%
+    \put(0,0){\includegraphics[width=\unitlength,page=12]{add-shop_sequence_export.pdf}}%
+    \put(0.33504156,0.54747414){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}setOpeningHours()\end{tabular}}}}%
+    \put(0,0){\includegraphics[width=\unitlength,page=13]{add-shop_sequence_export.pdf}}%
+    \put(0.42983967,0.29821754){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}submit()\end{tabular}}}}%
+    \put(0,0){\includegraphics[width=\unitlength,page=14]{add-shop_sequence_export.pdf}}%
+    \put(0.424291,0.1735894){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}confirm()\end{tabular}}}}%
+    \put(0,0){\includegraphics[width=\unitlength,page=15]{add-shop_sequence_export.pdf}}%
+    \put(0.08902018,0.98812402){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}\textbf{loop}\end{tabular}}}}%
+  \end{picture}%
+\endgroup%

@@ -1,0 +1,93 @@
+%% Creator: Inkscape 1.0.1 (3bc2e813f5, 2020-09-07), www.inkscape.org
+%% PDF/EPS/PS + LaTeX output extension by Johan Engelen, 2010
+%% Accompanies image file 'ticket_sequence_export.pdf' (pdf, eps, ps)
+%%
+%% To include the image in your LaTeX document, write
+%%   \input{<filename>.pdf_tex}
+%%  instead of
+%%   \includegraphics{<filename>.pdf}
+%% To scale the image, write
+%%   \def\svgwidth{<desired width>}
+%%   \input{<filename>.pdf_tex}
+%%  instead of
+%%   \includegraphics[width=<desired width>]{<filename>.pdf}
+%%
+%% Images with a different path to the parent latex file can
+%% be accessed with the `import' package (which may need to be
+%% installed) using
+%%   \usepackage{import}
+%% in the preamble, and then including the image with
+%%   \import{<path to file>}{<filename>.pdf_tex}
+%% Alternatively, one can specify
+%%   \graphicspath{{<path to file>/}}
+%% 
+%% For more information, please see info/svg-inkscape on CTAN:
+%%   http://tug.ctan.org/tex-archive/info/svg-inkscape
+%%
+\begingroup%
+  \makeatletter%
+  \providecommand\color[2][]{%
+    \errmessage{(Inkscape) Color is used for the text in Inkscape, but the package 'color.sty' is not loaded}%
+    \renewcommand\color[2][]{}%
+  }%
+  \providecommand\transparent[1]{%
+    \errmessage{(Inkscape) Transparency is used (non-zero) for the text in Inkscape, but the package 'transparent.sty' is not loaded}%
+    \renewcommand\transparent[1]{}%
+  }%
+  \providecommand\rotatebox[2]{#2}%
+  \newcommand*\fsize{\dimexpr\f@size pt\relax}%
+  \newcommand*\lineheight[1]{\fontsize{\fsize}{#1\fsize}\selectfont}%
+  \ifx\svgwidth\undefined%
+    \setlength{\unitlength}{345bp}%
+    \ifx\svgscale\undefined%
+      \relax%
+    \else%
+      \setlength{\unitlength}{\unitlength * \real{\svgscale}}%
+    \fi%
+  \else%
+    \setlength{\unitlength}{\svgwidth}%
+  \fi%
+  \global\let\svgwidth\undefined%
+  \global\let\svgscale\undefined%
+  \makeatother%
+  \begin{picture}(1,2.09463471)%
+    \lineheight{1}%
+    \setlength\tabcolsep{0pt}%
+    \put(0,0){\includegraphics[width=\unitlength,page=1]{ticket_sequence_export.pdf}}%
+    \put(0.11010596,1.9140597){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}Customer\end{tabular}}}}%
+    \put(0,0){\includegraphics[width=\unitlength,page=2]{ticket_sequence_export.pdf}}%
+    \put(0.62489909,1.93891761){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}Clup\end{tabular}}}}%
+    \put(0,0){\includegraphics[width=\unitlength,page=3]{ticket_sequence_export.pdf}}%
+    \put(0.1811077,1.80397461){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}\textbf{ref}\end{tabular}}}}%
+    \put(0.37896496,1.7425908){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}Login\end{tabular}}}}%
+    \put(0,0){\includegraphics[width=\unitlength,page=4]{ticket_sequence_export.pdf}}%
+    \put(0.2841626,1.52698639){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}search(shopName)\end{tabular}}}}%
+    \put(0,0){\includegraphics[width=\unitlength,page=5]{ticket_sequence_export.pdf}}%
+    \put(0.24266062,1.42755475){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}showResults(shopName)\end{tabular}}}}%
+    \put(0,0){\includegraphics[width=\unitlength,page=6]{ticket_sequence_export.pdf}}%
+    \put(0.30825351,1.27485607){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}getTicket(shop)\end{tabular}}}}%
+    \put(0,0){\includegraphics[width=\unitlength,page=7]{ticket_sequence_export.pdf}}%
+    \put(0.30032859,1.17542443){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}list(departments)\end{tabular}}}}%
+    \put(0,0){\includegraphics[width=\unitlength,page=8]{ticket_sequence_export.pdf}}%
+    \put(0.27880687,0.98011219){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}select(departments)\end{tabular}}}}%
+    \put(0,0){\includegraphics[width=\unitlength,page=9]{ticket_sequence_export.pdf}}%
+    \put(0.27420211,0.88068048){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}confim(departments)\end{tabular}}}}%
+    \put(0,0){\includegraphics[width=\unitlength,page=10]{ticket_sequence_export.pdf}}%
+    \put(0.36040766,0.72798193){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}submit()\end{tabular}}}}%
+    \put(0,0){\includegraphics[width=\unitlength,page=11]{ticket_sequence_export.pdf}}%
+    \put(0.72219683,0.62855022){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}checkOccupancy()\end{tabular}}}}%
+    \put(0,0){\includegraphics[width=\unitlength,page=12]{ticket_sequence_export.pdf}}%
+    \put(0.33461715,0.38707325){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}send(token)\end{tabular}}}}%
+    \put(0,0){\includegraphics[width=\unitlength,page=13]{ticket_sequence_export.pdf}}%
+    \put(0.27396496,0.19176115){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}fullOccupancy(shop)\end{tabular}}}}%
+    \put(0,0){\includegraphics[width=\unitlength,page=14]{ticket_sequence_export.pdf}}%
+    \put(0.07102262,1.62641807){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}\textbf{loop}\end{tabular}}}}%
+    \put(0,0){\includegraphics[width=\unitlength,page=15]{ticket_sequence_export.pdf}}%
+    \put(0.07102262,1.0795439){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}\textbf{opt}\end{tabular}}}}%
+    \put(0,0){\includegraphics[width=\unitlength,page=16]{ticket_sequence_export.pdf}}%
+    \put(0.07102262,0.48650496){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}\textbf{alt}\end{tabular}}}}%
+    \put(0.19327298,0.48650496){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}\textbf{[shop available]}\end{tabular}}}}%
+    \put(0,0){\includegraphics[width=\unitlength,page=17]{ticket_sequence_export.pdf}}%
+    \put(0.19327298,0.29119273){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}\textbf{[shop queue is full]}\end{tabular}}}}%
+  \end{picture}%
+\endgroup%
