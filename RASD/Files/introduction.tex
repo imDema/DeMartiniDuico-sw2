@@ -18,7 +18,7 @@ The product will also allow store managers to effectively monitor the entrances 
 
 Additionally to the lining up mechanism the application will allow customers to book a visit in the future, which will improve the distribution of customers during the day and the week, since they will be able to choose a less crowded time slot.
 
-CLup will also allow users to choose the approximate time of their visit and the category of items they wish to buy, which allows making more accurate predictions of the waiting times and, by knowing the areas that they will visit, to better utilize the space in the building, while respecting health and safety measures.
+CLup will also allow customers to choose the approximate time of their visit and the category of items they wish to buy, which allows making more accurate predictions of the waiting times and, by knowing the areas that they will visit, to better utilize the space in the building, while respecting health and safety measures.
 
 \subsection{Scope}
 
@@ -32,18 +32,18 @@ Using the "The World and The Machine" model by M. Jackson we can give an overall
 
 \subsubsection{World phenomena}
 \begin{itemize}
-    \item User enters a Shop
-    \item User goes to a department
-    \item User exits a Shop
-    \item User waits for their turn
-    \item User travels to the shop
+    \item Customer enters a Shop
+    \item Customer goes to a department
+    \item Customer exits a Shop
+    \item Customer waits for their turn
+    \item Customer travels to the shop
     \item Social distancing
     \item Store occuapancy
 \end{itemize}
 
 \subsubsection{Machine phenomena}
 \begin{itemize}
-    \item User data storage
+    \item Customer data storage
     \item Ticket queue
     \item Booking data
     \item Department occupancy computation
@@ -53,11 +53,11 @@ Using the "The World and The Machine" model by M. Jackson we can give an overall
 
 \paragraph{Controlled by the World}
 \begin{itemize}
-    \item User Registration and login
+    \item Customer Registration and login
     \item Manager adds a Shop
     \item Manager configures a Shop
-    \item User books a visit
-    \item User gets a ticket
+    \item Customer books a visit
+    \item Customer gets a ticket
     \item Staff checks a token
     \item Staff emits a substitute ticket
     \item Manager checks Shop occupancy
@@ -65,21 +65,19 @@ Using the "The World and The Machine" model by M. Jackson we can give an overall
 
 \paragraph{Controlled by the Machine}
 \begin{itemize}
-    \item System sends a reminder to the User
+    \item System sends a reminder to the Customer
 \end{itemize}
 
 \subsubsection{Goals}
 
 \begin{description}
-    \item [G1] Users shall be able to acquire a ticket which grants them access to the Shop
-    \item [G2]  Users shall be able to book a future visit to the Shop
-    \item [G3]  Users shall be able to enter the Shop at the earliest occasion without waiting in line
-    \item [G4]  Users shall be provided with an estimate of the waiting time for a Shop
-    \item [G5]  Users shall be reminded about considering the time needed to travel to the Shop
-    \item [G6]  Users shall be able to specify the categories of items they intend to buy \todo{Requirement}
-    \item [G7]  Third Parties shall better exploit the departments of the Shop without breaking social distancing measures
-    \item [G8]  Third parties shall be able to monitor the number of visits to the Shop, to ensure compliance with the laws
-    \item [G9] Third parties shall be able to retrieve data about booked visits, including the categories of items requested by each User \todo{Requirement}
+    \item [G1] Customers shall be able to acquire a ticket which grants them access to the Shop
+    \item [G2]  Customers shall be able to book a future visit to the Shop
+    \item [G3]  Customers shall be able to enter the Shop at the earliest occasion without waiting in line
+    \item [G4]  Customers shall be reminded about considering the time needed to travel to the Shop
+    \item [G5]  Third Parties shall better exploit the departments of the Shop without breaking social distancing measures
+    \item [G6]  Third parties shall be able to monitor the number of visits to the Shop, to ensure compliance with the laws
+    \item [G7?] \todo{Third parties shall be able to retrieve data about booked visits, including the categories of items requested by each Customer}
 
 \end{description}
 
@@ -91,9 +89,9 @@ Using the "The World and The Machine" model by M. Jackson we can give an overall
     \item [Booking] A digital proof of reservation for a visit to the Shop in a specific time slot
     \item [Token] Either a ticket or a booking, it's associated with a code which can also be represented as a QR code
     \item [Staff] Company personnel which is responsible of checking entrances
-    {\todo
-        \item \huge TODO
-    }
+          {\todo
+    \item \huge TODO
+          }
 \end{description}
 \subsubsection{Acronyms}
 \begin{description}
@@ -101,44 +99,44 @@ Using the "The World and The Machine" model by M. Jackson we can give an overall
     \item [API] Application Programming Interface
     \item [HTTP] Hypertext Transfer Protocol
     \item [HTML] Hypertext Markup Language
-    {\todo
-        \item \huge TODO
-    }
+          {\todo
+    \item \huge TODO
+          }
 \end{description}
 \subsubsection{Abbreviations}
 \begin{description}
     \item [Third party] A company that wants to use our services.
-    \item [{[Gn]}] n-th goal. 
-    \item [{[Dn]}] n-th domain assumption. 
-    \item [{[Rn]}] n-th functional requirement. 
+    \item [{[Gn]}] n-th goal.
+    \item [{[Dn]}] n-th domain assumption.
+    \item [{[Rn]}] n-th functional requirement.
 \end{description}
 
 \subsection{Revision history}
 
 \todo{
-\begin{description}
-    \item[v. 1.0 - 44/55/666] Initial release
-	\item[v. 1.1 - 44/55/666] Fixed return values in sequence diagrams; removed unnecessary Location class from class diagrams; removed unnecessary intermediate state for SpecificRequest and GroupRequest state diagrams
-	\item[v. 1.2 - 44/55/666] Adjusted User's fields in class diagrams; adjusted target Android API; removed a duplicate line in requirements
-\end{description}
+    \begin{description}
+        \item[v. 1.0 - 44/55/666] Initial release
+        \item[v. 1.1 - 44/55/666] Fixed return values in sequence diagrams; removed unnecessary Location class from class diagrams; removed unnecessary intermediate state for SpecificRequest and GroupRequest state diagrams
+        \item[v. 1.2 - 44/55/666] Adjusted Customer's fields in class diagrams; adjusted target Android API; removed a duplicate line in requirements
+    \end{description}
 }
 \subsection{Reference documents}
 \todo{
-\begin{minipage}{\textwidth}
-    \begin{description}
-        \item [BEEP channel] - Mandatory Project Assignment
-        \item [The world \& the machine] - M. Jackson, P. Zave
-    \end{description}
+    \begin{minipage}{\textwidth}
+        \begin{description}
+            \item [BEEP channel] - Mandatory Project Assignment
+            \item [The world \& the machine] - M. Jackson, P. Zave
+        \end{description}
     \end{minipage}
 }
 \subsection{Document structure}
 This document is structured in four main chapters, that are as follows:
 \begin{enumerate}
-	\item[Section 1] The first chapter serves as an introduction and an overview to the project, describing the main reasons for its development, its goals together with a brief informal description of it.
+    \item[Section 1] The first chapter serves as an introduction and an overview to the project, describing the main reasons for its development, its goals together with a brief informal description of it.
 
-	\item[Section 2] The second chapter serves as a more formal description of the project: it includes class diagrams, state machine diagrams, and it gives details on the shared phenomena and domain models. Class diagrams give a big picture description on how the system should be structured, while state machine diagrams focus on the more relevant entities of the model. Here are also presented all the requirements and domain assumptions the system in project must fulfill and take into considerations, in order to achieve the goals; they are presented each one after the goal it is relevant to.
+    \item[Section 2] The second chapter serves as a more formal description of the project: it includes class diagrams, state machine diagrams, and it gives details on the shared phenomena and domain models. Class diagrams give a big picture description on how the system should be structured, while state machine diagrams focus on the more relevant entities of the model. Here are also presented all the requirements and domain assumptions the system in project must fulfill and take into considerations, in order to achieve the goals; they are presented each one after the goal it is relevant to.
 
-	\item[Section 3] The third chapter presents the specific requirements: use cases and the design constraints the system must satisfy. The use cases are described using natural language, while the constraints are pictured with sequence/activity diagrams. A mockup is also shown as a general idea of how the end product should be, in terms of design and functionalities offered to the end user.
+    \item[Section 3] The third chapter presents the specific requirements: use cases and the design constraints the system must satisfy. The use cases are described using natural language, while the constraints are pictured with sequence/activity diagrams. A mockup is also shown as a general idea of how the end product should be, in terms of design and functionalities offered to the end customer.
 
-	\item[Section 4] The fourth and last chapter is a formal analysis of the model, made through the use of the open source Alloy language and analyzer, including a graphic representation of it obtained from Alloy Tool.
+    \item[Section 4] The fourth and last chapter is a formal analysis of the model, made through the use of the open source Alloy language and analyzer, including a graphic representation of it obtained from Alloy Tool.
 \end{enumerate}

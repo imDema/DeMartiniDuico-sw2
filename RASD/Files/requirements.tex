@@ -1,10 +1,10 @@
 \subsection{External interface Requirements}
 The \emph{CLup} frontend is a web application that can be accessed from web browsers. \todo{On modern smartphones, the App will also be installable as a native webapp.} The following section will give a comprehensive description in terms of hardware, software and communication interfaces.
 
-\subsubsection{User interfaces}
+\subsubsection{Customer interfaces}
 \textbf{Login and Registration}\\
 \label{page:login}
-When first opening the application, Users are presented with a registration page. They are asked to provide only the essential information: an \emph{e-mail address} and a \emph{password}. The interface also shows a small button to switch to the login page, in case the user has already signed in on another device or the session has expired. The page is identical to the one for the Registration, except for the Login button. In this case, the small button gives the Users the ability to switch back to the registration page, which is needed if multiple people share the same device.
+When first opening the application, Customers are presented with a registration page. They are asked to provide only the essential information: an \emph{e-mail address} and a \emph{password}. The interface also shows a small button to switch to the login page, in case the customer has already signed in on another device or the session has expired. The page is identical to the one for the Registration, except for the Login button. In this case, the small button gives the Customers the ability to switch back to the registration page, which is needed if multiple people share the same device.
 % \begin{figure}[h]
 %     \centering
 %     \includegraphics[scale=0.63]{Images/login_register2.png}
@@ -19,7 +19,7 @@ When first opening the application, Users are presented with a registration page
 
 \textbf{Shop selection page}\\
 \label{page:home}
-After login/registration, the app displays a Shop search bar that dynamically updates its results while the Users are typing. After selecting a Shop from the results, the two buttons "Get a Ticket" and "Make a Booking" are enabled, which are linked to the Ticket form and Booking form, respectively.
+After login/registration, the app displays a Shop search bar that dynamically updates its results while the Customers are typing. After selecting a Shop from the results, the two buttons "Get a Ticket" and "Make a Booking" are enabled, which are linked to the Ticket form and Booking form, respectively.
 % \begin{figure}[h]
 %     \centering
 %     \includegraphics[scale=0.63]{Images/login_register2.png}
@@ -28,7 +28,7 @@ After login/registration, the app displays a Shop search bar that dynamically up
 
 \textbf{Ticket form}\\
 \label{page:ticket_form}
-This page prompts Users for an optional choice of categories they want to buy. Users can confirm the Ticket request by pressing the "Submit" button. In both the Ticket form and the Booking form, Users are always given option to reset the app back to the Shop selection page.
+This page prompts Customers for an optional choice of categories they want to buy. Customers can confirm the Ticket request by pressing the "Submit" button. In both the Ticket form and the Booking form, Customers are always given option to reset the app back to the Shop selection page.
 % \begin{figure}[h]
 %     \centering
 %     \includegraphics[scale=0.63]{Images/login_register2.png}
@@ -37,7 +37,7 @@ This page prompts Users for an optional choice of categories they want to buy. U
 
 \textbf{Booking form}\\
 \label{page:booking_form}
-This page is identical to the previous, except for the added time selection. A table with days as columns and hours as rows shows the time slots with lower occupancy. When Users select the preferred day, the visualization updates with specific data for the day, giving an in-depth visualization of restricted to the opening hours. Given this, Users can easily choose a time for their visit. As in the Ticket form, Users can confirm the Booking request by pressing the "Submit" button.
+This page is identical to the previous, except for the added time selection. A table with days as columns and hours as rows shows the time slots with lower occupancy. When Customers select the preferred day, the visualization updates with specific data for the day, giving an in-depth visualization of restricted to the opening hours. Given this, Customers can easily choose a time for their visit. As in the Ticket form, Customers can confirm the Booking request by pressing the "Submit" button.
 % \begin{figure}[h]
 %     \centering
 %     \includegraphics[scale=0.63]{Images/login_register2.png}
@@ -62,16 +62,55 @@ Although not strictly required, the devices used by the staff should have a came
 \subsubsection{Software interfaces}
 \begin{itemize}
     \item \textbf{Web browser}: the applicative requires a web browser capable of rendering HTML5 web pages with Javascript
-    \item \textbf{Maps service}: although not required for the core functionality, having access to a maps service on the device will improve user experience
+    \item \textbf{Maps service}: although not required for the core functionality, having access to a maps service on the device will improve customer experience
 \end{itemize}
 
 \subsubsection{Communication interfaces}
 \begin{itemize}
-    \item \emph{User}: requires a internet connection in order to get a token. Access to the store can be done offline if necessary.
+    \item \emph{Customer}: requires a internet connection in order to get a token. Access to the store can be done offline if necessary.
     \item \emph{Staff}: requires a internet connection in order to communicate with the server and validate tokens or emit substitute tickets.
 \end{itemize}
 The system shall use the HTTPS protocol to provide secure communication from the client to the server.
 \subsection{Functional requirements}
+
+\subsubsection{Goal-Requirement mapping}
+\begin{description}
+    \item [G1] Customers shall be able to acquire a ticket which grants them access to the Shop
+          \subitem R1 The system shall keep track of the list of Customers waiting to visit each Shop
+          \subitem R2 The system shall allow customers to request the right to visit a shop as soon as possible
+          \subitem R3 The system shall give Customers a Token associated with their position in the waiting line
+          \subitem R4 The Staff shall be able to scan Customer generated Tokens using a camera
+          \subitem R5 The Staff shall be able to scan Customer generated Tokens using a textual input
+          \subitem R6 Given a Token, the Staff applicative shall be able to verify its validity
+          \subitem R7 Given a Token, the Staff applicative shall be able to verify the respective position in the waiting line
+          \subitem R8 Given a Token, the Staff applicative shall be able to mark it as used and update the list of Customers currently inside the Shop
+    \item [G2]  Customers shall be able to book a future visit to the Shop
+          \subitem R9 The system shall keep track of the Customers that want to visit a Shop in the future
+          \subitem R10 The system shall allow customers to choose a time in the future in which they wish ti visit a Shop
+          \subitem R11 The system shall give Customers a Token associated with their booking
+          \subitem R4 The Staff shall be able to scan Customer generated Tokens using a camera
+          \subitem R5 The Staff shall be able to scan Customer generated Tokens using a textual input
+          \subitem R6 Given a Token, the Staff applicative shall be able to verify its validity
+          \subitem R7 Given a Token, the Staff applicative shall be able to verify the respective position in the waiting line
+          \subitem R8 Given a Token, the Staff applicative shall be able to mark it as used and update the list of Customers currently inside the Shop
+    \item [G3]  Customers shall be able to enter the Shop at the earliest occasion without waiting in line
+          \subitem R1 The system shall keep track of the list of Customers waiting to visit each Shop
+          \subitem R9 The system shall keep track of the Customers that want to visit a Shop in the future
+          \subitem R12 The system shall ask Customers to specify the approximate duration of their visit
+          \subitem R13 The system shall automatically infer an estimate visit duration for returning customers
+          \subitem R14 The system shall give Customers an estimate of the waiting time remaining before it's their turn
+          \subitem R15 The system shall notify Customers when their turn is about to come
+    \item [G4]  Customers shall be reminded about considering the time needed to travel to the Shop
+          \subitem R14 The system shall give Customers an estimate of the waiting time remaining before it's their turn
+          \subitem R16 The system shall be able to connect to a Maps service to show information about travel time
+    \item [G5]  Third Parties shall better exploit the departments of the Shop without breaking social distancing measures
+          \subitem R17 Customers shall be able to specify the categories of items they intend to buy
+          \subitem R18 The system shall keep track of the number of customes visiting the Shop on a Department basis
+    \item [G6]  Third parties shall be able to monitor the number of visits to the Shop, to ensure compliance with the laws
+          \subitem R17 Customers shall be able to specify the categories of items they intend to buy
+          \subitem R18 The system shall keep track of the number of customes visiting the Shop on a Department basis
+\end{description}
+
 \subsubsection{Scenarios}
 \textbf{Scenario 1}\\
 Maria is gathering ingredients to bake a cake, but she realizes she doesn't have any milk.
@@ -97,7 +136,7 @@ Attilio was never a fan of technology and he does not have a smartphone, unfortu
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.7\textwidth]{Images/usecasediagram-user.pdf}
-    \caption{Use Case Diagram: User}
+    \caption{Use Case Diagram: Customer}
 \end{figure}
 \begin{figure}[H]
     \centering
@@ -108,50 +147,50 @@ Attilio was never a fan of technology and he does not have a smartphone, unfortu
 \begin{table}[H]
     \begin{tabu} to \textwidth {|X|X[4]|}
         \hline
-        Name            & User creates an account   \\ \hline
-        Actor           & User                      \\ \hline
+        Name            & Customer creates an account \\ \hline
+        Actor           & Customer                    \\ \hline
         Entry condition & \begin{itemize}
-            \item The User has not created an account yet
-        \end{itemize} \\ \hline
+            \item The Customer has not created an account yet
+        \end{itemize}   \\ \hline
         Event flow      & \begin{enumerate}
-            \item The User opens the web app
+            \item The Customer opens the web app
             \item The app asks for login or registration
-            \item The User clicks on register
-            \item The User inserts their email and password
-            \item The User clicks on confirm
-            \item The app prompts the User to check their email for a confirmation link
-            \item The User clicks on the confirmation link
-        \end{enumerate} \\ \hline
+            \item The Customer clicks on register
+            \item The Customer inserts their email and password
+            \item The Customer clicks on confirm
+            \item The app prompts the Customer to check their email for a confirmation link
+            \item The Customer clicks on the confirmation link
+        \end{enumerate}   \\ \hline
         Exit condition  & \begin{itemize}
-            \item User account is added to the database
-            \item The User can login
-        \end{itemize} \\ \hline
+            \item Customer account is added to the database
+            \item The Customer can login
+        \end{itemize}   \\ \hline
         Exceptions      & \begin{itemize}
-            \item The User already exists
-            \item The User does not click confirmation link
-        \end{itemize} \\ \hline
+            \item The Customer already exists
+            \item The Customer does not click confirmation link
+        \end{itemize}   \\ \hline
     \end{tabu}
 \end{table}
 
 \begin{table}[H]
     \begin{tabu} to \textwidth {|X|X[4]|}
         \hline
-        Name            & User logs in               \\ \hline
-        Actor           & Registered User            \\ \hline
+        Name            & Customer logs in           \\ \hline
+        Actor           & Registered Customer        \\ \hline
         Entry condition & \begin{itemize}
-            \item The User has an account
-        \end{itemize}  \\ \hline
+            \item The Customer has an account
+        \end{itemize} \\ \hline
         Event flow      & \begin{enumerate}
-            \item The User opens the web app
+            \item The Customer opens the web app
             \item The app asks for login or registration
-            \item The User inserts their email and password
-            \item The User clicks on confirm
-            \item The User receives confirmation from the server
-            \item The User is brought to the home page
+            \item The Customer inserts their email and password
+            \item The Customer clicks on confirm
+            \item The Customer receives confirmation from the server
+            \item The Customer is brought to the home page
         \end{enumerate} \\ \hline
         Exit condition  & \begin{itemize}
-            \item The User is logged in
-            \item The User can use other features
+            \item The Customer is logged in
+            \item The Customer can use other features
         \end{itemize} \\ \hline
         Exceptions      & \begin{itemize}
             \item Wrong credentials
@@ -162,31 +201,31 @@ Attilio was never a fan of technology and he does not have a smartphone, unfortu
 \begin{table}[H]
     \begin{tabu} to \textwidth {|X|X[4]|}
         \hline
-        Name            & User creates a booking     \\ \hline
-        Actor           & User                       \\ \hline
+        Name            & Customer creates a booking \\ \hline
+        Actor           & Customer                   \\ \hline
         Entry condition & \begin{itemize}
-            \item The User has logged in
+            \item The Customer has logged in
         \end{itemize} \\ \hline
         Event flow      & \begin{enumerate}
-            \item The User types all or part of the shop name in the search bar
+            \item The Customer types all or part of the shop name in the search bar
             \item Results are dynamically updated
-            \item The User selects one of the results
-            \item The User clicks on "Make a booking"
-            \item The User is brought to the \emph{Booking form}
-            \item The User chooses a day from the calendar
-            \item The User inputs the desired time of visit
-            \item The User can choose the departments it will visit
-            \item The User clicks submit
-            \item The User receives confirmation from the server and is shown the new booking
+            \item The Customer selects one of the results
+            \item The Customer clicks on "Make a booking"
+            \item The Customer is brought to the \emph{Booking form}
+            \item The Customer chooses a day from the calendar
+            \item The Customer inputs the desired time of visit
+            \item The Customer can choose the departments it will visit
+            \item The Customer clicks submit
+            \item The Customer receives confirmation from the server and is shown the new booking
         \end{enumerate} \\ \hline
         Exit condition  & \begin{itemize}
             \item Booking is added to the database
-            \item The User can now find the new token in his tokens
+            \item The Customer can now find the new token in his tokens
         \end{itemize} \\ \hline
         Exceptions      & \begin{itemize}
             \item Shop does not exist
             \item Shop is already completely booked
-            \item The User tries to book an already full time slot
+            \item The Customer tries to book an already full time slot
         \end{itemize} \\ \hline
     \end{tabu}
 \end{table}
@@ -194,23 +233,23 @@ Attilio was never a fan of technology and he does not have a smartphone, unfortu
 \begin{table}[H]
     \begin{tabu} to \textwidth {|X|X[4]|}
         \hline
-        Name            & User creates a ticket      \\ \hline
-        Actor           & User                       \\ \hline
+        Name            & Customer creates a ticket  \\ \hline
+        Actor           & Customer                   \\ \hline
         Entry condition & \begin{itemize}
-            \item The User has logged in
+            \item The Customer has logged in
         \end{itemize} \\ \hline
         Event flow      & \begin{enumerate}
-            \item The User types all or part of the shop name in the search bar
+            \item The Customer types all or part of the shop name in the search bar
             \item Results are dynamically updated
-            \item The User selects one of the results
-            \item The User clicks on "Get a Ticket"
-            \item The User is brought to the \emph{Get ticket form}
-            \item The User clicks submit
-            \item The User receives confirmation from the server and is shown the new ticket
+            \item The Customer selects one of the results
+            \item The Customer clicks on "Get a Ticket"
+            \item The Customer is brought to the \emph{Get ticket form}
+            \item The Customer clicks submit
+            \item The Customer receives confirmation from the server and is shown the new ticket
         \end{enumerate} \\ \hline
         Exit condition  & \begin{itemize}
             \item Ticket is added to the database
-            \item The User can now find the new token in his tokens
+            \item The Customer can now find the new token in his tokens
         \end{itemize} \\ \hline
         Exceptions      & \begin{itemize}
             \item Shop does not exist
@@ -223,15 +262,15 @@ Attilio was never a fan of technology and he does not have a smartphone, unfortu
 \begin{table}[H]
     \begin{tabu} to \textwidth {|X|X[4]|}
         \hline
-        Name            & User shows a token         \\ \hline
-        Actor           & User                       \\ \hline
+        Name            & Customer shows a token     \\ \hline
+        Actor           & Customer                   \\ \hline
         Entry condition & \begin{itemize}
-            \item The User has logged in
-            \item The User has created at least one token
+            \item The Customer has logged in
+            \item The Customer has created at least one token
         \end{itemize} \\ \hline
         Event flow      & \begin{enumerate}
-            \item The User clicks on \todo{"My Tokens"}
-            \item The User selects one of the tokens in the list
+            \item The Customer clicks on \todo{"My Tokens"}
+            \item The Customer selects one of the tokens in the list
             \item A QR code and associated text code are shown, either of which can be scanned with the staff applicative
         \end{enumerate} \\ \hline
     \end{tabu}
@@ -256,7 +295,7 @@ Attilio was never a fan of technology and he does not have a smartphone, unfortu
         \end{enumerate} \\ \hline
         Exit condition  & \begin{itemize}
             \item The new Shop is added to the database
-            \item Users can find the Shop in hteir search results
+            \item Customers can find the Shop in hteir search results
         \end{itemize} \\ \hline
         Exceptions      & \begin{itemize}
             \item The Shop already exists
@@ -272,14 +311,14 @@ Attilio was never a fan of technology and he does not have a smartphone, unfortu
         Entry condition & \begin{itemize}
             \item The Staff member is Logged in
             \item The Staff member selected one of the shops they have access to
-            \item \todo{A User shows a token in its valid time frame}
+            \item \todo{A Customer shows a token in its valid time frame}
         \end{itemize} \\ \hline
         Event flow      & \begin{enumerate}
             \item The Staff member opens the scan token section
-            \item The Staff member uses the camera of the device to scan the token from an User or inputs the code as text
+            \item The Staff member uses the camera of the device to scan the token from an Customer or inputs the code as text
             \item The token is sent to the server for validation
             \item The Staff member receives positive confirmation from the server
-            \item The User is allowed in
+            \item The Customer is allowed in
         \end{enumerate} \\ \hline
         Exit condition  & \begin{itemize}
             \item The token is marked as used
@@ -299,15 +338,15 @@ Attilio was never a fan of technology and he does not have a smartphone, unfortu
         Entry condition & \begin{itemize}
             \item The Staff member is Logged in
             \item The Staff member selected one of the shops they have access to
-            \item \todo{A User shows a token which is either expired or not yet valid}
+            \item \todo{A Customer shows a token which is either expired or not yet valid}
         \end{itemize}   \\ \hline
         Event flow      & \begin{enumerate}
             \item The Staff member opens the scan token section
-            \item The Staff member uses the camera of the device to scan the token from an User or inputs the code as text
+            \item The Staff member uses the camera of the device to scan the token from an Customer or inputs the code as text
             \item The token is sent to the server for validation
             \item The Staff member receives a negative response from the server
-            \item The User informed that either their ticket is expired or that it's too early
-            \item The User is not allowed in
+            \item The Customer informed that either their ticket is expired or that it's too early
+            \item The Customer is not allowed in
         \end{enumerate}   \\ \hline
         Exit condition  & \begin{itemize}
             \item The token is marked as used
@@ -327,18 +366,18 @@ Attilio was never a fan of technology and he does not have a smartphone, unfortu
         Entry condition & \begin{itemize}
             \item The Staff member is Logged in
             \item The Staff member selected one of the shops they have access to
-            \item A User without the applicative asks for a ticket
+            \item A Customer without the applicative asks for a ticket
         \end{itemize}        \\ \hline
         Event flow      & \begin{enumerate}
             \item The Staff member opens the create substitute ticket section
-            \item The Staff member asks the User and inputs the departments they wish to visit
+            \item The Staff member asks the Customer and inputs the departments they wish to visit
             \item The Staff member clicks on submit
-            \item The Staff member prints the token and hands it to the User
-            \item The Staff member reads the esimated wait time to the User
+            \item The Staff member prints the token and hands it to the Customer
+            \item The Staff member reads the esimated wait time to the Customer
         \end{enumerate}        \\ \hline
         Exit condition  & \begin{itemize}
             \item The substitute ticket is added to the database
-            \item The User can use the token to access the Shop when it's their turn in the queue
+            \item The Customer can use the token to access the Shop when it's their turn in the queue
         \end{itemize}        \\ \hline
         Exceptions      & \begin{itemize}
             \item The queue is full
@@ -375,7 +414,7 @@ Attilio was never a fan of technology and he does not have a smartphone, unfortu
 \subsection{Performance Requirements}
 \begin{itemize}
     \item Validating a token must be done as soon as possible and in no more than 5 seconds from when the token was acquired by the staff. This is required to achieve sufficient throughput and prevent queues from forming at the entrance.
-    \item When obtaining a token the user shall receive a response from the server within 15 seconds, since in this case time is not critical.
+    \item When obtaining a token the customer shall receive a response from the server within 15 seconds, since in this case time is not critical.
     \item Tokens shall be added to the system as soon as possible within 30 seconds.
 \end{itemize}
 \subsection{Design constraints}
@@ -389,13 +428,13 @@ To allow the validation of tickets by the Third Party Staff, the device should a
 
 \subsection{Software System Attributes}
 \subsubsection{Reliability}
-\textit{CLup} should be available 24/7 in order to allow Users to generate Tokens at any time of the day. Downtime due to maintenance shall be during the night and no longer than 2 hours, furthermore, users and third parties shall be notified at least 3 days prior the scheduled downtime.
+\textit{CLup} should be available 24/7 in order to allow Customers to generate Tokens at any time of the day. Downtime due to maintenance shall be during the night and no longer than 2 hours, furthermore, customers and third parties shall be notified at least 3 days prior the scheduled downtime.
 \subsubsection{Availability}
 \emph{CLup} does not have a critical nature, however any downtime could cause serious problems to the management of the entrances to Shops. Hence, 99\% availability during daytime is required for \emph{CLup} to be effective. At night time, the availability requirement can be relaxed to 95\%.
 \subsubsection{Security}
 All communication should be over HTTPS protocol to provide privacy, data integrity and authentication.
-User passwords shall be stored in a salted hash format.
-The system should keep thorough logs of the activity of logged in users and of login attempts. The registration and login procedure should not disclose informations about existing users and repeated login attempts shall be limited.
+Customer passwords shall be stored in a salted hash format.
+The system should keep thorough logs of the activity of logged in customers and of login attempts. The registration and login procedure should not disclose informations about existing customers and repeated login attempts shall be limited.
 Further details about the cryptographic functions and protocols employed will be discussed in the Design Document.
 \subsubsection{Maintainability}
 The system components shall be realized with high modularity and orthogonality between modules. This allows modifications to the code to be localized and leave the other components unaffected, minimizing the time required to fix problems with the system.

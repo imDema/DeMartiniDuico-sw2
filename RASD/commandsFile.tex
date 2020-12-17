@@ -4,14 +4,14 @@
 
 %Page margins, header and footer positions
 \usepackage{geometry}
- \geometry{
- a4paper,
- total={210mm,297mm},
- left=25mm,
- right=25mm,
- top=30mm,
- bottom=25mm,
- headsep=7mm}
+\geometry{
+    a4paper,
+    total={210mm,297mm},
+    left=25mm,
+    right=25mm,
+    top=30mm,
+    bottom=25mm,
+    headsep=7mm}
 
 \interfootnotelinepenalty=10000
 
@@ -88,19 +88,19 @@
         \if@twoside%
             \ifodd\c@page%
                 \gdef\LS@rot{\setbox\@outputbox\vbox{%
-                    \pdf@landscape@rotate{-90}%
-                    \hbox{\rotatebox{90}{\hbox{\rotatebox{180}{\box\@outputbox}}}}}%
+                        \pdf@landscape@rotate{-90}%
+                        \hbox{\rotatebox{90}{\hbox{\rotatebox{180}{\box\@outputbox}}}}}%
                 }%
             \else%
                 \gdef\LS@rot{\setbox\@outputbox\vbox{%
-                    \pdf@landscape@rotate{+90}%
-                    \hbox{\rotatebox{90}{\hbox{\rotatebox{0}{\box\@outputbox}}}}}%
+                        \pdf@landscape@rotate{+90}%
+                        \hbox{\rotatebox{90}{\hbox{\rotatebox{0}{\box\@outputbox}}}}}%
                 }%
             \fi%
         \else%
             \gdef\LS@rot{\setbox\@outputbox\vbox{%
-                \pdf@landscape@rotate{+90}%
-                \hbox{\rotatebox{90}{\hbox{\rotatebox{0}{\box\@outputbox}}}}}%
+                    \pdf@landscape@rotate{+90}%
+                    \hbox{\rotatebox{90}{\hbox{\rotatebox{0}{\box\@outputbox}}}}}%
             }%
         \fi%
     \fi%
