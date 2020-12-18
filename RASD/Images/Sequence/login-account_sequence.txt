@@ -1,4 +1,4 @@
-actor "Registered Customer" as User
+actor "Customer" as User
 participant Clup
 participant User
 User->Clup: openApp()

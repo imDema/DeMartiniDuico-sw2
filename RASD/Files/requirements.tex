@@ -404,13 +404,53 @@ Attilio was never a fan of technology and he does not have a smartphone, unfortu
 \end{table}
 
 \subsubsection{Sequence diagrams}
-%% TODO: ADD THE .pdf_tex's
+\begin{figure}[H]
+    \centering
+    \includegraphics[scale=0.9]{Images/Sequence/create-account_sequence_straight.pdf}
+    \caption{Sequence Diagram for the registration of a Customer}
+\end{figure}
+\begin{figure}[H]
+    \centering
+    \includegraphics[scale=0.9]{Images/Sequence/login-account_sequence_straight.pdf}
+    \caption{Sequence Diagram for a successful login attempt}
+\end{figure}
+\begin{figure}[H]
+    \centering
+    \includegraphics[scale=0.9]{Images/Sequence/failedlogin-account_sequence_straight.pdf}
+    \caption{Sequence Diagram for a failed login attempt}
+\end{figure}
+\begin{figure}[H]
+    \centering
+    \includegraphics[scale=0.9]{Images/Sequence/booking-loop_sequence_straight.pdf}
+    \caption{Sequence Diagram for the creation of a Booking}
+\end{figure}
+\begin{figure}[H]
+    \centering
+    \includegraphics[scale=0.9]{Images/Sequence/ticket_sequence_straight.pdf}
+    \caption{Sequence Diagram for the creation of a Ticket}
+\end{figure}
+\begin{figure}[H]
+    \centering
+    \includegraphics[scale=0.9]{Images/Sequence/add-shop_sequence_straight.pdf}
+    \caption{Sequence Diagram for the creation of a Shop}
+\end{figure}
+\begin{figure}[H]
+    \centering
+    \includegraphics[scale=0.9]{Images/Sequence/scan-token_sequence_straight.pdf}
+    \caption{Sequence Diagram for the scan of a valid Token}
+\end{figure}
+\begin{figure}[H]
+    \centering
+    \includegraphics[scale=0.9]{Images/Sequence/failedscan-token_sequence_straight.pdf}
+    \caption{Sequence Diagram for the scan of an invalid Token}
+\end{figure}
+\begin{figure}[H]
+    \centering
+    \includegraphics[scale=0.9]{Images/Sequence/substitute-ticket_sequence_straight.pdf}
+    \caption{Sequence Diagram for the generation of a Substitute Token}
+\end{figure}
 
-% \begin{figure}[htbp]
-%     \centering
-%     \input{Images/scan-token_sequence_export.pdf_tex}
-%     \caption{Sequence Diagram of the registration of a Customer}
-% \end{figure}
+
 \subsection{Performance Requirements}
 \begin{itemize}
     \item Validating a token must be done as soon as possible and in no more than 5 seconds from when the token was acquired by the staff. This is required to achieve sufficient throughput and prevent queues from forming at the entrance.
