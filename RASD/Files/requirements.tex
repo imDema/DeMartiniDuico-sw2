@@ -5,11 +5,11 @@ The \emph{CLup} frontend is a web application that can be accessed from web brow
 \textbf{Login and Registration}\\
 \label{page:login}
 When first opening the application, Customers are presented with a registration page. They are asked to provide only the essential information: an \emph{e-mail address} and a \emph{password}. The interface also shows a small button to switch to the login page, in case the customer has already signed in on another device or the session has expired. The page is identical to the one for the Registration, except for the Login button. In this case, the small button gives the Customers the ability to switch back to the registration page, which is needed if multiple people share the same device.
-% \begin{figure}[h]
-%     \centering
-%     \includegraphics[scale=0.63]{Images/login_register2.png}
-%     \caption{Registration interface}
-% \end{figure}
+\begin{figure}[H]
+    \centering
+    \includegraphics[scale=0.25]{Images/registration_mockup.png}
+    \caption{Registration interface}
+\end{figure}
 
 % \begin{figure}[h]
 %     \centering
@@ -20,39 +20,44 @@ When first opening the application, Customers are presented with a registration 
 \textbf{Shop selection page}\\
 \label{page:home}
 After login/registration, the app displays a Shop search bar that dynamically updates its results while the Customers are typing. After selecting a Shop from the results, the two buttons "Get a Ticket" and "Make a Booking" are enabled, which are linked to the Ticket form and Booking form, respectively.
-% \begin{figure}[h]
-%     \centering
-%     \includegraphics[scale=0.63]{Images/login_register2.png}
-%     \caption{Shop search interface}
-% \end{figure}
+\begin{figure}[H]
+    \centering
+    \includegraphics[scale=0.25]{Images/home-mockup.png}
+    \caption{Shop selection interface}
+\end{figure}
+\begin{figure}[H]
+    \centering
+    \includegraphics[scale=1]{Images/search-mockup.png}
+    \caption{Dynamic search in the shop selection interface}
+\end{figure}
 
 \textbf{Ticket form}\\
 \label{page:ticket_form}
 This page prompts Customers for an optional choice of categories they want to buy. Customers can confirm the Ticket request by pressing the "Submit" button. In both the Ticket form and the Booking form, Customers are always given option to reset the app back to the Shop selection page.
-% \begin{figure}[h]
-%     \centering
-%     \includegraphics[scale=0.63]{Images/login_register2.png}
-%     \caption{Ticket form}
-% \end{figure}
+\begin{figure}[H]
+    \centering
+    \includegraphics[scale=0.25]{Images/ticket-mockup.png}
+    \caption{Ticket interface}
+\end{figure}
 
 \textbf{Booking form}\\
 \label{page:booking_form}
 This page is identical to the previous, except for the added time selection. A table with days as columns and hours as rows shows the time slots with lower occupancy. When Customers select the preferred day, the visualization updates with specific data for the day, giving an in-depth visualization of restricted to the opening hours. Given this, Customers can easily choose a time for their visit. As in the Ticket form, Customers can confirm the Booking request by pressing the "Submit" button.
-% \begin{figure}[h]
-%     \centering
-%     \includegraphics[scale=0.63]{Images/login_register2.png}
-%     \caption{Booking form}
-% \end{figure}
+\begin{figure}[H]
+    \centering
+    \includegraphics[scale=0.25]{Images/booking-mockup.png}
+    \caption{Booking interface}
+\end{figure}
 
 \textbf{Token display}\\
 \label{page:token_show}
 After generating a Ticket or a Booking, and until its expiration, the app will display the token as a fullscreen QR code right after opening, or after Login (if the login timeout has passed).
 This makes it very quick to have the Token scanned by the clerks outside of a shop.
-% \begin{figure}[h]
-%     \centering
-%     \includegraphics[scale=0.63]{Images/login_register2.png}
-%     \caption{Token display}
-% \end{figure}
+\begin{figure}[H]
+    \centering
+    \includegraphics[scale=0.25]{Images/token-mockup.png}
+    \caption{Token display interface}
+\end{figure}
 
 \subsubsection{Hardware interfaces}
 The \emph{CLup} client shall be available for devices capable of rendering a web page with javascript and internet access, this includes smartphones, tablets and personal computers.
@@ -455,7 +460,6 @@ Attilio was never a fan of technology and he does not have a smartphone, unfortu
     \includegraphics[scale=0.9]{Images/Sequence/substitute-ticket_sequence_straight.pdf}
     \caption{Sequence Diagram for the generation of a Substitute Token}
 \end{figure}
-
 
 \subsection{Performance Requirements}
 \begin{itemize}
