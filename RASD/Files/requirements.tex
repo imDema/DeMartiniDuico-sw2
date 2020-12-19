@@ -21,14 +21,16 @@ When first opening the application, Customers are presented with a registration 
 \label{page:home}
 After login/registration, the app displays a Shop search bar that dynamically updates its results while the Customers are typing. After selecting a Shop from the results, the two buttons "Get a Ticket" and "Make a Booking" are enabled, which are linked to the Ticket form and Booking form, respectively.
 \begin{figure}[H]
-    \centering
-    \includegraphics[scale=0.25]{Images/home-mockup.png}
-    \caption{Shop selection interface}
-\end{figure}
-\begin{figure}[H]
-    \centering
-    \includegraphics[scale=1]{Images/search-mockup.png}
-    \caption{Dynamic search in the shop selection interface}
+    \begin{subfigure}{0.5\textwidth}
+        \centering
+        \includegraphics[width=0.75\textwidth]{Images/home-mockup.png}
+        \caption{Shop selection interface}
+    \end{subfigure}%
+    \begin{subfigure}{0.5\textwidth}
+        \centering
+        \includegraphics[width=0.75\textwidth]{Images/search-mockup.png}
+        \caption{Dynamic search in the shop selection interface}
+    \end{subfigure}
 \end{figure}
 
 \textbf{Ticket form}\\
@@ -54,10 +56,18 @@ This page is identical to the previous, except for the added time selection. A t
 After generating a Ticket or a Booking, and until its expiration, the app will display the token as a fullscreen QR code right after opening, or after Login (if the login timeout has passed).
 This makes it very quick to have the Token scanned by the clerks outside of a shop.
 \begin{figure}[H]
-    \centering
-    \includegraphics[scale=0.25]{Images/token-mockup.png}
-    \caption{Token display interface}
+    \begin{subfigure}{0.5\textwidth}
+        \centering
+        \includegraphics[width=0.75\textwidth]{Images/queue-mockup.png}
+        \caption{My Tokens interface}
+    \end{subfigure}%
+    \begin{subfigure}{0.5\textwidth}
+        \centering
+        \includegraphics[width=0.75\textwidth]{Images/token-mockup.png}
+        \caption{Show token interface}
+    \end{subfigure}
 \end{figure}
+
 
 \subsubsection{Hardware interfaces}
 The \emph{CLup} client shall be available for devices capable of rendering a web page with javascript and internet access, this includes smartphones, tablets and personal computers.
