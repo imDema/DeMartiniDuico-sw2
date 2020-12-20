@@ -39,13 +39,13 @@ The configuration of Shop is handled by the Third Party, which is able to set th
 \paragraph{Basic Customer functions} These functions are available to all Customers:
 \begin{itemize}
     \item \textbf{Registration and Login}\\
-          \emph{CLup} must be able to recognize Customers between requests, to display correct information and as means of authentication. Therefore, Customers should be able to create a personal account through the App. After creating an account, Customers should login to access the functions described in the following paragraphs;
+          Customers should be able to create a personal account for the App. By logging in with their account, Customers can access the other functions. For ease of use the app should allow users to stay logged in, this way the service can be accessed without inserting the login credentials every time.
     \item \textbf{Obtaining a Ticket}\\
-          \emph{CLup} has a waiting list of the customers who are currently waiting to enter the Shop. Registered Customers are able to join the list via the App, thus obtaining an estimate of the waiting time. This operation is certified by a Ticket. Notifications can be sent to the Customers' devices to remind them when it is their turn to enter the Store;
+          \emph{CLup} has a waiting list of the customers who are currently waiting to enter the Shop. Registered Customers can request to join the list via the App, if the queue is not full for the day they will be given a ticket. The ticket is associated with a \emph{unique} Token that can be shown to the staff. Customers are granted access to the shop by showing the token to the staff when it's their turn. Notifications can be sent to the Customers' devices to remind them when it is their turn to enter the Store.
     \item \textbf{Booking a visit}\\
-          \emph{CLup} allows Customers to book a visit to the Shop for a specific date in the future, via the App. This operation is finalized by the emission of a Booking. This data is used to determine whether the next bookings should be accepted, in order to prevent congestion in the Shop;
+          \emph{CLup} keeps a table of booked visits to the Shop. Registered Customers can book a visit for a specified time and date via the App if the time slot is not full. A successful booking is associated with a \emph{unique} Token that can be shown to the staff. Customers are granted access to the shop by showing the token to the staff in the time slot they bookid. Notifications can be sent to the Customers' devices to remind them about upcoming bookings.
     \item \textbf{Specifying item categories}\\
-          Furthermore, Customers can specify categories of products they intend to buy, when obtaining both a Ticket and a Booking.This makes possible to better optimize the capacity of the departments of the Shop.
+          When booking a visit or getting a ticket, Customers can specify categories of products they intend to buy. This data can be used to better optimize the occupancy of the departments of the Shop.
 \end{itemize}
 
 \paragraph{Third Parties base functions}
