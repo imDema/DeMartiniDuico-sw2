@@ -23,6 +23,14 @@ sig TicketListNode {
 	ticket: disj Ticket,
 	next: lone TicketListNode,
 }
+fact ticketListNodeSameShop{
+	all t: TicketListNode | 
+		t.next != none => t.ticket.shop = t.next.ticket.shop 
+}
+fact ticketListNodeNoCycles{
+	all t : TicketListNode | 
+		t not in t.^next
+}
 fun lastNode[node: TicketListNode]: TicketListNode {
 	node.next = none
 		implies node
