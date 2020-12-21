@@ -20,7 +20,6 @@ fact departmentsOfShop {
 
 
 
-
 sig Customer{
 	tokens: disj Token lone -> lone Time,
 	visiting: Visit -> Time,
@@ -41,16 +40,18 @@ sig Manager extends Staff{
 
 abstract sig Token{
 	//isRegistered:
-	spot: Time,
-	visit: one Visit,
+	associatedVisit: one Visit,
 }
-
+fact visitHasDepartmentsOfOneAndOnlyShop{
+	all tok: Token | 
+		all d1,d2 : Department | d1+d1 in tok.associatedVisit.departments => some s : Shop | d1 in s.departments and d2 in s.departments
+}
 fact tokenVisitNotEmpty {
-	all tok: Token | tok.visit.departments != none
+	all tok: Token | tok.associatedVisit.departments != none
 }
-//sig Booking {
-//	token: Token one -> one Time,
-//}
+sig Booking extends Token{
+	timeSlot: one Time,
+}
 sig Ticket extends Token{
 	
 }
@@ -69,11 +70,17 @@ fact tokenOwnership {
 
 
 
+
 pred enter[c: Customer, v: Visit, t, t': Time] {
-	some tok: Token | {
-		tok in c.tokens.t
-		tok.spot = t'
-		tok.visit = v
+	some b: Booking | {
+		b in c.tokens.t
+		b.timeSlot = t'
+		b.associatedVisit = v
+	}
+	or
+	some tick: Ticket |{
+		//ticket rules
+		tick != none
 	}
 	all d: v.departments | departmentOccupancy[d, t'] =< d.maxVisitors
 	c.visiting.t = none
@@ -112,4 +119,4 @@ assert checkOccupancy{
 	}
 }
 // check checkOccupancy
-run{} for 5 but exactly 6 Token, exactly 2 Department, exactly 4 Visit
+run{} for 5 but exactly 6 Token, exactly 2 Department
