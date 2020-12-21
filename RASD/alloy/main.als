@@ -1,4 +1,5 @@
 open util/ordering[Time]
+
 sig Time {}
 
 sig Department{
@@ -12,16 +13,30 @@ fact positiveMaxVisitors{
 }
 sig Shop{
 	departments: disj some Department,
-	waitingVisitors: set Customer,
+	queue: disj TicketListNode -> Time,
 }
 fact departmentsOfShop {
 	all d: Department | some s: Shop | d in s.departments
+
+}
+sig TicketListNode {
+	ticket: disj Ticket,
+	next: lone TicketListNode,
+}
+fun lastNode[node: TicketListNode]: TicketListNode {
+	node.next = none
+		implies node
+		else lastNode[node.next]
+}
+pred pop[h, h': TicketListNode, t: Ticket] {
+	h' = h.next
+	t = h.ticket
 }
 
 
 
 sig Customer{
-	tokens: disj Token lone -> lone Time,
+	tokens: disj set Token,
 	visiting: Visit -> Time,
 }
 sig RegisteredCustomer extends Customer{
@@ -39,12 +54,11 @@ sig Manager extends Staff{
 
 
 abstract sig Token{
-	//isRegistered:
 	associatedVisit: one Visit,
+	shop: Shop
 }
-fact visitHasDepartmentsOfOneAndOnlyShop{
-	all tok: Token | 
-		all d1,d2 : Department | d1+d1 in tok.associatedVisit.departments => some s : Shop | d1 in s.departments and d2 in s.departments
+fact tokenVisitDepartmentAreOfShop {
+	all tok: Token | tok.associatedVisit.departments in tok.shop.departments
 }
 fact tokenVisitNotEmpty {
 	all tok: Token | tok.associatedVisit.departments != none
@@ -59,28 +73,21 @@ sig Ticket extends Token{
 fact tokenOwnership {
 	// Exists owner
 	all tok: Token | 
-		some c: Customer | tok in c.tokens.Time
-	
-	// Unique owner
-	all disj c1, c2: Customer |
-			c1.tokens.Time & c2.tokens.Time = none
+		some c: Customer | tok in c.tokens
 }
-
-
-
-
 
 
 pred enter[c: Customer, v: Visit, t, t': Time] {
 	some b: Booking | {
-		b in c.tokens.t
+		b in c.tokens
 		b.timeSlot = t'
 		b.associatedVisit = v
 	}
 	or
 	some tick: Ticket |{
-		//ticket rules
-		tick != none
+		tick in c.tokens
+		tick.associatedVisit = v
+		pop[tick.shop.queue.t, tick.shop.queue.t',tick]
 	}
 	all d: v.departments | departmentOccupancy[d, t'] =< d.maxVisitors
 	c.visiting.t = none
@@ -119,4 +126,4 @@ assert checkOccupancy{
 	}
 }
 // check checkOccupancy
-run{} for 5 but exactly 6 Token, exactly 2 Department
+run{} for 5 but exactly 6 Token, exactly 3 Customer, exactly 3 Ticket, exactly 2 Department
