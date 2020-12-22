@@ -1,7 +1,7 @@
 \subsection{Introduction}
-In this chapter we present a formal analysis of the application. Only the interaction with the Customers is modeled, since it is the most crucial part of the system, while the operation of the Staff is relatively simple. Having considered that most of the problems with the usage of Tokens could arise with particular sequences of events, the Alloy model was designed to be dynamic with respect to time. 
-To achieve this, various minor semplifications had to be introduced: all of the Tokens are assigned from the beginning; the Shop has no closing time and the queue has stricter constraints, that make it less complicated. In practical use, the throughput could be increased by relaxing these constraints. 
-The Alloy model is used to check for the following properties:
+This chapter presents a formal analysis of the application. Since the application domain is time dependent at its core, we decided to model the evolution of the system over time, with focus on the entrances to the Shops. The model focuses on Customers, Tickets and Bookings: the Staff can be seen as an intermediary and moderator between the Costumers and the Applicative, therefore, by assuming that the Staff will follow the rules, we can simplify the model for clarity and ease of comprehension.
+The scenario being analyzed starts from a state in which Customers already have acquired the tokens and anter the Shops. The queue uses strict constraints, by allowing only the first in queue to enter the Shop. In practice, the constraint can be relaxed to increase throughput if needed. 
+In particular, the model checks the following properties:
 \begin{itemize}
     \item No department in a Shop exceeds its occupancy limits
     \item Customers cannot enter a Shop without a valid Token
@@ -11,10 +11,14 @@ The Alloy model is used to check for the following properties:
 \end{itemize}
 \subsection{Alloy code}
 \subsubsection{Model description}
+The first section describes the signatures of the objects which are relevant for the formal analysis and their representation invariants.
 \lstinputlisting[language=alloy,firstline=1,lastline=68]{alloy/main.als}
 \subsubsection{Dynamic properties}
+This section describes the rules that guarantee the correct evolution of the system over time. In particular, the \texttt{Trace} fact rules the transition from an instant to the next for Customers and for the Waiting List. 
 \lstinputlisting[language=alloy,firstline=72,lastline=127]{alloy/main.als}
 \subsubsection{Assertions}
-\lstinputlisting[language=alloy,firstline=131,lastline=254]{alloy/main.als}
+This section lists some of the property that will be guaranteed \emph{if} the invariants described in the previous sections hold. The The result of the evaluation of these assertions will be presented in the next section.
+\lstinputlisting[language=alloy,firstline=131,lastline=211]{alloy/main.als}
 \subsubsection{Execution results}
-\lstinputlisting[language=alloy,firstline=256]{alloy/main.als}
+This section shows the experimental result of the formal analysis 
+\lstinputlisting[language=alloy,firstline=224]{alloy/main.als}
