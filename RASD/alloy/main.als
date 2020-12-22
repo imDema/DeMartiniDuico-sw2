@@ -128,19 +128,12 @@ fact Trace {
 
 // ASSERTIONS
 
-assert allAssertions {
-	checkOccupancy
-	cannotEnterWithoutToken
-	cannotEnterAtDifferentTimeWithBooking
-	cannotSkipQueue
-}
-
-pred checkOccupancy{
+assert checkOccupancy{
 	all t: Time, d: Department | {
 		departmentOccupancy[d, t] =< d.maxVisitors
 	}
 }
-pred cannotEnterWithoutToken {
+assert cannotEnterWithoutToken {
 	no c: Customer | {
 		some t: Time | { 
 			c.visiting.t != none
@@ -148,7 +141,7 @@ pred cannotEnterWithoutToken {
 		}
 	}
 }
-pred cannotEnterAtDifferentTimeWithBooking {
+assert cannotEnterAtDifferentTimeWithBooking {
 	no c: Customer, v: Visit, t: Time | {
 		// Customer has no tickets
 		c.tokens & Ticket = none
@@ -164,7 +157,7 @@ pred cannotEnterAtDifferentTimeWithBooking {
 		}
 	}
 }
-pred cannotSkipQueue {
+assert cannotSkipQueue {
 	no c: Customer, v: Visit, t: Time | {
 		// Customer has no booking
 		c.tokens & Booking = none
@@ -176,9 +169,44 @@ pred cannotSkipQueue {
 		no tick: Ticket | {
 			tick in c.tokens
 			tick.associatedVisit = v
-			tick in tick.shop.queue.(prevs[t] + t).ticket // Ticket was in queue
-			tick not in tick.shop.queue.(nexts[t]).ticket // Ticket was used
+			tick in tick.shop.queue.t.ticket // Ticket was first in queue at t
 		}
+	}
+}
+assert cannotReuseTicket {
+	no c: Customer, v: Visit, tick: Ticket | {
+
+		// Tick is the only token valid for this visit
+		tick.associatedVisit = v 
+		v not in (c.tokens - tick).associatedVisit
+
+		some t1,t2,t3: Time | {
+			lt[t1,t2]
+			lt[t2,t3]
+			c.visiting.t1 = v
+			c.visiting.t2 != v
+			c.visiting.t3 = v
+		}
+	}
+}
+assert cannotVisitMultipleAtSameTime {
+	no c: Customer, v1,v2: Visit, t: Time {
+		v1 != v2
+		c.visiting.t = v1
+		c.visiting.t = v2
+	}
+}
+assert ticketsGetUsed {
+	no c: Customer, v: Visit, tick: Ticket, t: Time - last | {
+		// Customer has no booking
+		c.tokens & Booking = none
+
+		tick.associatedVisit = v
+		c.visiting.t != v
+		c.visiting.(t.next) = v
+
+		tick.shop.queue.t.ticket = tick
+		tick in tick.shop.queue.(nexts[t]).ticket
 	}
 }
 
@@ -214,17 +242,28 @@ pred enterExitTicketBooking {
 		}
 	}
 }
-pred show {
-	#Shop = 2
-	#Department = 3
-	#Ticket = 3
-	#Booking = 3
-	#Customer = 4
-	#Visit = 4
+pred visitDifferentShops {
+	some c: Customer, s1,s2: Shop, t1, t2: Time {
+		t1 != t2
+		s1 != s2
+		c.visiting.t1 != none
+		c.visiting.t2 != none
+		c.visiting.t1.departments in s1.departments
+		c.visiting.t2.departments in s2.departments
+	}
 }
-check allAssertions for 3 but exactly 10 Time
 
-run show for 6
-run {enterAndExit} for 8 but exactly 5 Customer, exactly 6 Token, exactly 3 Booking, exactly 3 Department, exactly 2 Shop, exactly 4 Visit
+check checkOccupancy for 5
+check cannotEnterWithoutToken for 5
+check cannotEnterAtDifferentTimeWithBooking for 5
+check cannotSkipQueue for 5
+check cannotReuseTicket for 5
+check ticketsGetUsed for 5
+check cannotVisitMultipleAtSameTime for 5
 
-run {enterExitTicketBooking} for 8 but exactly 5 Customer, exactly 6 Token, exactly 3 Booking, exactly 3 Department, exactly 2 Shop, exactly 4 Visit
+
+run {} for 6 but exactly 2 Shop, exactly 3 Department, exactly 3 Ticket, exactly 3 Booking, exactly 4 Customer, exactly 4 Visit
+run visitDifferentShops for 5
+run enterAndExit for 8 but exactly 5 Customer, exactly 6 Token, exactly 3 Booking, exactly 3 Department, exactly 2 Shop, exactly 4 Visit
+
+run enterExitTicketBooking for 8 but exactly 5 Customer, exactly 6 Token, exactly 3 Booking, exactly 3 Department, exactly 2 Shop, exactly 4 Visit
