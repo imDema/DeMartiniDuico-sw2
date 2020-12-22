@@ -1,1 +1,20 @@
-Organize this section according to the rules defined in the project description. 
+\subsection{Introduction}
+In this chapter we present a formal analysis of the application. Only the interaction with the Customers is modeled, since it is the most crucial part of the system, while the operation of the Staff is relatively simple. Having considered that most of the problems with the usage of Tokens could arise with particular sequences of events, the Alloy model was designed to be dynamic with respect to time. 
+To achieve this, various minor semplifications had to be introduced: all of the Tokens are assigned from the beginning; the Shop has no closing time and the queue has stricter constraints, that make it less complicated. In practical use, the throughput could be increased by relaxing these constraints. 
+The Alloy model is used to check for the following properties:
+\begin{itemize}
+    \item No department in a Shop exceeds its occupancy limits
+    \item Customers cannot enter a Shop without a valid Token
+    \item Customers can use a Booking to enter a Shop only at the time specified
+    \item Customers cannot cut the waiting line for a Shop
+    \item The same Token cannot be used for multiple visits
+\end{itemize}
+\subsection{Alloy code}
+\subsubsection{Model description}
+\lstinputlisting[language=alloy,firstline=1,lastline=68]{alloy/main.als}
+\subsubsection{Dynamic properties}
+\lstinputlisting[language=alloy,firstline=72,lastline=127]{alloy/main.als}
+\subsubsection{Assertions}
+\lstinputlisting[language=alloy,firstline=131,lastline=254]{alloy/main.als}
+\subsubsection{Execution results}
+\lstinputlisting[language=alloy,firstline=256]{alloy/main.als}

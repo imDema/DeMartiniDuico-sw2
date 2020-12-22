@@ -25,7 +25,7 @@ sig Visit {
 	departments: some Department
 }
 fact uniqueVisits {
-	all v, v': Visit | v != v' => v.departments != v'.departments
+	all v, v': Visit | v != v' implies v.departments != v'.departments
 }
 
 sig WaitingListNode {
@@ -34,7 +34,7 @@ sig WaitingListNode {
 }
 fact waitingListNodeSameShop{
 	all t: WaitingListNode | 
-		t.next != none => t.ticket.shop = t.next.ticket.shop 
+		t.next != none implies t.ticket.shop = t.next.ticket.shop 
 }
 fact waitingListNodeNoCycles{
 	all t : WaitingListNode | 
