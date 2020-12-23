@@ -1,5 +1,5 @@
 \subsection{External interface Requirements}
-The \emph{CLup} frontend is a web application that can be accessed from web browsers. \todo{On modern smartphones, the App will also be installable as a native webapp.} The following section will give a comprehensive description in terms of hardware, software and communication interfaces.
+The \emph{CLup} frontend is a web application that can be accessed from web browsers, both from mobile and desktop devices. The following section will give a comprehensive description in terms of hardware, software and communication interfaces.
 
 \subsubsection{Customer interfaces}
 \textbf{Login and Registration}\\
@@ -16,7 +16,7 @@ When first opening the application, Customers are presented with a registration 
 %     \includegraphics[scale=0.63]{Images/login_register2.png}
 %     \caption{Login interface}
 % \end{figure}
-
+\pagebreak
 \textbf{Shop selection page}\\
 \label{page:home}
 After login/registration, the app displays a Shop search bar that dynamically updates its results while the Customers are typing. After selecting a Shop from the results, the two buttons "Get a Ticket" and "Make a Booking" are enabled, which are linked to the Ticket form and Booking form, respectively.
@@ -32,16 +32,17 @@ After login/registration, the app displays a Shop search bar that dynamically up
         \caption{Dynamic search in the shop selection interface}
     \end{subfigure}
 \end{figure}
-
+\pagebreak
 \textbf{Ticket form}\\
 \label{page:ticket_form}
-This page prompts Customers for an optional choice of categories they want to buy. Customers can confirm the Ticket request by pressing the "Submit" button. In both the Ticket form and the Booking form, Customers are always given option to reset the app back to the Shop selection page.
+This page prompts Customers for an optional choice of categories they want to buy. Customers can confirm the Ticket request by pressing the \emph{"Submit"} button. In both the Ticket form and the Booking form, Customers are always given option to reset the app back to the Shop selection page.
 \begin{figure}[H]
     \centering
     \includegraphics[scale=0.25]{Images/ticket-mockup.png}
     \caption{Ticket interface}
 \end{figure}
 
+\pagebreak
 \textbf{Booking form}\\
 \label{page:booking_form}
 This page is identical to the previous, except for the added time selection. A table with days as columns and hours as rows shows the time slots with lower occupancy. When Customers select the preferred day, the visualization updates with specific data for the day, giving an in-depth visualization of restricted to the opening hours. Given this, Customers can easily choose a time for their visit. As in the Ticket form, Customers can confirm the Booking request by pressing the "Submit" button.
@@ -51,6 +52,7 @@ This page is identical to the previous, except for the added time selection. A t
     \caption{Booking interface}
 \end{figure}
 
+\pagebreak
 \textbf{Token display}\\
 \label{page:token_show}
 After generating a Ticket or a Booking, and until its expiration, the app will display the token as a fullscreen QR code right after opening, or after Login (if the login timeout has passed).
@@ -141,13 +143,13 @@ The system shall use the HTTPS protocol to provide secure communication from the
 \subsubsection{Scenarios}
 \textbf{Scenario 1}\\
 Maria is gathering ingredients to bake a cake, but she realizes she doesn't have any milk.
-Maria lives near to a grocery shop so she opens the web app, she writes the shop name in the search bar and she is presented with the most relevant matches. She clicks on the shop and then she chooses \todo{\emph{"Get a Ticket"}}. Now she checks the dairy section and confirms, receiving her ticket.
+Maria lives near to a grocery shop so she opens the web app, she writes the shop name in the search bar and she is presented with the most relevant matches. She clicks on the shop and then she chooses \emph{"Get a Ticket"}. Now she checks the dairy section and confirms, receiving her ticket.
 CLup shows that Maria's turn will be in about 10 minutes. Five minutes later she checks back on the app and the approximate time is now 5 minutes, so she leaves and she goes to the shop.
 At the shop Giovanni, a memeber of the staff, is at the entrance waiting for customers. Maria is welcomed by Giovanni, she opens the application and she shows him the ticket, Giovanni scans the ticket with his phone, Maria is just in time, so she can enter the shop and do her groceries.
 At the exit she is invited by Mario, another member of the staff to scan her ticket, she shows the ticket one last time, then she leaves the shop and returns home ready to bake a cake.
 
 \textbf{Scenario 2}\\
-Marco has a busy schedule for the week and he needs to go and get a suit for an important meeting. He looks at his schedule and finds a spot on thursday, so he opens the web app, he writes the shop name in the search bar and she is presented with the most relevant matches. He clicks on the shop and then he chooses \todo{\emph{"Book a visit"}}. Then he checks the clothing section and clicks on thursday on the calendar luckily there is a free time slot. So he inputs the time and confirms, the app responds with the token for the booking. On thursday Marco goes to the shop in time for his booking, he is welcomed by Francesca, a staff member, and shows her the QR code associated with his booking, she scans it using her phone and Marco is allowed in. At the exit he is invited to scan his booking one last time before leaving.
+Marco has a busy schedule for the week and he needs to go and get a suit for an important meeting. He looks at his schedule and finds a spot on thursday, so he opens the web app, he writes the shop name in the search bar and she is presented with the most relevant matches. He clicks on the shop and then he chooses \emph{"Make a Booking"}. Then he checks the clothing section and clicks on thursday on the calendar luckily there is a free time slot. So he inputs the time and confirms, the app responds with the token for the booking. On thursday Marco goes to the shop in time for his booking, he is welcomed by Francesca, a staff member, and shows her the QR code associated with his booking, she scans it using her phone and Marco is allowed in. At the exit he is invited to scan his booking one last time before leaving.
 
 \textbf{Scenario 3}\\
 Attilio was never a fan of technology and he does not have a smartphone, unfortuanately his grandchild Matteo is not around to get a ticket for him, so he picks up his bicycle and goes to the grocery shop. At the entrance to the shop Francesco, a staff member, informs Attilio about the new procedure to enter the shop, since Attilio does not have a smartphone Fancesco uses his device to create a substitute ticket and prints it. Francesco hands Attilio the ticket, then he tells him that there are already 5 people waiting, so he will have to wait for about 10 minutes. Ten minutes later Attilio goes back to the entrance where Francesco scans the ticket letting Attilio go in. At the exit he is invited to scan the ticket one last time before heading home.
@@ -176,9 +178,9 @@ Attilio was never a fan of technology and he does not have a smartphone, unfortu
         Event flow      & \begin{enumerate}
             \item The Customer opens the web app
             \item The app asks for login or registration
-            \item The Customer clicks on register
+            \item The Customer clicks on \emph{"Register"}
             \item The Customer inserts their email and password
-            \item The Customer clicks on confirm
+            \item The Customer clicks on \emph{"Submit"}
             \item The app prompts the Customer to check their email for a confirmation link
             \item The Customer clicks on the confirmation link
         \end{enumerate}  \\ \hline
@@ -205,7 +207,7 @@ Attilio was never a fan of technology and he does not have a smartphone, unfortu
             \item The Customer opens the web app
             \item The app asks for login or registration
             \item The Customer inserts their email and password
-            \item The Customer clicks on confirm
+            \item The Customer clicks on \emph{"Submit"}
             \item The Customer receives confirmation from the server
             \item The Customer is brought to the home page
         \end{enumerate} \\ \hline
@@ -231,7 +233,7 @@ Attilio was never a fan of technology and he does not have a smartphone, unfortu
             \item The Customer types all or part of the shop name in the search bar
             \item Results are dynamically updated
             \item The Customer selects one of the results
-            \item The Customer clicks on "Make a booking"
+            \item The Customer clicks on \emph{"Make a booking"}
             \item The Customer is brought to the \emph{Booking form}
             \item The Customer chooses a day from the calendar
             \item The Customer inputs the desired time of visit
@@ -263,7 +265,7 @@ Attilio was never a fan of technology and he does not have a smartphone, unfortu
             \item The Customer types all or part of the shop name in the search bar
             \item Results are dynamically updated
             \item The Customer selects one of the results
-            \item The Customer clicks on "Get a Ticket"
+            \item The Customer clicks on \emph{"Get a Ticket"}
             \item The Customer is brought to the \emph{Get ticket form}
             \item The Customer clicks submit
             \item The Customer receives confirmation from the server and is shown the new ticket
@@ -290,7 +292,7 @@ Attilio was never a fan of technology and he does not have a smartphone, unfortu
             \item The Customer has created at least one token
         \end{itemize} \\ \hline
         Event flow      & \begin{enumerate}
-            \item The Customer clicks on \todo{"My Tokens"}
+            \item The Customer clicks on \emph{"My Tokens"}
             \item The Customer selects one of the tokens in the list
             \item A QR code and associated text code are shown, either of which can be scanned with the staff applicative
         \end{enumerate} \\ \hline
@@ -303,10 +305,10 @@ Attilio was never a fan of technology and he does not have a smartphone, unfortu
         Name            & Manager adds a shop        \\ \hline
         Actor           & Staff                      \\ \hline
         Entry condition & \begin{itemize}
-            \item \todo{Logged in with Manager account}
+            \item The Manager is logged in with an administrative account
         \end{itemize} \\ \hline
         Event flow      & \begin{enumerate}
-            \item The Manager opens the \todo{\emph{Manage Shops}} section
+            \item The Manager opens the "Manage Shops" section
             \item The Manager clicks on add a Shop
             \item The Manager inserts the Shop name and location
             \item The Manager adds departments to the Shop and specifies the max capacity of each
@@ -332,7 +334,7 @@ Attilio was never a fan of technology and he does not have a smartphone, unfortu
         Entry condition & \begin{itemize}
             \item The Staff member is Logged in
             \item The Staff member selected one of the shops they have access to
-            \item \todo{A Customer shows a token in its valid time frame}
+            \item A Customer shows a token that is valid at the current time
         \end{itemize} \\ \hline
         Event flow      & \begin{enumerate}
             \item The Staff member opens the scan token section
@@ -359,7 +361,7 @@ Attilio was never a fan of technology and he does not have a smartphone, unfortu
         Entry condition & \begin{itemize}
             \item The Staff member is Logged in
             \item The Staff member selected one of the shops they have access to
-            \item \todo{A Customer shows a token which is either expired or not yet valid}
+            \item A Customer shows a token which is either expired or not yet valid
         \end{itemize}   \\ \hline
         Event flow      & \begin{enumerate}
             \item The Staff member opens the scan token section
@@ -412,7 +414,7 @@ Attilio was never a fan of technology and he does not have a smartphone, unfortu
         Name            & Manager checks shop occupancy \\ \hline
         Actor           & Staff                         \\ \hline
         Entry condition & \begin{itemize}
-            \item \todo{Logged in with Manager account}
+            \item The Manager is Logged in with an administrative account
         \end{itemize}    \\ \hline
         Event flow      & \begin{enumerate}
             \item The Manager selects a Shop from those available

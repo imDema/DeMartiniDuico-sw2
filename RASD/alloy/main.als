@@ -4,7 +4,10 @@ sig Time {}
 
 sig Shop{
 	departments: disj some Department,
-	queue: disj WaitingListNode lone -> Time,
+	queue: WaitingListNode lone -> Time,
+}
+fact everyNodeInQueueHasRightShop{
+	all s: Shop, t: Time | s.queue.t.*next.ticket.shop in s
 }
 fact departmentsOfShop {
 	all d: Department | some s: Shop | d in s.departments
@@ -30,12 +33,9 @@ fact uniqueVisits {
 
 sig WaitingListNode {
 	ticket: disj Ticket,
-	next: lone WaitingListNode,
+	next: disj lone WaitingListNode,
 }
-fact waitingListNodeSameShop{
-	all t: WaitingListNode | 
-		t.next != none implies t.ticket.shop = t.next.ticket.shop 
-}
+
 fact waitingListNodeNoCycles{
 	all t : WaitingListNode | 
 		t not in t.^next
@@ -261,9 +261,7 @@ check cannotReuseTicket for 5
 check ticketsGetUsed for 5
 check cannotVisitMultipleAtSameTime for 5
 
-
 run {} for 6 but exactly 2 Shop, exactly 3 Department, exactly 3 Ticket, exactly 3 Booking, exactly 4 Customer, exactly 4 Visit
-run visitDifferentShops for 5
-run enterAndExit for 8 but exactly 5 Customer, exactly 6 Token, exactly 3 Booking, exactly 3 Department, exactly 2 Shop, exactly 4 Visit
-
+run visitDifferentShops for 5 but exactly 5 Customer
+run enterAndExit for 8 but exactly 5 Customer, exactly 5 Token, exactly 2 Booking, exactly 5 Department, exactly 2 Shop, exactly 4 Visit
 run enterExitTicketBooking for 8 but exactly 5 Customer, exactly 6 Token, exactly 3 Booking, exactly 3 Department, exactly 2 Shop, exactly 4 Visit
