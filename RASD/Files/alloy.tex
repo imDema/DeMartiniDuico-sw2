@@ -20,11 +20,20 @@ This section describes the rules that guarantee the correct evolution of the sys
 This section lists some of the property that will be guaranteed \emph{if} the invariants described in the previous sections hold. The The result of the evaluation of these assertions will be presented in the next section.
 \lstinputlisting[language=alloy,firstline=131,lastline=211]{alloy/main.als}
 \subsubsection{Execution results}
-This section shows the experimental result of the formal analysis 
-\lstinputlisting[language=alloy,firstline=215]{alloy/main.als}
+This section shows the experimental result of the formal analysis.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.75\textwidth]{Images/Alloy/check_assertions.png}
+    \caption{All assertions pass the test on a restricted domain.}
+\end{figure}
 
 \pagebreak
-The following figures show the evolution of a particular instance of the enterAndExit predicate, for 5 consecutive Time instants. A visiting Customer is pointed out by a \emph{visiting} connection to one of the Visit elements, which, in turn, is connected to a set of Department nodes of the same Shop.
+\lstinputlisting[language=alloy,firstline=215]{alloy/main.als}
+
+All presented predicates have valid instances in the domain.
+
+The following figures show the evolution of a scenario of the enterAndExit predicate for 5 consecutive Time instants. When a Customer visits a Shop the graph shows a \emph{visiting} relation from the customer to one of the Visit elements, which point to the departments of the shop concerning the visit.
 \begin{figure}[H]
     \centering
     \includegraphics[height=0.25\textheight]{Images/Alloy/5Customers_v1_t0.png}
@@ -52,8 +61,8 @@ The following figures show the evolution of a particular instance of the enterAn
 \end{figure}
 
 \pagebreak
-Figure \ref{fig:waitinglistnode1} and \ref{fig:waitinglistnode2} provide a more detailed view of the same instance, displaying the working principle of the waiting List. Each WaitingListNode represents a single Customer in line, with their Ticket. In the first figure, set at Time 0, we see that \emph{Customer1} has the Ticket corresponding to the first WaitingListNode for \emph{Shop0}, pointed by the \emph{queue} attribute, thus he is allowed to enter at the next time frame.
-Indeed, in the second figure, set at Time 1, a new \emph{visiting} connection between \emph{Customer1} and \emph{Visit1} is spawned, which means that the Customer is visiting \emph{Department1} of \emph{Shop0}. The \emph{queue} attribute of the Shop has also been moved forward to a new WaitingListNode, as expected.
+Figure \ref{fig:waitinglistnode1} and \ref{fig:waitinglistnode2} show a detailed view of the same instance, displaying the working principle of the waiting List. Each \emph{WaitingListNode} represents the position of a Customer in the \emph{Waiting list}, associated with their Ticket. The first in queue for each Shop is marked by the \emph{queue} relation. In the first figure, set at Time 0, we see that \emph{Customer1} is the first in queue, since their Ticket is in the first WaitingListNode for \emph{Shop0} (marked by the \emph{queue} relation), thus he is allowed to enter at the next time frame.
+Indeed, in the second figure, set at Time 1, a new \emph{visiting} relation between \emph{Customer1} and \emph{Visit1} is created, to represent the customer visiting \emph{Department1} of \emph{Shop0}. As expected, the \emph{queue} relation of the Shop has now moved forward to the next WaitingListNode, advancing the queue.
 \begin{figure}[H]
     \centering
     \includegraphics[width=\textwidth]{Images/Alloy/5Customers_v1_t0_detail_crop.png}

@@ -253,13 +253,13 @@ pred visitDifferentShops {
 	}
 }
 
-check checkOccupancy for 5
-check cannotEnterWithoutToken for 5
-check cannotEnterAtDifferentTimeWithBooking for 5
-check cannotSkipQueue for 5
-check cannotReuseTicket for 5
+check checkOccupancy for 6
+check cannotEnterWithoutToken for 8
+check cannotEnterAtDifferentTimeWithBooking for 8
+check cannotSkipQueue for 8
+check cannotReuseTicket for 8
 check ticketsGetUsed for 5
-check cannotVisitMultipleAtSameTime for 5
+check cannotVisitMultipleAtSameTime for 8
 
 run {} for 6 but exactly 2 Shop, exactly 3 Department, exactly 3 Ticket, exactly 3 Booking, exactly 4 Customer, exactly 4 Visit
 run visitDifferentShops for 5 but exactly 5 Customer
