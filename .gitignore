@@ -11,3 +11,5 @@
 *.toc
 main.pdf
 .vscode
+ITD/backend/target
+.env
