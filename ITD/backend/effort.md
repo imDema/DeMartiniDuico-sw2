@@ -2,5 +2,5 @@
 
 | Date       | Time | Topic                 |
 | ---------- | ---- | --------------------- |
-| 2020-12-27 | 2h   | Initial configuration |
+| 2020-12-27 | 3h   | Initial configuration |
 |            |      |                       |

@@ -1,0 +1,8 @@
+SET ROLE clup;
+DROP TABLE IF EXISTS Account;
+CREATE TABLE Account (
+    id SERIAL PRIMARY KEY,
+    email VARCHAR NOT NULL,
+    salt BYTEA NOT NULL,
+    digest BYTEA NOT NULL
+);

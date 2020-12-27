@@ -13,3 +13,5 @@ main.pdf
 .vscode
 ITD/backend/target
 .env
+.env_fish
+
