@@ -1,0 +1,193 @@
+\documentclass [11pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+
+%Page margins, header and footer positions
+\usepackage{geometry}
+\geometry{
+    a4paper,
+    total={210mm,297mm},
+    left=25mm,
+    right=25mm,
+    top=30mm,
+    bottom=25mm,
+    headsep=7mm}
+
+\interfootnotelinepenalty=10000
+
+%To display filling dots in the TOC for all entries
+\usepackage[titles]{tocloft}
+\renewcommand{\cftsecleader}{\cftdotfill{\cftdotsep}}
+
+%Define new header and footer style
+\usepackage{fancyhdr}
+\usepackage[activate=true,final,tracking=true,kerning=true,spacing=true]{microtype}
+\microtypecontext{spacing=nonfrench}
+
+\pagestyle{fancy}
+\fancyhf{}
+\lhead{\color{Gray}{\small{CLup project by Luca De Martini, Alessandro Duico}}}
+\lfoot{\textcolor{Gray}{\small{Copyright © 2020, Luca De Martini, Alessandro Duico - All rights reserved}}}
+\rfoot{\textcolor{Gray}{\thepage}}
+\renewcommand{\headrulewidth}{0pt}
+
+%PACKAGES
+\usepackage{wasysym}
+\usepackage{pifont}
+
+\newcommand{\supported}{\ding{52}\xspace}
+\newcommand{\unsupported}{\ding{55}\xspace}
+\newcommand{\partsupported}{\textcolor{black!40}{\ding{52}}\xspace}
+\newcommand{\lowsupported}{\textcolor{black!20}{\ding{52}}\xspace}
+\newcommand{\unknowsupported}{\textbf{?}\xspace}
+
+%Font: Times
+\usepackage{times}
+%Change monospaced font
+\renewcommand{\ttdefault}{lmtt}
+%\usepackage{FiraMono}
+
+%tables
+\usepackage{tabu}
+\usepackage{tabularx}
+\usepackage{ltablex}
+\usepackage{longtable}
+\usepackage{float} % To allow the use of H modifier in long tables
+
+%landscape mode
+\usepackage{pdflscape}
+\usepackage{rotating}
+\usepackage{caption}
+\usepackage{subcaption}
+
+%svg support
+%\usepackage{svg}
+
+%make landscape mode be sensitive to even and odd pages
+%start
+\def\myrotate{\ifodd\c@page\else-\fi 90}
+\makeatletter
+\global\let\orig@begin@landscape=\landscape%
+\global\let\orig@end@landscape=\endlandscape%
+\gdef\@true{1}
+\gdef\@false{0}
+\gdef\landscape{%
+    \global\let\within@landscape=\@true%
+    \orig@begin@landscape%
+}%
+\gdef\endlandscape{%
+    \orig@end@landscape%
+    \global\let\within@landscape=\@false%
+}%
+\@ifpackageloaded{pdflscape}{%
+    \gdef\pdf@landscape@rotate{\PLS@Rotate}%
+}{
+    \gdef\pdf@landscape@rotate#1{}%
+}
+\let\latex@outputpage\@outputpage
+\def\@outputpage{
+    \ifx\within@landscape\@true%
+        \if@twoside%
+            \ifodd\c@page%
+                \gdef\LS@rot{\setbox\@outputbox\vbox{%
+                        \pdf@landscape@rotate{-90}%
+                        \hbox{\rotatebox{90}{\hbox{\rotatebox{180}{\box\@outputbox}}}}}%
+                }%
+            \else%
+                \gdef\LS@rot{\setbox\@outputbox\vbox{%
+                        \pdf@landscape@rotate{+90}%
+                        \hbox{\rotatebox{90}{\hbox{\rotatebox{0}{\box\@outputbox}}}}}%
+                }%
+            \fi%
+        \else%
+            \gdef\LS@rot{\setbox\@outputbox\vbox{%
+                    \pdf@landscape@rotate{+90}%
+                    \hbox{\rotatebox{90}{\hbox{\rotatebox{0}{\box\@outputbox}}}}}%
+            }%
+        \fi%
+    \fi%
+    \latex@outputpage%
+}
+\makeatother
+%end
+
+
+%graphics
+\usepackage{graphicx}
+\usepackage[dvipsnames, table]{xcolor}
+%If you upload images from PC, you need to insert code for the path here (different for Windows and Unix OS)
+
+
+% Image Shadow -- Credit: https://tex.stackexchange.com/a/81847
+\usepackage{tikz}
+\usetikzlibrary{shadows,calc}
+
+% code adapted from https://tex.stackexchange.com/a/11483/3954
+
+% some parameters for customization
+\def\shadowshift{0pt,-3pt}
+\def\shadowradius{8pt}
+
+\colorlet{innercolor}{black!30}
+\colorlet{outercolor}{gray!01}
+
+% this draws a shadow under a rectangle node
+\newcommand\drawshadow[1]{
+    \begin{pgfonlayer}{shadow}
+        \shade[outercolor,inner color=innercolor,outer color=outercolor] ($(#1.south west)+(\shadowshift)+(\shadowradius/2,\shadowradius/2)$) circle (\shadowradius);
+        \shade[outercolor,inner color=innercolor,outer color=outercolor] ($(#1.north west)+(\shadowshift)+(\shadowradius/2,-\shadowradius/2)$) circle (\shadowradius);
+        \shade[outercolor,inner color=innercolor,outer color=outercolor] ($(#1.south east)+(\shadowshift)+(-\shadowradius/2,\shadowradius/2)$) circle (\shadowradius);
+        \shade[outercolor,inner color=innercolor,outer color=outercolor] ($(#1.north east)+(\shadowshift)+(-\shadowradius/2,-\shadowradius/2)$) circle (\shadowradius);
+        \shade[top color=innercolor,bottom color=outercolor] ($(#1.south west)+(\shadowshift)+(\shadowradius/2,-\shadowradius/2)$) rectangle ($(#1.south east)+(\shadowshift)+(-\shadowradius/2,\shadowradius/2)$);
+        \shade[left color=innercolor,right color=outercolor] ($(#1.south east)+(\shadowshift)+(-\shadowradius/2,\shadowradius/2)$) rectangle ($(#1.north east)+(\shadowshift)+(\shadowradius/2,-\shadowradius/2)$);
+        \shade[bottom color=innercolor,top color=outercolor] ($(#1.north west)+(\shadowshift)+(\shadowradius/2,-\shadowradius/2)$) rectangle ($(#1.north east)+(\shadowshift)+(-\shadowradius/2,\shadowradius/2)$);
+        \shade[outercolor,right color=innercolor,left color=outercolor] ($(#1.south west)+(\shadowshift)+(-\shadowradius/2,\shadowradius/2)$) rectangle ($(#1.north west)+(\shadowshift)+(\shadowradius/2,-\shadowradius/2)$);
+        \filldraw ($(#1.south west)+(\shadowshift)+(\shadowradius/2,\shadowradius/2)$) rectangle ($(#1.north east)+(\shadowshift)-(\shadowradius/2,\shadowradius/2)$);
+    \end{pgfonlayer}
+}
+
+% create a shadow layer, so that we don't need to worry about overdrawing other things
+\pgfdeclarelayer{shadow} 
+\pgfsetlayers{shadow,main}
+
+
+\newcommand\shadowimage[2][]{%
+\begin{tikzpicture}
+\node[anchor=south west,inner sep=0] (image) at (0,0) {\includegraphics[#1]{#2}};
+\drawshadow{image}
+\end{tikzpicture}}
+
+
+%References
+%\usepackage{xpatch}
+%\usepackage[backend=biber, style=numeric, citestyle=numeric, sorting=none]{biblatex}
+%\addbibresource{main.bib}
+
+%Other
+\usepackage{ifthen}
+\usepackage{xspace}
+\usepackage{enumitem}
+\usepackage{amssymb}
+\usepackage[pdftex, colorlinks]{hyperref}
+\newcommand{\comment}[1]{{\color{Red}$\blacktriangleright$ Comment: #1 $\blacktriangleleft$}}
+\usepackage{listings}
+
+\hypersetup{
+    colorlinks=true,
+    linkcolor=red,
+    urlcolor=magenta
+}
+
+%custom
+\newcommand{\todo}[1]{{\color{green}#1}}
+
+\setlength\parindent{0pt}
+\setlength\parskip{0.75\baselineskip}
+
+% Some utilities\ldots
+\input{util/highlight}
+\input{util/abbrev}
+
+
+
+\date{}
