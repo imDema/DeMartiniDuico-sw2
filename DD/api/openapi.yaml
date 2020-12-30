@@ -1,0 +1,118 @@
+openapi: '3.0.3'
+info:
+  title: API Title
+  version: '1.0'
+servers:
+  - url: https://127.0.0.1:5000/v1
+paths:
+  /account/login:
+    post:
+      tags:
+      - "login"
+      summary: "Logs in and returns the authentication  cookie"
+      description: "Login"
+      operationId: "login"
+      requestBody:
+        required: true
+        description: "A JSON object containing the login and password."
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LoginRequest"
+      security: []
+      responses:
+        '200':
+          description: OK
+          headers:
+            Set-Cookie:
+              schema:
+                type: string
+                example: SESSIONID=abcdef12345ABCD; Path=/;
+        '400':
+          description: Invalid Credentials
+          
+  /account/register:
+    post:
+      tags:
+      - "registration"
+      summary: "Request creation of a new account"
+      description: "Start registration"
+      operationId: "submit_registration"
+      security: []
+      requestBody:
+        description: "Credentials"
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RegistrationRequest"
+      responses:
+        '200':
+          description: OK
+  /account/confirm:
+    get:
+      tags:
+      - "registration"
+      summary: "Submit email confirmation"
+      description: "Finalizes account creation"
+      operationId: "confirm_registration"
+      parameters:
+      - in: "query"
+        name: "code"
+        description: "Confirmation code received by email"
+        required: true
+        schema:
+          type: "string"
+      security: []
+      responses:
+        "201":
+          description: "successful operation"
+        "400":
+          description: "Invalid code value"
+  # /search:
+  #   get:
+  #     tags:
+  #     - "search"
+  #     - "shop"
+  #     summary: Search for a shop by name
+  #     description: Search for a shop by name
+  #     operationId: "search_shop"
+  #     security:
+  #       - cookieAuth: []
+
+  # /tokens:
+  #   get:
+
+
+  # /shop/{shop_id}/ticket/create:
+  #   post:
+
+  # /shop/{shop_id}/ticket/waiting_time:
+  #   post:
+      
+
+
+
+components:
+  schemas:
+    RegistrationRequest:
+      type: object
+      properties:
+        email:
+          type: string
+        password:
+          type: string
+    LoginRequest:
+      type: object
+      properties:
+        email:
+          type: string
+        password:
+          type: string
+        remember:
+          type: boolean
+  securitySchemes:
+    cookieAuth:
+      type: apiKey
+      in: cookie
+      name: SESSIONID
