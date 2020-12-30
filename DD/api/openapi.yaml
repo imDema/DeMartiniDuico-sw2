@@ -1,17 +1,15 @@
-openapi: '3.0.3'
+openapi: "3.0.3"
 info:
   title: API Title
-  version: '1.0'
+  version: "1.0"
 servers:
   - url: https://127.0.0.1:5000/v1
 paths:
-  /account/login:
+  /login:
     post:
       tags:
-      - "login"
+        - "account"
       summary: "Logs in and returns the authentication  cookie"
-      description: "Login"
-      operationId: "login"
       requestBody:
         required: true
         description: "A JSON object containing the login and password."
@@ -21,23 +19,21 @@ paths:
               $ref: "#/components/schemas/LoginRequest"
       security: []
       responses:
-        '200':
+        "200":
           description: OK
           headers:
             Set-Cookie:
               schema:
                 type: string
                 example: SESSIONID=abcdef12345ABCD; Path=/;
-        '400':
+        "400":
           description: Invalid Credentials
-          
-  /account/register:
+
+  /register:
     post:
       tags:
-      - "registration"
+        - "account"
       summary: "Request creation of a new account"
-      description: "Start registration"
-      operationId: "submit_registration"
       security: []
       requestBody:
         description: "Credentials"
@@ -47,51 +43,298 @@ paths:
             schema:
               $ref: "#/components/schemas/RegistrationRequest"
       responses:
-        '200':
+        "200":
           description: OK
-  /account/confirm:
+  /register/confirm:
     get:
       tags:
-      - "registration"
+        - "account"
       summary: "Submit email confirmation"
       description: "Finalizes account creation"
       operationId: "confirm_registration"
       parameters:
-      - in: "query"
-        name: "code"
-        description: "Confirmation code received by email"
-        required: true
-        schema:
-          type: "string"
+        - in: "query"
+          name: "code"
+          description: "Confirmation code received by email"
+          required: true
+          schema:
+            type: "string"
       security: []
       responses:
         "201":
           description: "successful operation"
         "400":
           description: "Invalid code value"
-  # /search:
-  #   get:
-  #     tags:
-  #     - "search"
-  #     - "shop"
-  #     summary: Search for a shop by name
-  #     description: Search for a shop by name
-  #     operationId: "search_shop"
-  #     security:
-  #       - cookieAuth: []
+  /search:
+    get:
+      summary: Search for a shop by name
+      description: Search for a shop by name
+      operationId: "search_shop"
+      security: []
+      responses:
+        "200":
+          description: OK
 
-  # /tokens:
-  #   get:
+  /tokens:
+    get:
+      summary: Get active tokens
+      tags:
+        - "booking"
+        - "ticket"
+      responses:
+        "200":
+          description: OK
+      security:
+        - customerAuth: []
 
+  /ticket/est:
+    post:
+      summary: Get the estimated waiting time for a ticket
+      tags:
+        - "ticket"
+      responses:
+        "200":
+          description: OK
+      security:
+        - customerAuth: []
 
-  # /shop/{shop_id}/ticket/create:
-  #   post:
+  /booking/est:
+    post:
+      summary: Get the time untill the booking time slot
+      tags:
+        - "booking"
+      responses:
+        "200":
+          description: OK
+      security:
+        - customerAuth: []
 
-  # /shop/{shop_id}/ticket/waiting_time:
-  #   post:
-      
+  /shop/{shop_id}:
+    get:
+      parameters:
+        - in: path
+          name: "shop_id"
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
 
+  /shop/{shop_id}/ticket/new:
+    post:
+      summary: Request a ticket for a shop
+      parameters:
+        - in: path
+          name: "shop_id"
+          required: true
+          schema:
+            type: string
+      tags:
+        - "ticket"
+      responses:
+        "200":
+          description: OK
+      security:
+        - customerAuth: []
 
+  /shop/{shop_id}/ticket/queue:
+    get:
+      summary: Get information about the queue status and approximate waiting time
+      parameters:
+        - in: path
+          name: "shop_id"
+          required: true
+          schema:
+            type: string
+      tags:
+        - "ticket"
+      responses:
+        "200":
+          description: OK
+
+  /shop/{shop_id}/booking/new:
+    post:
+      summary: Request a booking for a shop
+      parameters:
+        - in: path
+          name: "shop_id"
+          required: true
+          schema:
+            type: string
+      tags:
+        - "booking"
+      responses:
+        "200":
+          description: OK
+      security:
+        - customerAuth: []
+
+  /shop/{shop_id}/booking/availability:
+    get:
+      summary: Get information about the time slot availability for bookings
+      parameters:
+        - in: path
+          name: "shop_id"
+          required: true
+          schema:
+            type: string
+      tags:
+        - "booking"
+      responses:
+        "200":
+          description: OK
+      security:
+        - staffAuth: []
+
+  /staff/login:
+    post:
+      summary: Log in and return authentication cookie
+      tags:
+        - "staff-account"
+      requestBody:
+        required: true
+        description: "A JSON object containing the login and password."
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LoginRequest"
+      responses:
+        "200":
+          description: OK
+
+  /staff/register:
+    post:
+      summary: Request the creation of a new staff account
+      tags:
+        - "staff-account"
+      responses:
+        "200":
+          description: OK
+
+  /staff/shop/{shop_id}/ticket/queue:
+    get:
+      summary: Get detailed information about the current queue status
+      parameters:
+        - in: path
+          name: "shop_id"
+          required: true
+          schema:
+            type: string
+      tags:
+        - "staff"
+      responses:
+        "200":
+          description: OK
+      security:
+        - staffAuth: []
+
+  /staff/shop/{shop_id}/booking/list:
+    get:
+      summary: Get detailed information about the current and future bookings
+      parameters:
+        - in: path
+          name: "shop_id"
+          required: true
+          schema:
+            type: string
+      tags:
+        - "staff"
+      responses:
+        "200":
+          description: OK
+      security:
+        - staffAuth: []
+
+  /staff/shop/{shop_id}/token/check:
+    post:
+      summary: Check if a token is valid for entry at this moment
+      parameters:
+        - in: path
+          name: "shop_id"
+          required: true
+          schema:
+            type: string
+      tags:
+        - "staff"
+      responses:
+        "200":
+          description: OK
+      security:
+        - staffAuth: []
+
+  /staff/shop/{shop_id}/ticket/new-substitute:
+    post:
+      summary: Request creation of a substitute ticket
+      parameters:
+        - in: path
+          name: "shop_id"
+          required: true
+          schema:
+            type: string
+      tags:
+        - "staff"
+      responses:
+        "200":
+          description: OK
+      security:
+        - staffAuth: []
+
+  /staff/shop/{shop_id}/token/log-entry:
+    post:
+      summary: Log entry, consume the token and update shop occupancy information
+      parameters:
+        - in: path
+          name: "shop_id"
+          required: true
+          schema:
+            type: string
+      tags:
+        - "staff"
+      responses:
+        "200":
+          description: OK
+      security:
+        - staffAuth: []
+
+  /staff/shop/{shop_id}/token/log-exit:
+    post:
+      summary: Log exit, update shop occupancy information
+      parameters:
+        - in: path
+          name: "shop_id"
+          required: true
+          schema:
+            type: string
+      tags:
+        - "staff"
+      responses:
+        "200":
+          description: OK
+      security:
+        - staffAuth: []
+
+  /staff/manage/add-shop:
+    post:
+      summary: Add a new shop to the database
+      tags:
+        - "manage"
+      responses:
+        "200":
+          description: OK
+      security:
+        - staffAuth: []
+
+  /staff/manage/edit-shop:
+    post:
+      summary: Edit a shop listing
+      tags:
+        - "manage"
+      responses:
+        "200":
+          description: OK
+      security:
+        - staffAuth: []
 
 components:
   schemas:
@@ -112,7 +355,11 @@ components:
         remember:
           type: boolean
   securitySchemes:
-    cookieAuth:
+    customerAuth:
+      type: apiKey
+      in: cookie
+      name: SESSIONID
+    staffAuth:
       type: apiKey
       in: cookie
       name: SESSIONID
