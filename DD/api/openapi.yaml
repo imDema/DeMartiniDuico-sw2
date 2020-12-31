@@ -1,6 +1,6 @@
 openapi: "3.0.3"
 info:
-  title: API Title
+  title: Clup
   version: "1.0"
 servers:
   - url: https://127.0.0.1:5000/v1
@@ -16,7 +16,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/LoginRequest"
+              $ref: "#/components/schemas/RequestLogin"
       security: []
       responses:
         "200":
@@ -41,10 +41,12 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/RegistrationRequest"
+              $ref: "#/components/schemas/RequestRegister"
       responses:
         "200":
           description: OK
+        "400":
+          description: Invalid data
   /register/confirm:
     get:
       tags:
@@ -64,7 +66,7 @@ paths:
         "201":
           description: "successful operation"
         "400":
-          description: "Invalid code value"
+          description: "Invalid code"
   /search:
     get:
       summary: Search for a shop by name
@@ -84,33 +86,60 @@ paths:
       responses:
         "200":
           description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Tokens"
+
+              
       security:
         - customerAuth: []
 
   /ticket/est:
-    post:
+    get:
       summary: Get the estimated waiting time for a ticket
       tags:
         - "ticket"
+      parameters:
+        - in: "query"
+          name: "code"
+          description: "Ticket code"
+          required: true
+          schema:
+            type: "string"
       responses:
         "200":
           description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/QueueEst"
+        "400":
+          description: "Invalid or expired code"
       security:
         - customerAuth: []
 
-  /booking/est:
-    post:
-      summary: Get the time untill the booking time slot
-      tags:
-        - "booking"
-      responses:
-        "200":
-          description: OK
-      security:
-        - customerAuth: []
+  # /booking/est:
+  #   get:
+  #     summary: Get the time untill the booking time slot
+  #     tags:
+  #       - "booking"
+  #     parameters:
+  #       - in: "query"
+  #         name: "code"
+  #         description: "Booking code"
+  #         required: true
+  #         schema:
+  #           type: "string"
+  #     responses:
+  #       "200":
+  #         description: OK
+  #     security:
+  #       - customerAuth: []
 
   /shop/{shop_id}:
     get:
+      summary: "Get available shop information"
       parameters:
         - in: path
           name: "shop_id"
@@ -123,6 +152,8 @@ paths:
 
   /shop/{shop_id}/ticket/new:
     post:
+      tags:
+        - "ticket"
       summary: Request a ticket for a shop
       parameters:
         - in: path
@@ -130,11 +161,20 @@ paths:
           required: true
           schema:
             type: string
-      tags:
-        - "ticket"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RequestTicket"
       responses:
         "200":
           description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TokenTicket"
+        "400":
+          description: Error
       security:
         - customerAuth: []
 
@@ -152,9 +192,15 @@ paths:
       responses:
         "200":
           description: OK
+          content:
+            application/json:
+                schema:
+                  $ref: "#/components/schemas/QueueEst"
 
   /shop/{shop_id}/booking/new:
     post:
+      tags:
+        - "booking"
       summary: Request a booking for a shop
       parameters:
         - in: path
@@ -162,11 +208,20 @@ paths:
           required: true
           schema:
             type: string
-      tags:
-        - "booking"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RequestBooking"
       responses:
         "200":
           description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TokenBooking"
+        "400":
+          description: Error
       security:
         - customerAuth: []
 
@@ -198,10 +253,16 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/LoginRequest"
+              $ref: "#/components/schemas/RequestLogin"
       responses:
         "200":
           description: OK
+          headers:
+            Set-Cookie:
+              schema:
+                type: string
+                example: SESSIONID=abcdef12345ABCD; Path=/;
+
 
   /staff/register:
     post:
@@ -246,12 +307,17 @@ paths:
       security:
         - staffAuth: []
 
-  /staff/shop/{shop_id}/token/check:
-    post:
-      summary: Check if a token is valid for entry at this moment
+  /staff/shop/{shop_id}/token/info:
+    get:
+      summary: Get token information and validity
       parameters:
         - in: path
           name: "shop_id"
+          required: true
+          schema:
+            type: string
+        - in: query
+          name: "code"
           required: true
           schema:
             type: string
@@ -260,11 +326,25 @@ paths:
       responses:
         "200":
           description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: # TODO: Check
+                  status:
+                    type: string
+                    enum:
+                    - "expired"
+                    - "invalid"
+                    - "valid"
+                    - "active"
       security:
         - staffAuth: []
 
   /staff/shop/{shop_id}/ticket/new-substitute:
     post:
+      tags:
+        - "staff"
       summary: Request creation of a substitute ticket
       parameters:
         - in: path
@@ -272,11 +352,20 @@ paths:
           required: true
           schema:
             type: string
-      tags:
-        - "staff"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RequestTicket"
       responses:
         "200":
           description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TokenTicket"
+        "400":
+          description: Error
       security:
         - staffAuth: []
 
@@ -338,14 +427,14 @@ paths:
 
 components:
   schemas:
-    RegistrationRequest:
+    RequestRegister:
       type: object
       properties:
         email:
           type: string
         password:
           type: string
-    LoginRequest:
+    RequestLogin:
       type: object
       properties:
         email:
@@ -354,6 +443,84 @@ components:
           type: string
         remember:
           type: boolean
+    RequestBooking:
+      type: object
+      properties:
+        shop_id:
+          type: string
+        department_ids:
+          type: array
+          items:
+            type: string
+        start_time:
+          type: string
+          format: date-time
+        end_time:
+          type: string
+          format: date-time
+    RequestTicket:
+      type: object
+      properties:
+        shop_id:
+          type: string
+        department_ids:
+          type: array
+          items:
+            type: string
+    TokenBooking:
+      type: object
+      properties:
+        uid:
+          type: string
+        shop_id:
+          type: string
+        department_ids:
+          type: array
+          items:
+            type: string
+        start_time:
+          type: string
+          format: date-time
+        end_time:
+          type: string
+          format: date-time
+    TokenTicket:
+      type: object
+      properties:
+        uid:
+          type: string
+        shop_id:
+          type: string
+        department_ids:
+          type: array
+          items:
+            type: string
+        expiration:
+          type: string
+          format: date-time
+    Tokens:
+      type: object
+      properties:
+        tickets:
+          type: array
+          items:
+            type: object
+            $ref: "#/components/schemas/TokenTicket"
+        bookings:
+          type: array
+          items:
+            type: object
+            $ref: "#/components/schemas/TokenBooking"
+    QueueEst:
+      type: object
+      properties:
+        people:
+          type: integer
+        est:
+          type: string
+          format: date-time
+        
+
   securitySchemes:
     customerAuth:
       type: apiKey
