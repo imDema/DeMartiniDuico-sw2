@@ -1,36 +1,10 @@
-use actix_web::{web, get, App, HttpServer, Responder, HttpResponse};
-use clup::models::account::PersistentAccount;
-use sqlx::PgPool;
+use actix_web::middleware::Logger;
+use actix_web::{web, App, HttpServer};
+// use actix_redis::RedisSession;
+// use actix_session::Session;
+use clup::api;
 use sqlx::postgres::PgPoolOptions;
 use std::env;
-use futures::TryStreamExt;
-
-#[get("/")]
-async fn index() -> impl Responder {
-    HttpResponse::Ok().body(r#"Welcome to Clup
-    __       __
-    / <`     '> \
-   (  / @   @ \  )
-    \(_ _\_/_ _)/
-  (\ `-/     \-' /)
-   "===\     /==="
-    .==')___(`==.
-   ' .='     `=."#)
-}
-
-#[get("/accounts")]
-async fn accounts(conn: web::Data<PgPool>) -> impl Responder {
-    if let Ok(mut stream) = PersistentAccount::get_stream(&conn.into_inner()).await {
-        let mut body = String::new();
-        while let Ok(Some(acc)) = stream.try_next().await {
-            body.push_str(&format!("{:?}", acc));
-            body.push('\n');
-        }
-        HttpResponse::Ok().body(&body)
-    } else {
-        HttpResponse::InternalServerError().body("Internal server error")
-    }
-}
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
@@ -53,11 +27,11 @@ async fn main() -> std::io::Result<()> {
 
     HttpServer::new(move || {
         App::new()
+            .wrap(Logger::default())
+            // .wrap(RedisSession::new(addr, key))
             .data(db_pool.clone())
-            .service(index)
-            .service(accounts)
+            .configure(api::generic::endpoints)
             // .route("/", web::get().to(index))
-            // .service(web::scope("/api").configure(api::endpoints))
     })
     .bind(api_url)?
     .run()

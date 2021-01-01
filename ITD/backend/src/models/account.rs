@@ -53,6 +53,19 @@ impl<'a> PersistentAccount<'a> {
         Ok(Self{inner: acc, conn})
     }
 
+    pub async fn find(conn: &'a PgPool, email: &str) -> sqlx::Result<Option<PersistentAccount<'a>>> {
+        let acc = query_as!(Account,
+                r"SELECT id, email, salt, digest FROM Account WHERE email = $1",
+                email
+            ).fetch_optional(conn)
+            .await?;
+        if let Some(acc) = acc {
+            Ok(Some(Self{inner: acc, conn}))
+        } else {
+            Ok(None)
+        }
+    }
+
     pub async fn get_stream(conn: &'a PgPool) -> sqlx::Result<Pin<Box<dyn Stream<Item = std::result::Result<Account, sqlx::Error>> + 'a>>> {
         let stream = query_as!(Account, r"SELECT id, email, salt, digest FROM Account")
             // .map(|acc| PersistentAccount{inner: acc, conn})
