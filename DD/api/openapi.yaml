@@ -2,6 +2,7 @@ openapi: "3.0.3"
 info:
   title: Clup
   version: "1.0"
+  description: Clup REST API specification
 # servers:
 #   - url: https://127.0.0.1:5000/v1
 paths:
