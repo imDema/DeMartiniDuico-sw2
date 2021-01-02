@@ -2,8 +2,8 @@ openapi: "3.0.3"
 info:
   title: Clup
   version: "1.0"
-servers:
-  - url: https://127.0.0.1:5000/v1
+# servers:
+#   - url: https://127.0.0.1:5000/v1
 paths:
   /login:
     post:
@@ -69,17 +69,31 @@ paths:
           description: "Invalid code"
   /search:
     get:
+      tags:
+        - "shop"
       summary: Search for a shop by name
       description: Search for a shop by name
-      operationId: "search_shop"
+      parameters:
+        - in: query
+          name: "q"
+          required: true
+          description: "Search string"
+          schema:
+            type: string
       security: []
       responses:
         "200":
           description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/SearchResult"
 
   /tokens:
     get:
-      summary: Get active tokens
+      summary: Get active tokens for the customer
       tags:
         - "booking"
         - "ticket"
@@ -102,8 +116,8 @@ paths:
         - "ticket"
       parameters:
         - in: "query"
-          name: "code"
-          description: "Ticket code"
+          name: "uid"
+          description: "Ticket unique identifier"
           required: true
           schema:
             type: "string"
@@ -119,26 +133,10 @@ paths:
       security:
         - customerAuth: []
 
-  # /booking/est:
-  #   get:
-  #     summary: Get the time untill the booking time slot
-  #     tags:
-  #       - "booking"
-  #     parameters:
-  #       - in: "query"
-  #         name: "code"
-  #         description: "Booking code"
-  #         required: true
-  #         schema:
-  #           type: "string"
-  #     responses:
-  #       "200":
-  #         description: OK
-  #     security:
-  #       - customerAuth: []
-
   /shop/{shop_id}:
     get:
+      tags:
+        - "shop"
       summary: "Get available shop information"
       parameters:
         - in: path
@@ -149,6 +147,10 @@ paths:
       responses:
         "200":
           description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Shop"
 
   /shop/{shop_id}/ticket/new:
     post:
@@ -234,13 +236,23 @@ paths:
           required: true
           schema:
             type: string
+        - in: query
+          name: "day"
+          required: false
+          schema:
+            type: string
+            format: date
       tags:
         - "booking"
       responses:
         "200":
           description: OK
-      security:
-        - staffAuth: []
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BookingAvailability"
+        "400":
+          description: Error
 
   /staff/login:
     post:
@@ -287,6 +299,10 @@ paths:
       responses:
         "200":
           description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Queue"
       security:
         - staffAuth: []
 
@@ -304,6 +320,10 @@ paths:
       responses:
         "200":
           description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BookingList"
       security:
         - staffAuth: []
 
@@ -317,7 +337,7 @@ paths:
           schema:
             type: string
         - in: query
-          name: "code"
+          name: "uid"
           required: true
           schema:
             type: string
@@ -329,15 +349,9 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties: # TODO: Check
-                  status:
-                    type: string
-                    enum:
-                    - "expired"
-                    - "invalid"
-                    - "valid"
-                    - "active"
+                $ref: "#/components/schemas/TokenTicket"
+        "400":
+          description: Ticket does not exist
       security:
         - staffAuth: []
 
@@ -378,6 +392,11 @@ paths:
           required: true
           schema:
             type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TokenCode"
       tags:
         - "staff"
       responses:
@@ -388,6 +407,8 @@ paths:
 
   /staff/shop/{shop_id}/token/log-exit:
     post:
+      tags:
+        - "staff"
       summary: Log exit, update shop occupancy information
       parameters:
         - in: path
@@ -395,30 +416,107 @@ paths:
           required: true
           schema:
             type: string
-      tags:
-        - "staff"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TokenCode"
       responses:
         "200":
           description: OK
       security:
         - staffAuth: []
 
-  /staff/manage/add-shop:
+  /staff/manage/shop/add:
     post:
       summary: Add a new shop to the database
       tags:
         - "manage"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Shop"
+      security:
+        - staffAuth: []
+
+  /staff/manage/shop/list:
+    post:
+      summary: Get a list of all managed shops
+      tags:
+        - "manage"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/SearchResult"
+      security:
+        - staffAuth: []
+
+  /staff/manage/shop/edit/{shop_id}:
+    post:
+      summary: Edit an existing shop listing
+      tags:
+        - "manage"
+      parameters:
+        - in: path
+          name: shop_id
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Shop"
       responses:
         "200":
           description: OK
       security:
         - staffAuth: []
 
-  /staff/manage/edit-shop:
+  /staff/manage/shop/show/{shop_id}:
     post:
-      summary: Edit a shop listing
+      summary: Make shop public and reachable from customers
       tags:
         - "manage"
+      parameters:
+        - in: path
+          name: shop_id
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+      security:
+        - staffAuth: []
+
+  /staff/manage/shop/hide/{shop_id}:
+    post:
+      summary: Make shop private and hidden from customers
+      tags:
+        - "manage"
+      parameters:
+        - in: path
+          name: shop_id
+          required: true
+          schema:
+            type: string
       responses:
         "200":
           description: OK
@@ -495,22 +593,37 @@ components:
           type: array
           items:
             type: string
+        creation:
+          type: string
+          format: date-time
         expiration:
           type: string
           format: date-time
+        state:
+          type: string
+          enum:
+            - "valid"
+            - "expired"
+    TokenCode:
+      type: object
+      properties:
+        uid:
+          type: string
     Tokens:
       type: object
       properties:
         tickets:
           type: array
           items:
-            type: object
             $ref: "#/components/schemas/TokenTicket"
         bookings:
           type: array
           items:
-            type: object
             $ref: "#/components/schemas/TokenBooking"
+    Queue:
+      type: array
+      items:
+        $ref: "#/components/schemas/TokenTicket"
     QueueEst:
       type: object
       properties:
@@ -519,6 +632,99 @@ components:
         est:
           type: string
           format: date-time
+    BookingList:
+      type: array
+      items:
+        $ref: "#/components/schemas/TokenBooking"
+    Shop:
+      type: object
+      properties:
+        uid:
+          type: string
+        name: 
+          type: string
+        description: 
+          type: string
+        image:
+          type: string
+          format: url
+        location:
+          type: string
+        departments:
+          type: array
+          items:
+            $ref: "#/components/schemas/Department"
+        schedule:
+          type: object
+          properties:
+            mo:
+              $ref: "#/components/schemas/Schedule"
+            tu:
+              $ref: "#/components/schemas/Schedule"
+            we:
+              $ref: "#/components/schemas/Schedule"
+            th:
+              $ref: "#/components/schemas/Schedule"
+            fr:
+              $ref: "#/components/schemas/Schedule"
+            sa:
+              $ref: "#/components/schemas/Schedule"
+            su:
+              $ref: "#/components/schemas/Schedule"
+    ShopOccupancy:
+      type: object
+      description: department_uid, occupancy map
+      additionalProperties:
+        type: integer
+    Schedule:
+      type: array
+      items:
+        type: object
+        $ref: "#/components/schemas/TimeSpan"
+    TimeSpan:
+      type: object
+      properties:
+        start:
+          type: string
+          format: partial-time
+          description: rfc3339 section-5.6 partial-time
+        end:
+          type: string
+          format: partial-time
+          description: rfc3339 section-5.6 partial-time
+    Department:
+      type: object
+      properties:
+        uid:
+          type: string
+        description:
+          type: string
+        capacity:
+          type: integer
+    SearchResult:
+      type: object
+      properties:
+        uid: 
+          type: string
+        name:
+          type: string
+        image:
+          type: string
+          format: url
+        description:
+          type: string
+    BookingAvailability:
+      type: array
+      items:
+        type: object
+        properties:
+          dept_id:
+            type: string
+          time:
+            $ref: "#/components/schemas/TimeSpan"
+          available:
+            type: integer
+
         
 
   securitySchemes:
