@@ -57,6 +57,20 @@ A more specific description of each component follows:
 
 
 \subsection{Deployment view}
+The distribution of device and artifacts representing the topology of the system is pictured with a deployment diagram.
+The system is structured in a 2-tier architecture: the first tier is a series of Web servers, each running a reverse proxy that routes traffic to the Application servers, where the CLup binary is hosted together with a in-memory data store; the second tier is a Database server, receiving connections from the Application servers.
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\textwidth]{Images/deployment-1.pdf}
+    \caption{Deployment Diagram}
+\end{figure}
+\newpage
+The same system can also be deployed with a containerized structure, as explained in the RASD. This makes setup easier, thus more portable, as it is agnostic with respect to the environment.
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\textwidth]{Images/deployment-2.pdf}
+    \caption{Deployment Diagram using Docker containers}
+\end{figure}
 
 \subsection{Runtime view}
 
