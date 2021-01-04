@@ -19,39 +19,34 @@ Further details on the System components and their interactions will be examined
 
 In this section, an UML component diagram shows the internal structure of the \emph{CLup} system. The architecture is simple, there are a small number of components and few external service providers. It can be divided in two higher level components: a Web Application and an Application Server, with the respective dependencies.
 As for component dependencies, the Web application uses a Camera module to scan the QR codes, and it can use an optiona Map service provider to show directions. The Application server uses a DBMS, an in-memory data store and a search engine.
-The relationships and interfaces between the components are represented through assembly connectors and delegation connectors. 
+The relationships and interfaces between the components are represented through assembly connectors and delegation connectors.
 A detailed description of the components is included in the following paragraphs:
 
 \textbf{Web application}\\
 \emph{CLup} is a distributed system, therefore part of the logic is included in the client. The Web Application client consists of two main components and some external interfaces:
 \begin{itemize}
-    \item \textbf{Customer interface}\\ The Customer can interact with a Web application that queries the Application server under the hood. The applicaition guides the user through the creation of a Ticket or a Booking displaying useful data and sending the Customer choices to the server only after validation, so that invalid input can be blocked without putting strain on the server.
-    \item \textbf{Staff interface}\\ The Staff can access a special module of the interface that works in a similar way to the Customer interface, but features different functionalities. 
-    
-\end{itemize}
-\textbf{Web application external Interfaces}
-\begin{itemize}
-    \item \textbf{Camera}\\ It is a requirement for the clerks to have a working camera on their device to be able to take photos of the QR codes of customers. The conversion is managed locally in the web browser and will produce an identifier that can be sent to the Application server. 
-    \item \textbf{Maps provider}\\ After generating a Ticket the Users can choose to display a Map with directions to the Shop. This is possible with the help of an external Maps service provider.
+    \item \textbf{Customer interface} is what Customers use to interact with the service. It processes the inputs, transparently querying the application server with transformed data, and it transforms the repsonses into a user frierndly representation. The application guides the user through the creation of a Ticket or a Booking while performing input validation to reduce the workload on the application server. It can interface with a \emph{Maps provider} to display a Map with directions to the Shop.
+    \item \textbf{Staff interface} is what the Staff uses to interact with the service. The behaviour is similar to that of the Customer interface, however the functionalities allow checking tokens and managing the shops. It interfaces with a \emph{Camera} to scan the QR codes associated with tokens
 \end{itemize}
 
 \textbf{Application server}\\
-The application server follows the Actor model (See \ref{sect:patterns}) so it can be seen as a set of components which have no shared state, \todo{for clarity ...}
+The application server is accessed through a REST API. Its internal structure follows the Actor model (\ref{sect:patterns}) so it can be seen as a set of components which have no shared state. The actors can be organized and seen as three groups based on their functions:
 \begin{itemize}
-    \item \textbf{Customer web services}\\ It provides a REST API that is open to the Internet, which will be queried by the Web App when the user is logged in as a Customer. It makes use of the Search Engine module to provide accurate Shop results, of the In-memory storage to obtain the data relative to the current session, and of the DBMS to retrieve the persistent information that is necessary to the API.
-    \item \textbf{Staff web services}\\ With a similar interface and dependencies to the above, it provides a REST API intended to be used by the Staff: store managers and clerks. \todo{More on functionalities}
-    \item \textbf{Authentication}\\ This component manages the registration and login of any category of user. Given the credentials of the user by any other component, it can perform a registration or a login and generate a valid session. Its interface accepts session data to confirm a user has previously logged in and has a valid session.
-    
-\end{itemize}
-\textbf{Application server external Interfaces}
-\begin{itemize}
-    \item \textbf{Search Engine}\\ This component generates real-time Shop results for every query Customers make on the homepage of the Web application.
-    \item \textbf{DBMS}\\ All of the data regarding Shops, Bookings, Tickets and Customers is stored in a relational database that is managed through a DBMS, e.g. PostgreSQL. Its interface is connected to every component of the Application server.
-    \item \textbf{In-memory storage}\\ Session and cache data are stored in a in-memory data store to enhance performance.
-    \item \textbf{Email service}\\ It provides the capability to send emails to new Customers to validate their email address.
-\end{itemize}
+    \item \textbf{Authentication} handles registrations and logins. It interfaces with the DBMS to validate and update credentials and with the Session Store to create and update Sessions. It can verify or update login credentials and authenticate a user Session.
+    \item \textbf{Customer web services} interface with the Search engine to allow users to find Shops. They use Session storage to check authentiaction and update session data. They interact with the DBMS to retrieve the persist the data necessary for the services. They allow users to create Tokens, search Shops and receive time estimates.
+    \item \textbf{Staff web services} They use Session storage to check authentiaction and update session data. They interact with the DBMS to retrieve the persist the data necessary for the services. They allow the staff to validate Tokens, check occupancies and they allow managers to manage shop listings.
 
+\end{itemize}
+\textbf{Application server external Interfaces}\\
+The application server has interfaces for its internal components in the form of REST API. The web application can interact with the Application Server by sending HTTP queries to the endpoints described in the API (\ref{sect:api})
 
+\textbf{Search Engine}\\ This component generates real-time search results to allow Customers to find a Shop by name.
+
+\textbf{DBMS}\\ Stores the long term persistent data regarding Shops, Bookings, Tickets and Account data in a relational database.
+
+\textbf{In-memory Session Store}\\ Keeps track of Sessions and stores data that should persist throughout the lifetime of a session. It provides a fast in-memory data structure that the Application server can use for non critical data to reduce the frequency of accesses to the relational database.
+
+\textbf{Email service}\\ It provides the capability to send emails to new Customers to validate their email address.
 
 
 \subsection{Deployment view}
@@ -68,11 +63,31 @@ CLup can also be deployed in a containerized environment as stated in the portab
     \caption{Deployment Diagram using Docker containers}
 \end{figure}
 
+\subsubsection*{Recommended Implementation}
+\begin{itemize}
+    \item \textbf{Web Application}: the web application should be written in a web framework such as \emph{Vue.js} or \emph{Angular} to create a consistent web interface with cross platform support.
+    \item \textbf{Application Server}: the recommended implementation for the server uses the \emph{Rust} language, the \emph{Actix}\footnote{https://actix.rs/} actor framework and \emph{SQLx}\footnote{https://github.com/launchbadge/sqlx}. The Rust language provides a safe, concurrent alternative over C and C++ while providing comparable performance, allowing high reliability and throughput for the service.
+    \item \textbf{In-Memory data store}: the in memory data store employed may be \emph{Redis Enterprise}
+    \item \textbf{DBMS}: the relational database manager software may be \emph{PostgreSQL 13}
+    \item \textbf{Reverse Proxy}: the reverse proxy may be \emph{NGINX}
+\end{itemize}
+
 \subsection{Runtime view}
 
 \subsection{Component interfaces}
 
+\label{sect:api}
+\subsubsection{API}
+\todo{
+    \input{api/api}
+}
 \label{sect:patterns}
 \subsection{Selected architectural styles and patterns}
+The main design pattern characterizing the Application server is the \textbf{Actor Model}\cite{10.5555/1624775.1624804}. It's a model that allows building highly concurrent applications, without the need to synchronize access to shared memory.
+An \textbf{Actor} is an indipendent virtual processor with its own local state. Each actor has a \textbf{Mailbox}. When a message appears in the mailbox and the actor is idle, it kicks into life and processes the message\cite{pragmatic}. Actors process one message at a time and can only interact with other actors with messages.
+
+In the \emph{CLup} Application server, every endpoint of the API is an indipendent actor with no shared state.
+
+On a higher level of abstraction, \emph{CLup} follows the Model, View, Controller design pattern, where the controller is split between the Application Server and the Web Application
 
 \subsection{Other design decisions}
