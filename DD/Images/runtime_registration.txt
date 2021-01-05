@@ -1,0 +1,44 @@
+participant "Clup Webapp" as C
+#participant "Reverse Proxy" as P
+participant "CLup Application Server" as S
+participant "Session store" as R
+participant "DBMS" as DB
+participant "Email provider" as E
+
+C->S: POST /register (email, password)
+activate C
+activate S
+S->DB: check_and_insert_credentials()
+activate DB
+DB-->>S: 
+deactivate DB
+alt unavailable credentials
+S-->>C: 400 Bad Request
+else available credentials
+S->E: send_email(email)
+activate E
+E->E: send_email(email)
+activate E
+deactivateafter E
+E-->>S:
+deactivate E
+S-->>C: 200 OK
+deactivate C
+deactivate S
+#E->>Customer: activation email
+#activate Customer
+#deactivate E
+#Customer->C: click on link
+#deactivateafter Customer
+C->S: GET /register/confirm
+activate C
+activate S
+S->DB: activate_credentials()
+activate DB
+DB-->>S:
+deactivate DB
+S-->>C: 201 OK
+deactivate S
+deactivate C 
+
+end

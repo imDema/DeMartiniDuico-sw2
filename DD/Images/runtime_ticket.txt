@@ -1,0 +1,63 @@
+participant "Clup Webapp" as C
+#participant "Reverse Proxy" as P
+participant "CLup Application Server" as S
+participant "Session store" as R
+participant "DBMS" as DB
+participant "Search engine" as SE
+
+frame logged-in Customer
+
+C->S: GET /search (name)
+activate C
+activate S
+S->SE: search_shop(name)
+activate SE
+SE-->>S: search_results()
+deactivate SE
+S-->>C: 200 OK (shop_id, name,...)
+deactivate S
+
+C->S: GET /shop/{shop_id}
+activate S
+S->DB: get_shop_info()
+activate DB
+DB-->>S: 
+deactivate DB
+S-->>C: 200 OK (departments, schedule,...)
+deactivate S
+
+
+C->S: GET /shop/{shop_id}/ticket/queue
+activate S
+S->DB: get_waiting_list_info()
+activate DB
+DB-->>S:
+deactivate DB
+S-->>C: 200 OK (people, est)
+deactivate S
+
+C->S: POST /shop/{shop_id}/ticket/new
+activate S
+S->R: check_session()
+activate R
+R-->>S:
+deactivate R
+S->DB: get_waiting_list_info()
+activate DB
+DB-->>S:
+deactivate DB
+S->S: check_waiting_list()
+activate S
+deactivateafter S
+
+alt waiting list is full
+S-->>C: 400 Bad Request
+else waiting list is not full
+S->DB: insert_ticket()
+activate DB
+DB-->>S:
+deactivate DB
+S-->>C: 200 OK (uid, shop_id, start_time, ...)
+deactivate C
+deactivate S
+end

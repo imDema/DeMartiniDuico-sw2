@@ -1,0 +1,99 @@
+actor Customer
+participant "Clup Webapp (Staff)" as C
+#participant "Reverse Proxy" as P
+participant "CLup Application Server" as S
+participant "Session store" as R
+participant "DBMS" as DB
+
+#C->S: POST /login (email, password, remember)
+#activate C
+#activate S
+#S->DB: get_staff_credentials()
+#activate DB
+#DB-->>S: 
+#deactivate DB
+#S->S: validate_credentials()
+#activate S
+#deactivateafter S
+
+
+#S->R: update_session()
+#activate S
+#activate R
+#R-->>S: 
+#deactivate R
+#deactivate S
+#S-->>C: 200 OK [Set-Cookie: session]
+#deactivate S
+#deactivate C
+
+frame logged-in Staff
+
+activate Customer
+Customer->C: ask for substitute ticket
+activate C
+
+C->S: POST /staff/shop/{shop_id}/ticket/new-substitute
+activate S
+S->R: check_session()
+activate R
+R-->>S:
+deactivate R
+S->DB: get_waiting_list_info()
+activate DB
+DB-->>S:
+deactivate DB
+S->S: check_waiting_list()
+activate S
+deactivateafter S
+
+
+alt waiting list is full
+S-->>C: 400 Bad Request
+else waiting list is not full
+#par 
+S->DB: insert_ticket()
+activate DB
+DB-->>S:
+deactivate DB
+#thread
+S->DB: log_entry()
+activate DB
+DB-->>S:
+deactivate DB
+#end
+S-->>C: 200 OK (uid, shop_id, start_time, ...)
+deactivate S
+C-->Customer: allow entry
+deactivate C
+Customer->Customer: visit Shop
+Customer->C: show substitute ticket, on exit
+activate C
+C->C: scan QR code
+activate C
+deactivateafter C
+C->S: POST /staff/shop/{shop_id}/token/log-exit (uid)
+activate S
+S->R: check_session()
+activate R
+R-->>S:
+deactivate R
+S->DB: check_token()
+activate DB
+DB-->>S:
+deactivate DB
+#S->S: check_token()
+#activate S
+#deactivateafter S
+
+S->DB: log_exit()
+activate DB
+DB-->>S:
+deactivate DB
+S-->>C: 200 OK
+deactivate S
+C-->Customer: allow exit
+deactivate C
+deactivate Customer
+end
+
