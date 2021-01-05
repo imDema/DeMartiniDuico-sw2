@@ -56,44 +56,9 @@ S->DB: insert_ticket()
 activate DB
 DB-->>S:
 deactivate DB
-#thread
-S->DB: log_entry()
-activate DB
-DB-->>S:
-deactivate DB
-#end
 S-->>C: 200 OK (uid, shop_id, start_time, ...)
 deactivate S
-C-->Customer: allow entry
+C-->Customer: hand ticket
 deactivate C
-Customer->Customer: visit Shop
-Customer->C: show substitute ticket, on exit
-activate C
-C->C: scan QR code
-activate C
-deactivateafter C
-C->S: POST /staff/shop/{shop_id}/token/log-exit (uid)
-activate S
-S->R: check_session()
-activate R
-R-->>S:
-deactivate R
-S->DB: check_token()
-activate DB
-DB-->>S:
-deactivate DB
-#S->S: check_token()
-#activate S
-#deactivateafter S
-
-S->DB: log_exit()
-activate DB
-DB-->>S:
-deactivate DB
-S-->>C: 200 OK
-deactivate S
-C-->Customer: allow exit
-deactivate C
-deactivate Customer
+deactivateafter Customer
 end
-

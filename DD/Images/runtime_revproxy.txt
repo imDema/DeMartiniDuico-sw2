@@ -1,0 +1,90 @@
+actor Customer
+participant "Clup Webapp" as C
+participant "Reverse Proxy" as P
+participant "CLup Application Server" as S
+participant "Session store" as R
+participant "DBMS" as DB
+#participant "Search engine" as SE
+
+Customer->C: open webapp
+activate Customer
+C->P: GET /
+activate C
+activate P
+P-->>C: 200 OK
+deactivate P
+
+par 
+C->P: GET /script1.js
+activate C
+activate P
+P-->>C: 200 OK
+deactivate P
+deactivate C
+thread 
+C->P: GET /script2.js
+activate C
+activate P
+P-->>C: 200 OK
+deactivate P
+deactivate C
+thread 
+C->P: GET /image.png
+activate C
+activate P
+P-->>C: 200 OK
+deactivate P
+deactivate C
+end
+C-->>Customer: show login page
+deactivate C
+deactivate Customer
+
+Customer->C: interact with webapp
+activate Customer
+activate C
+C->P: POST /{API-query}
+activate P
+P->S: POST /{API-query}
+activate S
+deactivate P
+opt endpoint needs authentication
+S->R: check_session()
+activate R
+R-->>S: 
+deactivate R
+end
+opt additional data are needed
+S->DB: retrieve_info()
+activate DB
+DB-->>S:
+deactivate DB
+end
+S->S: compute_response()
+activate S
+deactivateafter S
+opt data must be updated
+S->DB: update_info()
+activate DB
+DB-->>S:
+deactivate DB
+end
+
+alt invalid query
+S-->>P: 400 Bad Request
+activate P
+P-->>C: 400 Bad Request
+deactivate P
+C-->>Customer: display error 
+
+else valid query
+
+S-->>P: 200 OK
+deactivate S
+activate P
+P-->>C: 200 OK
+deactivate P
+C-->>Customer: show query result
+deactivate C
+deactivateafter Customer
+end
