@@ -42,7 +42,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/RequestRegister"
+              $ref: "#/components/schemas/RequestRegistration"
       responses:
         "200":
           description: OK
@@ -96,8 +96,7 @@ paths:
     get:
       summary: Get active tokens for the customer
       tags:
-        - "booking"
-        - "ticket"
+        - "token"
       responses:
         "200":
           description: OK
@@ -279,12 +278,20 @@ paths:
 
   /staff/register:
     post:
-      summary: Request the creation of a new staff account
+      summary: Activate staff account and set password
       tags:
         - "staff-account"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/StaffRequestRegistration"
       responses:
         "200":
           description: OK
+        "400":
+          description: Invalid credentials
 
   /staff/shop/{shop_id}/ticket/queue:
     get:
@@ -403,6 +410,8 @@ paths:
       responses:
         "200":
           description: OK
+        "400":
+          description: Error
       security:
         - staffAuth: []
 
@@ -425,6 +434,30 @@ paths:
       responses:
         "200":
           description: OK
+        "400":
+          description: Error
+      security:
+        - staffAuth: []
+
+  /staff/manage/create-account/{shop_id}:
+    post:
+      summary: Generate a temporary staff account for activation
+      tags: 
+        - "manage"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StaffTempAccount"
+        "400":
+          description: Invalid email
       security:
         - staffAuth: []
 
@@ -437,10 +470,7 @@ paths:
         content:
           application/json:
             schema:
-              type: object
-              properties:
-                name:
-                  type: string
+              type: string
       responses:
         "200":
           description: OK
@@ -468,7 +498,7 @@ paths:
       security:
         - staffAuth: []
 
-  /staff/manage/shop/edit/{shop_id}:
+  /staff/manage/shop/{shop_id}/edit:
     post:
       summary: Edit an existing shop listing
       tags:
@@ -490,7 +520,7 @@ paths:
       security:
         - staffAuth: []
 
-  /staff/manage/shop/show/{shop_id}:
+  /staff/manage/shop/{shop_id}/show:
     post:
       summary: Make shop public and reachable from customers
       tags:
@@ -507,7 +537,7 @@ paths:
       security:
         - staffAuth: []
 
-  /staff/manage/shop/hide/{shop_id}:
+  /staff/manage/shop/{shop_id}/hide:
     post:
       summary: Make shop private and hidden from customers
       tags:
@@ -526,7 +556,7 @@ paths:
 
 components:
   schemas:
-    RequestRegister:
+    RequestRegistration:
       type: object
       properties:
         email:
@@ -542,6 +572,22 @@ components:
           type: string
         remember:
           type: boolean
+    StaffTempAccount:
+      type: object
+      properties:
+        email:
+          type: string
+        token:
+          type: string
+    StaffRequestRegistration:
+      type: object
+      properties:
+        email:
+          type: string
+        token:
+          type: string
+        password:
+          type: string
     RequestBooking:
       type: object
       properties:
@@ -655,7 +701,7 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/Department"
-        schedule:
+        weekly-schedule:
           type: object
           properties:
             mo:
