@@ -121,8 +121,10 @@ CLup can also be deployed in a containerized environment as stated in the portab
 The main design pattern characterizing the Application server is the \textbf{Actor Model}\cite{10.5555/1624775.1624804}. It's a model that allows building highly concurrent applications, without the need to synchronize access to shared memory.
 An \textbf{Actor} is an indipendent virtual processor with its own local state. Each actor has a \textbf{Mailbox}. When a message appears in the mailbox and the actor is idle, it kicks into life and processes the message\cite{pragmatic}. Actors process one message at a time and can only interact with other actors with messages.
 
-In the \emph{CLup} Application server, every endpoint of the API is an indipendent actor with no shared state.
+In the \emph{CLup} Application server, every endpoint of the API is an independent actor with no shared state.
 
-On a higher level of abstraction, \emph{CLup} follows the Model, View, Controller design pattern, where the controller is split between the Application Server and the Web Application
+On a higher level of abstraction, \emph{CLup} follows the \textbf{Model, View, Controller} design pattern, where the controller is split between the Application Server and the Web Application.
+
+The Web Application implements the \textbf{MVVM} (Model–View–ViewModel) pattern, where every property of the view is exposed by the view model through a binding. This accomplishes a better separation between the UX and the business logic of the Application, which makes development in a team more efficient.
 
 \subsection{Other design decisions}
