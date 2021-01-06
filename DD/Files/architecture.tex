@@ -33,8 +33,8 @@ A detailed description of the components is included in the following paragraphs
 The application server is accessed through a REST API. Its internal structure follows the Actor model (\ref{sect:patterns}) so it can be seen as a set of components which have no shared state. The actors can be organized and seen as three groups based on their functions:
 \begin{itemize}
     \item \textbf{Authentication} handles registrations and logins. It interfaces with the DBMS to validate and update credentials and with the Session Store to create and update Sessions. It can verify or update login credentials and authenticate a user Session.
-    \item \textbf{Customer web services} interface with the Search engine to allow users to find Shops. They use Session storage to check authentiaction and update session data. They interact with the DBMS to retrieve the persist the data necessary for the services. They allow users to create Tokens, search Shops and receive time estimates.
-    \item \textbf{Staff web services} They use Session storage to check authentiaction and update session data. They interact with the DBMS to retrieve the persist the data necessary for the services. They allow the staff to validate Tokens, check occupancies and they allow managers to manage shop listings.
+    \item \textbf{Customer web services} interface with the Search engine to allow users to find Shops. They use Session storage to check authentication and update session data. They interact with the DBMS to retrieve the persist the data necessary for the services. They allow users to create Tokens, search Shops and receive time estimates.
+    \item \textbf{Staff web services} They use Session storage to check authentication and update session data. They interact with the DBMS to retrieve the persist the data necessary for the services. They allow the staff to validate Tokens, check occupancies and they allow managers to manage shop listings.
 
 \end{itemize}
 \textbf{Application server external Interfaces}\\
@@ -62,15 +62,6 @@ CLup can also be deployed in a containerized environment as stated in the portab
     \includegraphics[width=1\textwidth]{Images/deployment-2.pdf}
     \caption{Deployment Diagram using Docker containers}
 \end{figure}
-
-\subsubsection*{Recommended Implementation}
-\begin{itemize}
-    \item \textbf{Web Application}: the web application should be written in a web framework such as \emph{Vue.js} or \emph{Angular} to create a consistent web interface with cross platform support.
-    \item \textbf{Application Server}: the recommended implementation for the server uses the \emph{Rust} language, the \emph{Actix}\footnote{https://actix.rs/} actor framework and \emph{SQLx}\footnote{https://github.com/launchbadge/sqlx}. The Rust language provides a safe, concurrent alternative over C and C++ while providing comparable performance, allowing high reliability and throughput for the service.
-    \item \textbf{In-Memory data store}: the in memory data store employed may be \emph{Redis Enterprise}
-    \item \textbf{DBMS}: the relational database manager software may be \emph{PostgreSQL 13}
-    \item \textbf{Reverse Proxy}: the reverse proxy may be \emph{NGINX}
-\end{itemize}
 
 \subsection{Runtime view}
 \begin{figure}[H]
