@@ -58,23 +58,24 @@ def endpoints(y):
             p = p["post"]
         else:
             raise ()
+        path = re.sub(r"\{", r"\{", re.sub(r"\}", r"\}", path))
         out += f"\\textbf{{{method}}}  & \\texttt{{{path}}} \\\\\n"
         desc = p["summary"]
         out += f"Description   & {desc}  \\\\\n"
         if "parameters" in p:
-            out += "Parameters    & \\begin{tabu}{X|X}\n"
+            out += "Parameters    & \\everyrow{}\\begin{tabu}{X|X}\n"
             out += "\\textbf{Name} & \\textbf{Type} \\\\\n"
             for par in p["parameters"]:
                 name = par["name"]
                 type = parse_schema(par["schema"])
-                out += f"{name} & {type} \\\\\n"
+                out += f"\hline {name} & {type} \\\\\n"
 
-            out += "\\end{tabu}  \\\\\n"
+            out += "\\end{tabu}\\everyrow{\\tabucline[0.5pt]-}\\\\\n"
         if "requestBody" in p:
             type = parse_schema(p["requestBody"]["content"]["application/json"]["schema"])
             out += f"Body & {type} \\\\\n"
                 
-        out += "Responses     & \\begin{tabu}{X[0.5]|X[3]|X[2]} \n"
+        out += "Responses     & \\everyrow{}\\begin{tabu}{X[0.5]|X[3]|X[2]} \n"
         out += "\\textbf{Code} & \\textbf{Description} & \\textbf{Body} \\\\\n"
         for code, resp in p["responses"].items():
             desc = resp["description"]
@@ -83,7 +84,7 @@ def endpoints(y):
                 type = parse_schema(resp["content"]["application/json"]["schema"])
                 out += type
             out += "\\\\\n"
-        out += "\\end{tabu} \\\\\n"
+        out += "\\end{tabu}\\everyrow{\\tabucline[0.5pt]-} \\\\\n"
 
         out += "\\end{tabu}\n"
         out += "\\end{table}\n"
@@ -93,7 +94,7 @@ def summary(y):
     out = """
 \\begin{table}[H]
 \\everyrow{\\tabucline[0.5pt]-}
-\\begin{tabu} to \\textwidth {|X[-2]|X|X|} \\hline
+\\begin{tabu} to \\textwidth {|X|X[2.5]|X[2.5]|} \\hline
 Class & HTTP request & Description \\\\
 """
 
@@ -110,6 +111,7 @@ Class & HTTP request & Description \\\\
             raise ()
 
         cl = p["tags"][0]
+        path = re.sub(r"\{", r"\{", re.sub(r"\}", r"\}", path))
         req = f"\\textbf{{{method}}}\\newline \\texttt{{{path}}}"
         desc = p["summary"]
 
@@ -131,7 +133,7 @@ def models(y):
     \\centering
     \\textbf{{{name}}}\\\\
     \\everyrow{{\\tabucline[0.5pt]-}}
-    \\begin{{tabu}} spread 0pt {{|X[-2]|X|}} \\hline
+    \\begin{{tabu}} to 0.55\\textwidth {{|X|X|}} \\hline
     Field & Type \\\\
     """
 
@@ -148,18 +150,20 @@ def models(y):
             out += "\\end{table}\n\n"
         else:
             type = parse_schema(content)
-            out += f"{{\\centering\\textbf{{{name}}}: {type}}}\n\n"
+            out += f"\\begin{{center}}\\textbf{{{name}}}: {type}\\end{{center}}\n\n"
     return out
 
 
 infile = argv[1]
 
-print(infile)
+# print(infile)
 
 with open(infile, "r") as infile:
     y = yaml.full_load(infile)
 
-out = summary(y) + endpoints(y) + models(y)
+out = "\\subsubsection{API}\n\n" + summary(y) +\
+    "\\subsubsection{Endpoints}\n\n" + endpoints(y) +\
+    "\\subsubsection{Models}\n\n" + models(y)
 
 out = re.sub(r"\$", r"\\$", out)
 out = re.sub(r"#", r"\#", out)
