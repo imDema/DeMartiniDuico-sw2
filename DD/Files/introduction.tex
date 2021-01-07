@@ -1,17 +1,5 @@
 \subsection{Purpose}
 
-During the COVID-19 pandemic in order to reduce the of transmission of the virus governments have introduced various measures aimed to reduce to a minimum close contacts between people, these measures include social distancing and lockdowns.
-
-During lockdowns people can leave their habitations only for essential needs such as grocery shopping, which makes supermarkets a gathering spot where the virus could spread and consitutes a potential danger for the people visiting.
-
-For this reason the access to essential activities should be limited to lower the density of people inside the activities and allow keeping distances effectively and mitigate the risk.
-
-However this is not of trivial execution, because in order to serve the same amount of people, with reduced maximum capacity, the clients need to access the activity distributed over a longer timespan than regular operation. This means that if too many people want to access the shop in a given moment, some people will be left out and this will result in a line of people waiting to enter the shop.
-
-This is a hazard in and of itself since people outside will stay for a prolonged amount of time in close proximity with each other while waiting for their turn.
-
-The problem of forming lines can be mitigated by handing a number to each client and having people enter in order of arrival. This approach, while better than queueing, still requires all clients to go to the shop and take a ticket. Even though they would not need to stay in a queue, they would need to wait close to the activity nevertheless.
-
 This application aims to provide a digital alternative to the "handing numbers" approach and improve it by allowing people to take their number online, this way people only need to go to the shop when it is their turn to enter and they will not need to hang around the building.
 
 The product will also allow shop managers to effectively monitor the entrances by scanning a QR code associated with the "number" to ensure the safety limits are being followed.
@@ -20,30 +8,11 @@ Additionally to the lining up mechanism the application will allow customers to 
 
 CLup will also allow customers to choose the approximate time of their visit and the category of items they wish to buy, which allows making more accurate predictions of the waiting times and, by knowing the areas that they will visit, to better utilize the space in the building, while respecting health and safety measures.
 
+For more details about the context in which the application is born refer to the Purpose part of the RASD
+
 \subsection{Scope}
-\todo{TODO
---Machine
-Prenotation database
-Ticket queue
-Department occupation computation
-User data storage
---Shared
-Registration and Login
-Staff checks a token
-Staff emits a substitute ticket
-Customer books a visit
-Customer gets a ticket
-Manager adds and configures a Shop
-Manager checks Shop occupancy
---World
-Customer enters a Shop
-Customer goes to a department
-Customer exits a Shop
-Customer waits for their turn
-Customer travels to the Shop
-Social distancing
-Shop occupancy
-}
+
+The document describes the design of the \emph{CLup} sofware system, starting from the architectural design, including deployment guidelines, information about the flow of the user experience and concluding with implementation and integrationg guidelines.
 
 \subsection{Definitions, Acronyms, Abbreviations}
 \subsubsection{Definitions}
@@ -79,7 +48,7 @@ Shop occupancy
 
 \todo{
 \begin{description}
-    \item[v. 1.0 - ?/01/2020] Initial release
+    \item[v. 1.0 - 9/01/2021] Initial release
 \end{description} 
 }
 \subsection{Reference documents}
