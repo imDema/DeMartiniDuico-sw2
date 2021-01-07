@@ -1,0 +1,79 @@
+\begin{longtable}{| l | p{0.6\linewidth} |}
+    \caption{Mapping of the Requirements (from the \emph{RASD}) on the Components. \label{requirements_mapping} }\\
+   
+    \hline
+    \textbf{Component (DD)}  &  \textbf{Requirements (RASD)} \\
+    \hline
+    \endfirsthead
+   
+    \hline
+    \multicolumn{2}{|c|}{Continuation of Table \ref{requirements_mapping}}\\
+    \hline
+    \textbf{Component (DD)}  &  \textbf{Requirements (RASD)} \\
+    \hline
+    \endhead
+   
+    \hline
+    \endfoot
+   
+    Customer interface (Web application) & 
+    \begin{itemize}
+        \item \textbf{[R2]} The system shall allow customers to request the right to visit a shop as soon as possible
+        \item \textbf{[R3]} The system shall give Customers a Token associated with their position in the waiting line
+        \item \textbf{[R10]} The system shall allow customers to choose a time in the future in which they wish to visit a Shop
+        \item \textbf{[R11]} The system shall give Customers a Token associated with their booking
+        \item \textbf{[R12]} The system shall ask Customers to specify the approximate duration of their visit
+        \item \textbf{[R14]} The system shall give Customers an estimate of the waiting time remaining before it’s their turn
+        \item \textbf{[R17]} Customers shall be able to specify the categories of items they intend to buy
+    \end{itemize} \\\hline
+    Maps provider & 
+    \begin{itemize}
+        \item \textbf{[R16]} The system shall be able to connect to a Maps service to show information about travel time
+    \end{itemize} \\\hline
+    Staff interface (Web application) & 
+    \begin{itemize}
+        \item \textbf{[R4]} The Staff shall be able to scan Customer generated Tokens using a camera
+        \item \textbf{[R5]} The Staff shall be able to scan Customer generated Tokens using a textual input
+        \item \textbf{[R6]} Given a Token, the Staff application shall be able to verify its validity
+        \item \textbf{[R7]} Given a Token, the Staff application shall be able to verify its position in the waitingline
+        \item \textbf{[R8]} Given a Token, the Staff application shall be able to mark it as used and update the list of Customers currently inside the Shop
+    \end{itemize} \\\hline
+    Camera & 
+    \begin{itemize}
+        \item \textbf{[R4]} The Staff shall be able to scan Customer generated Tokens using a camera
+    \end{itemize} \\\hline
+    Customer Ticket service & 
+    \begin{itemize}
+        \item \textbf{[R1]} The system shall keep track of the list of Customers waiting to visit each Shop
+        \item \textbf{[R2]} The system shall allow customers to request the right to visit a shop as soon as possible
+        \item \textbf{[R3]} The system shall give Customers a Token associated with their position in the waiting line
+        \item \textbf{[R12]} The system shall ask Customers to specify the approximate duration of their visit
+        \item \textbf{[R13]} The system shall automatically infer an estimate visit duration for returning customers
+        \item \textbf{[R14]} The system shall give Customers an estimate of the waiting time remaining before it’s their turn
+        \item \textbf{[R15]} The system shall notify Customers when their turn is about to come
+        \item \textbf{[R17]} Customers shall be able to specify the categories of items they intend to buy
+
+    \end{itemize} \\\hline
+    Customer Booking service & 
+    \begin{itemize}
+        \item \textbf{[R9]} The system shall keep track of the Customers that want to visit a Shop in the future
+        \item \textbf{[R10]} The system shall allow customers to choose a time in the future in which they wish to visit a Shop
+        \item \textbf{[R11]} The system shall give Customers a Token associated with their booking
+        \item \textbf{[R12]} The system shall ask Customers to specify the approximate duration of their visit
+        \item \textbf{[R13]} The system shall automatically infer an estimate visit duration for returning customers
+        \item \textbf{[R17]} Customers shall be able to specify the categories of items they intend to buy
+        \item \textbf{[R18]} The system shall keep track of the number of customers visiting the Shop on a Department basis
+    \end{itemize} \\\hline
+    Token validation service &     
+    \begin{itemize}
+        \item \textbf{[R6]} Given a Token, the Staff application shall be able to verify its validity
+        \item \textbf{[R7]} Given a Token, the Staff application shall be able to verify its position in the waitingline
+        \item \textbf{[R8]} Given a Token, the Staff application shall be able to mark it as used and update the list of Customers currently inside the Shop
+        \item \textbf{[R18]} The system shall keep track of the number of customers visiting the Shop on a Department basis
+    \end{itemize} \\\hline
+    Shop management service & 
+    \begin{itemize}
+        \item \textbf{[R17]} Customers shall be able to specify the categories of items they intend to buy
+        \item \textbf{[R18]} The system shall keep track of the number of customers visiting the Shop on a Department basis
+    \end{itemize} \\\hline
+\end{longtable}
