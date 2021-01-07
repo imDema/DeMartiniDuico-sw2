@@ -92,10 +92,8 @@ def endpoints(y):
 
 def summary(y):
     out = """
-\\begin{table}[H]
-\\everyrow{\\tabucline[0.5pt]-}
-\\begin{tabu} to \\textwidth {|X|X[2.5]|X[2.5]|} \\hline
-Class & HTTP request & Description \\\\
+\\begin{tabularx}{\\textwidth}{|p{0.08\\textwidth}|l|X|} \\hline
+\\textbf{Class} & \\textbf{HTTP request} & \\textbf{Description} \\\\\\hline\\endhead
 """
 
     paths = y["paths"]
@@ -112,13 +110,12 @@ Class & HTTP request & Description \\\\
 
         cl = p["tags"][0]
         path = re.sub(r"\{", r"\{", re.sub(r"\}", r"\}", path))
-        req = f"\\textbf{{{method}}}\\newline \\texttt{{{path}}}"
+        req = f"\\makecell{{\\textbf{{{method}}} \\\\ \\texttt{{{path}}}}}"
         desc = p["summary"]
 
-        out += f"{cl} & {req}  & {desc} \\\\\n"
+        out += f"{cl} & {req}  & {desc} \\\\\\hline\n"
 
-    out += "\\end{tabu}\n"
-    out += "\\end{table}\n\n"
+    out += "\\end{tabularx}\n\n"
     return out
 
 def models(y):
