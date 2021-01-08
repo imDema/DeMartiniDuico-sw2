@@ -34,9 +34,9 @@ The application server is accessed through a REST API. Its internal structure fo
 \begin{itemize}
     \item \textbf{Authentication} handles registrations and logins. It interfaces with the DBMS to validate and update credentials and with the Session Store to create and update Sessions. It can verify or update login credentials and authenticate a user Session.
     \item \textbf{Customer Ticket service} interface with the Search engine to allow users to find Shops. It uses Session storage to check authentication and update session data. It interacts with the DBMS to retrieve the persistent data necessary for the services. It allows users to create Tickets, search Shops and receive time estimates.
-    \item \textbf{Customer Booking service} shares the Search engine with the Ticket Service and has a similar policy to the Session storage and the DBMS. It computes the availability of Shop departments to decide whether to accept Booking requests.
+    \item \textbf{Customer Booking service} interface with the Search engine with the Ticket Service and has a similar policy to the Session storage and the DBMS. It computes the availability of Shop departments to decide whether to accept Booking requests.
     \item \textbf{Token validation service} It uses Session storage to check authentication and update session data. It interacts with the DBMS to retrieve the persistent data necessary for the services. It allows the Staff to validate Tokens. 
-    \item \textbf{Shop Management service} It has an interface analogous to the one above. It allows the Managers to check occupancies and they to manage shop listings.
+    \item \textbf{Shop Management service} interfaces with the DBMS. It allows the Managers to add and edit Shops, check tehir current status and occupancy.
 
 \end{itemize}
 \textbf{Application server external Interfaces}\\
@@ -64,6 +64,8 @@ CLup can also be deployed in a containerized environment as stated in the portab
     \includegraphics[width=1\textwidth]{Images/deployment-2.pdf}
     \caption{Deployment Diagram using Docker containers}
 \end{figure}
+
+The CLup application server should be deployable as separate artifacts for the components shown in Figure \ref{fig:component_diagram} to allow updating the services one at a time and limit service degradation in case of failures.
 
 \subsection{Runtime view}
 \begin{figure}[H]
@@ -117,5 +119,3 @@ In the \emph{CLup} Application server, every endpoint of the API is an independe
 On a higher level of abstraction, \emph{CLup} follows the \textbf{Model, View, Controller} design pattern, where the controller is split between the Application Server and the Web Application.
 
 The Web Application implements the \textbf{MVVM} (Model-View-ViewModel) pattern, where every property of the view is exposed by the view model through a binding. This accomplishes a better separation between the UX and the business logic of the Application, which makes development in a team more efficient.
-
-\subsection{Other design decisions}
