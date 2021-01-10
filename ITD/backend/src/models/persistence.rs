@@ -9,6 +9,7 @@ fn round_fn(x: u16) -> u16 {
     ((k & 0xFFFF) ^ (k >> 16)) as u16
 }
 
+
 fn feistel(x: u32, n: u32) -> u32 {
     let mut l = (x & 0xFFFF) as u16;
     let mut r = (x >> 16) as u16;
@@ -21,6 +22,14 @@ fn feistel(x: u32, n: u32) -> u32 {
     (l as u32) << 16 | r as u32
 }
 
+
+///```rust
+/// # use clup::models::persistence::{encode_serial, decode_serial};
+/// let x = 1234;
+/// let enc = encode_serial(x);
+/// let dec = decode_serial(&enc);
+/// assert_eq!(Ok(x), dec);
+///```
 pub fn encode_serial(id: i32) -> String {
     format!("{:x}", feistel(id as u32, N))
 }

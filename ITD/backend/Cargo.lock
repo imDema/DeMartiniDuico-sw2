@@ -731,6 +731,7 @@ dependencies = [
  "chrono",
  "dotenv",
  "futures",
+ "hex",
  "lazy_static",
  "log",
  "parking_lot",
