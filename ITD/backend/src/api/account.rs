@@ -8,6 +8,7 @@ use serde::Deserialize;
 
 pub fn endpoints(cfg: &mut web::ServiceConfig) {
     cfg.service(login);
+    cfg.service(logout);
     cfg.service(register);
     cfg.service(confirm);
 }
@@ -16,7 +17,7 @@ pub fn endpoints(cfg: &mut web::ServiceConfig) {
 struct RequestLogin {
     email: String,
     password: String,
-    remember: bool,
+    remember: Option<bool>,
 }
 // TODO: remember
 #[post("/login")]
@@ -39,6 +40,13 @@ async fn login(conn: web::Data<PgPool>, body: web::Json<RequestLogin>, session: 
     } else {
         error
     }
+}
+
+#[get("/logout")]
+async fn logout(_conn: web::Data<PgPool>, session: Session) -> HttpResponse {
+    // let conn = conn.into_inner();
+    session::clear_account(&session);
+    HttpResponse::Ok().finish()
 }
 
 #[derive(Deserialize)]

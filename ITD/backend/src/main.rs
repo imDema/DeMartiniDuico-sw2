@@ -1,5 +1,5 @@
 use actix_web::middleware::Logger;
-use actix_web::{web, App, HttpServer};
+use actix_web::{App, HttpServer, web};
 use actix_redis::RedisSession;
 use clup::api;
 use sqlx::PgPool;
@@ -39,9 +39,8 @@ async fn main() -> std::io::Result<()> {
         .wrap(Logger::default())
         .wrap(RedisSession::new(&redis_url, &key))
         .data(db_pool.clone())
-        // .configure(api::generic::endpoints)
         .configure(api::account::endpoints)
-        // .route("/", web::get().to(index))
+        .service(web::scope("/dev").configure(api::dev::endpoints))
     })
     .bind(api_url)?
     .run()

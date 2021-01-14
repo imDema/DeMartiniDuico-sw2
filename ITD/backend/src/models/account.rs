@@ -50,14 +50,17 @@ pub struct PersistentCustomer<'a> {
 }
 
 impl<'a> PersistentCustomer<'a> {
-    pub async fn get(conn: &'a PgPool, id: i32) -> sqlx::Result<PersistentCustomer<'a>> {
+    pub async fn get(conn: &'a PgPool, id: i32) -> sqlx::Result<Option<PersistentCustomer<'a>>> {
         let acc = query_as!(Customer,
                 r"SELECT id, email, salt, digest FROM customer WHERE id = $1",
                 id
-            ).fetch_one(conn)
+            ).fetch_optional(conn)
             .await?;
 
-        Ok(Self{inner: acc, conn})
+        match acc {
+            Some(acc) => Ok(Some(Self{inner: acc, conn})),
+            None => Ok(None)
+        }
     }
 
     pub async fn find(conn: &'a PgPool, email: &str) -> sqlx::Result<Option<PersistentCustomer<'a>>> {
