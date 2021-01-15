@@ -1,0 +1,121 @@
+\subsection{Overview}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=.85\textwidth]{Images/overview.pdf}
+    \caption{\label{fig:world_machine} Architecture overview}
+\end{figure}
+The figure above shows an high level representation of the \emph{CLup} system architecture.
+Two parts can be easily distinguished, separated by the firewall: the Client Web Application and the Application Server with its data storage.
+Further details on the System components and their interactions will be examined in the following sections.
+
+\subsection{Component view}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=.85\textwidth]{Images/component2.pdf}
+    \caption{\label{fig:component_diagram} Component diagram of the full system}
+\end{figure}
+
+In this section, an UML component diagram shows the internal structure of the \emph{CLup} system. The architecture is simple, there are a small number of components and few external service providers. It can be divided in two higher level components: a Web Application and an Application Server, with the respective dependencies.
+As for component dependencies, the Web application uses a Camera module to scan the QR codes, and it can use an optiona Map service provider to show directions. The Application server uses a DBMS, an in-memory data store and a search engine.
+The relationships and interfaces between the components are represented through assembly connectors and delegation connectors.
+A detailed description of the components is included in the following paragraphs:
+
+\textbf{Web application}\\
+\emph{CLup} is a distributed system, therefore part of the logic is included in the client. The Web Application client consists of two main components and some external interfaces:
+\begin{itemize}
+    \item \textbf{Customer interface} is what Customers use to interact with the service. It processes the inputs, transparently querying the application server with transformed data, and it transforms the repsonses into a user frierndly representation. The application guides the user through the creation of a Ticket or a Booking while performing input validation to reduce the workload on the application server. It can interface with a \emph{Maps provider} to display a Map with directions to the Shop.
+    \item \textbf{Staff interface} is what the Staff uses to interact with the service. The behaviour is similar to that of the Customer interface, however the functionalities allow checking tokens and managing the shops. It interfaces with a \emph{Camera} to scan the QR codes associated with tokens
+\end{itemize}
+
+\textbf{Application server}\\
+The application server is accessed through a REST API. Its internal structure follows the Actor model (\ref{sect:patterns}) so it can be seen as a set of components which have no shared state. The actors can be organized and seen as three groups based on their functions:
+\begin{itemize}
+    \item \textbf{Authentication} handles registrations and logins. It interfaces with the DBMS to validate and update credentials and with the Session Store to create and update Sessions. It can verify or update login credentials and authenticate a user Session.
+    \item \textbf{Customer Ticket service} interface with the Search engine to allow users to find Shops. It uses Session storage to check authentication and update session data. It interacts with the DBMS to retrieve the persistent data necessary for the services. It allows users to create Tickets, search Shops and receive time estimates.
+    \item \textbf{Customer Booking service} interface with the Search engine with the Ticket Service and has a similar policy to the Session storage and the DBMS. It computes the availability of Shop departments to decide whether to accept Booking requests.
+    \item \textbf{Token validation service} It uses Session storage to check authentication and update session data. It interacts with the DBMS to retrieve the persistent data necessary for the services. It allows the Staff to validate Tokens. 
+    \item \textbf{Shop Management service} interfaces with the DBMS. It allows the Managers to add and edit Shops, check tehir current status and occupancy.
+
+\end{itemize}
+\textbf{Application server external Interfaces}\\
+The application server has interfaces for its internal components in the form of REST API. The web application can interact with the Application Server by sending HTTP queries to the endpoints described in the API (\ref{sect:api})
+
+\textbf{Search Engine}\\ This component generates real-time search results to allow Customers to find a Shop by name.
+
+\textbf{DBMS}\\ Stores the long term persistent data regarding Shops, Bookings, Tickets and Account data in a relational database.
+
+\textbf{In-memory Session Store}\\ Keeps track of Sessions and stores data that should persist throughout the lifetime of a session. It provides a fast in-memory data structure that the Application server can use for non critical data to reduce the frequency of accesses to the relational database.
+
+\textbf{Email service}\\ It provides the capability to send emails to new Customers to validate their email address.
+
+
+\subsection{Deployment view}
+The deployment view shows the organization of the distributed devices that make up the Clup service with a UML deployment diagram. The first tier is the \emph{Presentation tier}, represented by the web application. The web application can be accessed either through a web browser as a normal website, or installed on a smartphone as a \emph{Progressive Web App}. The middle tier, is the \emph{Logic tier}, composed of the application server running the Clup artifact, the reverse proxy serving static pages, and the Redis session store. The last tier is the \emph{Data tier} running a DBMS.
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\textwidth]{Images/deployment-1.pdf}
+    \caption{Deployment Diagram}
+\end{figure}
+CLup can also be deployed in a containerized environment as stated in the portability section of the RASD. This deployment scenario is easier to setup and adapts to many different device layouts. It can be deployed on a single machine running docker, a docker cluster or in the cloud. Configuring the service in a containerized environment is easier since installing dependencies and connecting components is automated.
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\textwidth]{Images/deployment-2.pdf}
+    \caption{Deployment Diagram using Docker containers}
+\end{figure}
+
+The CLup application server should be deployable as separate artifacts for the components shown in Figure \ref{fig:component_diagram} to allow updating the services one at a time and limit service degradation in case of failures.
+
+\subsection{Runtime view}
+\begin{figure}[H]
+    \centering
+    \includegraphics[height=0.9\textheight]{Images/runtime_revproxy.pdf}
+    \caption{Generic API request (with detail of the Reverse Proxy)}
+\end{figure}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\textwidth]{Images/runtime_registration.pdf}
+    \caption{Customer registering}
+\end{figure}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\textwidth]{Images/runtime_login.pdf}
+    \caption{Customer logging in}
+\end{figure}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\textwidth]{Images/runtime_booking.pdf}
+    \caption{Customer generating a Booking}
+\end{figure}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\textwidth]{Images/runtime_ticket.pdf}
+    \caption{Customer generating a Ticket}
+\end{figure}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\textwidth]{Images/runtime_tokenvalidate.pdf}
+    \caption{Staff validating either a Ticket or a Booking}
+\end{figure}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\textwidth]{Images/runtime_substitute.pdf}
+    \caption{Staff generating a substitute Ticket}
+\end{figure}
+
+\subsection{Component interfaces}
+
+\label{sect:api}
+\input{api/api}
+
+\label{sect:patterns}
+\subsection{Selected architectural styles and patterns}
+The main design pattern characterizing the Application server is the \textbf{Actor Model}\cite{10.5555/1624775.1624804}. It's a model that allows building highly concurrent applications, without the need to synchronize access to shared memory.
+An \textbf{Actor} is an indipendent virtual processor with its own local state. Each actor has a \textbf{Mailbox}. When a message appears in the mailbox and the actor is idle, it kicks into life and processes the message\cite{pragmatic}. Actors process one message at a time and can only interact with other actors with messages.
+
+In the \emph{CLup} Application server, every endpoint of the API is an independent actor with no shared state.
+
+On a higher level of abstraction, \emph{CLup} follows the \textbf{Model, View, Controller} design pattern, where the controller is split between the Application Server and the Web Application.
+
+The Web Application implements the \textbf{MVVM} (Model-View-ViewModel) pattern, where every property of the view is exposed by the view model through a binding. This accomplishes a better separation between the UX and the business logic of the Application, which makes development in a team more efficient.

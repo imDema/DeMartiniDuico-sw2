@@ -1,0 +1,93 @@
+actor Customer
+participant "Clup Webapp (Staff)" as C
+#participant "Reverse Proxy" as P
+participant "CLup Application Server" as S
+participant "Session store" as R
+participant "DBMS" as DB
+
+#C->S: POST /login (email, password, remember)
+#activate C
+#activate S
+#S->DB: get_staff_credentials()
+#activate DB
+#DB-->>S: 
+#deactivate DB
+#S->S: validate_credentials()
+#activate S
+#deactivateafter S
+
+
+#S->R: update_session()
+#activate S
+#activate R
+#R-->>S: 
+#deactivate R
+#deactivate S
+#S-->>C: 200 OK [Set-Cookie: session]
+#deactivate S
+#deactivate C
+
+frame logged-in Staff
+
+activate Customer
+Customer->C: show QR code (entrance)
+activate C
+C->C: scan QR code
+activate C
+deactivateafter C
+C->S: POST /staff/shop/{shop_id}/token/log-entry (uid)
+activate S
+S->R: check_session()
+activate R
+R-->>S:
+deactivate R
+S->DB: check_token()
+activate DB
+DB-->>S:
+deactivate DB
+#S->S: check_token()
+#activate S
+#deactivateafter S
+
+alt invalid token
+S-->>C: 400 Bad Request
+else valid token
+S->DB: log_entry()
+activate DB
+DB-->>S:
+deactivate DB
+S-->>C: 200 OK
+deactivate S
+
+C-->Customer: allow entry
+deactivate C
+Customer->Customer: visit Shop
+Customer->C: show QR code (exit)
+activate C
+C->C: scan QR code
+activate C
+deactivateafter C
+C->S: POST /staff/shop/{shop_id}/token/log-exit (uid)
+activate S
+S->R: check_session()
+activate R
+R-->>S:
+deactivate R
+S->DB: check_token()
+activate DB
+DB-->>S:
+deactivate DB
+#S->S: check_token()
+#activate S
+#deactivateafter S
+
+S->DB: log_exit()
+activate DB
+DB-->>S:
+deactivate DB
+S-->>C: 200 OK
+deactivate S
+C-->Customer: allow exit
+deactivate C
+deactivate Customer
+end

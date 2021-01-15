@@ -1,0 +1,80 @@
+\subsection{Purpose}
+
+This application aims to provide a digital alternative to the "handing numbers" approach and improve it by allowing people to take their number online, this way people only need to go to the shop when it is their turn to enter and they will not need to hang around the building.
+
+The product will also allow shop managers to effectively monitor the entrances by scanning a QR code associated with the "number" to ensure the safety limits are being followed.
+
+Additionally to the lining up mechanism the application will allow customers to book a visit in the future, which will improve the distribution of customers during the day and the week, since they will be able to choose a less crowded time slot.
+
+CLup will also allow customers to choose the approximate time of their visit and the category of items they wish to buy, which allows making more accurate predictions of the waiting times and, by knowing the areas that they will visit, to better utilize the space in the building, while respecting health and safety measures.
+
+\subsection{Scope}
+
+The CLup system aims to implement the following functionalities:
+\begin{itemize}
+    \item Registration and Login
+    \item Staff checks a token
+    \item Staff emits a substitute ticket
+    \item Customer books a visit
+    \item Customer gets a ticket
+    \item Manager adds and configures a Shop
+    \item Manager checks Shop occupancy
+\end{itemize}
+
+\subsection{Definitions, Acronyms, Abbreviations}
+\subsubsection{Definitions}
+
+\begin{description}
+    \item [Third party company] A company that wants to use our services
+    \item [Ticket] A digital proof of presence in the waiting list
+    \item [Booking] A digital proof of reservation for a visit to the Shop in a specific time slot
+    \item [Token] Either a ticket or a booking, it's associated with a code which can also be represented as a QR code
+    \item [Staff] Company personnel which is responsible of checking entrances
+    \item [Shop] Point of sale of the Third party company
+\end{description}
+\subsubsection{Acronyms}
+
+\begin{description}
+    \item [RASD] Requirement Analysis and Specification Document
+    \item [DD] Design Document
+    \item [API] Application Programming Interface
+    \item [REST] Representational state transfer
+    \item [HTTP] Hypertext Transfer Protocol
+    \item [HTML] Hypertext Markup Language
+    \item [UML] Unified Modeling Language
+\end{description}
+\subsubsection{Abbreviations}
+
+\begin{description}
+    \item [{[Gn]}] n-th goal.
+    \item [{[Dn]}] n-th domain assumption.
+    \item [{[Rn]}] n-th functional requirement.
+\end{description}
+
+\subsection{Revision history}
+
+\begin{description}
+    \item[v. 1.0 - 9/01/2021] Initial release
+\end{description} 
+
+\subsection{Reference documents}
+
+\begin{description}
+    \item [BEEP channel] - Mandatory Project Assignment
+    \item [Luca De Martini, Alessandro Duico] - RASD
+\end{description}
+
+
+\subsection{Document structure}
+This document provides a specification of the architecture of the \emph{CLup} system, mainly intended for developers and testers. 
+It complements the RASD with a more in-depth description of the components and their interaction, and the plan for implementation, integration and testing. 
+Eventually, the solutions adopted to satisfy each of the requirements of the RASD are explained in detail.
+This document is structured in five chapters, that are briefly described here:
+\begin{enumerate}
+\item\textbf{Introduction}: the purpose of the document is presented, together with prerequisites for the correct interpretation of the document;
+\item\textbf{Architectural Design}: shows the main components of the System and their relationships. This section also focuses on design choices and architectural styles, patterns and paradigms, along with a complete explanation of the reasons for their employment;
+\item\textbf{User Interface Design}: expands the indications on the user interfaces and user experience, starting from those provided in the RASD;
+\item\textbf{Requirements Traceability}: provides a map of the requirements presented in the RASD to the design choices of the DD;
+\item\textbf{Implementation, Integration and Test plan:} presents the plan for the implementation and integration of the components and for the testing of the system.
+\end{enumerate}
+

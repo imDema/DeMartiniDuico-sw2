@@ -1,0 +1,32 @@
+participant "Clup Webapp" as C
+#participant "Reverse Proxy" as P
+participant "CLup Application Server" as S
+participant "Session store" as R
+participant "DBMS" as DB
+
+C->S: POST /login (email, password, remember)
+activate C
+activate S
+S->DB: get_customer_credentials()
+activate DB
+DB-->>S: 
+deactivate DB
+S->S: validate_credentials()
+activate S
+deactivateafter S
+alt invalid credentials
+S-->>C: 400 Bad Request
+
+else valid credentials
+
+S->R: update_session()
+activate S
+activate R
+R-->>S: 
+deactivate R
+deactivate S
+S-->>C: 200 OK [Set-Cookie: session]
+deactivate C
+deactivate S
+
+end

@@ -73,7 +73,7 @@ Although not strictly required, the devices used by the staff should have a came
 
 \subsubsection{Software interfaces}
 \begin{itemize}
-    \item \textbf{Web browser}: the applicative requires a web browser capable of rendering HTML5 web pages with Javascript
+    \item \textbf{Web browser}: the application requires a web browser capable of rendering HTML5 web pages with Javascript
     \item \textbf{Maps service}: although not required for the core functionality, having access to a maps service on the device will improve customer experience
 \end{itemize}
 
@@ -94,9 +94,9 @@ The system shall use the HTTPS protocol to provide secure communication from the
               \item [R3] The system shall give Customers a Token associated with their position in the waiting line
               \item [R4] The Staff shall be able to scan Customer generated Tokens using a camera
               \item [R5] The Staff shall be able to scan Customer generated Tokens using a textual input
-              \item [R6] Given a Token, the Staff applicative shall be able to verify its validity
-              \item [R7] Given a Token, the Staff applicative shall be able to verify the respective position in the waiting line
-              \item [R8] Given a Token, the Staff applicative shall be able to mark it as used and update the list of Customers currently inside the Shop
+              \item [R6] Given a Token, the Staff application shall be able to verify its validity
+              \item [R7] Given a Token, the Staff application shall be able to verify the respective position in the waiting line
+              \item [R8] Given a Token, the Staff application shall be able to mark it as used and update the list of Customers currently inside the Shop
           \end{description}
     \item [G2]  Customers shall be able to book a future visit to the Shop
           \begin{description}
@@ -105,9 +105,9 @@ The system shall use the HTTPS protocol to provide secure communication from the
               \item [R11] The system shall give Customers a Token associated with their booking
               \item [R4] The Staff shall be able to scan Customer generated Tokens using a camera
               \item [R5] The Staff shall be able to scan Customer generated Tokens using a textual input
-              \item [R6] Given a Token, the Staff applicative shall be able to verify its validity
-              \item [R7] Given a Token, the Staff applicative shall be able to verify the respective position in the waiting line
-              \item [R8] Given a Token, the Staff applicative shall be able to mark it as used and update the list of Customers currently inside the Shop
+              \item [R6] Given a Token, the Staff application shall be able to verify its validity
+              \item [R7] Given a Token, the Staff application shall be able to verify the respective position in the waiting line
+              \item [R8] Given a Token, the Staff application shall be able to mark it as used and update the list of Customers currently inside the Shop
           \end{description}
     \item [G3]  Customers shall be able to enter the Shop at the earliest occasion without waiting in line
           \begin{description}
@@ -289,7 +289,7 @@ Attilio was never a fan of technology and he does not have a smartphone, unfortu
         Event flow      & \begin{enumerate}
             \item The Customer clicks on \emph{"My Tokens"}
             \item The Customer selects one of the tokens in the list
-            \item A QR code and associated text code are shown, either of which can be scanned with the staff applicative
+            \item A QR code and associated text code are shown, either of which can be scanned with the staff application
         \end{enumerate} \\ \hline
     \end{tabu}
 \end{table}
@@ -384,7 +384,7 @@ Attilio was never a fan of technology and he does not have a smartphone, unfortu
         Entry condition & \begin{itemize}
             \item The Staff member is Logged in
             \item The Staff member selected one of the shops they have access to
-            \item A Customer without the applicative asks for a ticket
+            \item A Customer without the application asks for a ticket
         \end{itemize}        \\ \hline
         Event flow      & \begin{enumerate}
             \item The Staff member opens the create substitute ticket section

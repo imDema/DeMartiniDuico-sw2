@@ -52,7 +52,11 @@
 \usepackage{tabularx}
 \usepackage{ltablex}
 \usepackage{longtable}
+\usepackage{booktabs}
 \usepackage{float} % To allow the use of H modifier in long tables
+\usepackage{makecell}
+\renewcommand\cellgape{\Gape[4pt]}
+\renewcommand\cellalign{l}
 
 %landscape mode
 \usepackage{pdflscape}
@@ -111,10 +115,12 @@
 \makeatother
 %end
 
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
 
 %graphics
 \usepackage{graphicx}
-\usepackage[dvipsnames, table]{xcolor}
+\usepackage[dvipsnames, hyperref, table]{xcolor}
 %If you upload images from PC, you need to insert code for the path here (different for Windows and Unix OS)
 
 
@@ -171,7 +177,6 @@
 \usepackage[pdftex, colorlinks]{hyperref}
 \newcommand{\comment}[1]{{\color{Red}$\blacktriangleright$ Comment: #1 $\blacktriangleleft$}}
 \usepackage{listings}
-\usepackage{util/alloy-style}
 
 \hypersetup{
     colorlinks=true,

@@ -1,0 +1,613 @@
+\subsubsection{API}
+
+
+\begin{tabularx}{\textwidth}{|p{0.08\textwidth}|l|X|} \hline
+\textbf{Class} & \textbf{HTTP request} & \textbf{Description} \\\hline\endhead
+account & \makecell{\textbf{POST} \\ \texttt{/login}}  & Logs in and returns the authentication  cookie \\\hline
+account & \makecell{\textbf{POST} \\ \texttt{/register}}  & Request creation of a new account \\\hline
+account & \makecell{\textbf{GET} \\ \texttt{/register/confirm}}  & Submit email confirmation \\\hline
+booking & \makecell{\textbf{POST} \\ \texttt{/shop/\{shop\_id\}/booking/new}}  & Request a booking for a shop \\\hline
+booking & \makecell{\textbf{GET} \\ \texttt{/shop/\{shop\_id\}/booking/availability}}  & Get information about the time slot availability for bookings \\\hline
+manage & \makecell{\textbf{POST} \\ \texttt{/staff/manage/create-account/\{shop\_id\}}}  & Generate a temporary staff account for activation \\\hline
+manage & \makecell{\textbf{POST} \\ \texttt{/staff/manage/shop/add}}  & Add a new shop to the database \\\hline
+manage & \makecell{\textbf{POST} \\ \texttt{/staff/manage/shop/list}}  & Get a list of all managed shops \\\hline
+manage & \makecell{\textbf{POST} \\ \texttt{/staff/manage/shop/\{shop\_id\}/edit}}  & Edit an existing shop listing \\\hline
+manage & \makecell{\textbf{POST} \\ \texttt{/staff/manage/shop/\{shop\_id\}/show}}  & Make shop public and reachable from customers \\\hline
+manage & \makecell{\textbf{POST} \\ \texttt{/staff/manage/shop/\{shop\_id\}/hide}}  & Make shop private and hidden from customers \\\hline
+shop & \makecell{\textbf{GET} \\ \texttt{/search}}  & Search for a shop by name \\\hline
+shop & \makecell{\textbf{GET} \\ \texttt{/shop/\{shop\_id\}}}  & Get available shop information \\\hline
+staff & \makecell{\textbf{GET} \\ \texttt{/staff/shop/\{shop\_id\}/ticket/queue}}  & Get detailed information about the current queue status \\\hline
+staff & \makecell{\textbf{GET} \\ \texttt{/staff/shop/\{shop\_id\}/booking/list}}  & Get detailed information about the current and future bookings \\\hline
+staff & \makecell{\textbf{GET} \\ \texttt{/staff/shop/\{shop\_id\}/token/info}}  & Get token information and validity \\\hline
+staff & \makecell{\textbf{POST} \\ \texttt{/staff/shop/\{shop\_id\}/ticket/new-substitute}}  & Request creation of a substitute ticket \\\hline
+staff & \makecell{\textbf{POST} \\ \texttt{/staff/shop/\{shop\_id\}/token/log-entry}}  & Log entry, consume the token and update shop occupancy information \\\hline
+staff & \makecell{\textbf{POST} \\ \texttt{/staff/shop/\{shop\_id\}/token/log-exit}}  & Log exit, update shop occupancy information \\\hline
+staff-account & \makecell{\textbf{POST} \\ \texttt{/staff/login}}  & Log in and return authentication cookie \\\hline
+staff-account & \makecell{\textbf{POST} \\ \texttt{/staff/register}}  & Activate staff account and set password \\\hline
+ticket & \makecell{\textbf{GET} \\ \texttt{/ticket/est}}  & Get the estimated waiting time for a ticket \\\hline
+ticket & \makecell{\textbf{POST} \\ \texttt{/shop/\{shop\_id\}/ticket/new}}  & Request a ticket for a shop \\\hline
+ticket & \makecell{\textbf{GET} \\ \texttt{/shop/\{shop\_id\}/ticket/queue}}  & Get information about the queue status and approximate waiting time \\\hline
+token & \makecell{\textbf{GET} \\ \texttt{/tokens}}  & Get active tokens for the customer \\\hline
+\end{tabularx}
+
+\subsubsection{Endpoints}
+
+\begin{table}[H]
+\tabulinesep=4pt\everyrow{\tabucline[0.5pt]-}
+\begin{tabu} to \textwidth {@{}|X|X[5]|} \hline
+\textbf{POST}  & \texttt{/login} \\
+Description   & Logs in and returns the authentication  cookie  \\
+Body & \texttt{RequestLogin} \\
+Responses     & \everyrow{}\begin{tabu}{X[0.5]|X[3]|X[2]} 
+\textbf{Code} & \textbf{Description} & \textbf{Body} \\
+\hline \textbf{200} & OK &\\
+\hline \textbf{400} & Invalid Credentials &\\
+\end{tabu}\everyrow{\tabucline[0.5pt]-} \\
+\end{tabu}
+\end{table}
+\begin{table}[H]
+\tabulinesep=4pt\everyrow{\tabucline[0.5pt]-}
+\begin{tabu} to \textwidth {@{}|X|X[5]|} \hline
+\textbf{POST}  & \texttt{/register} \\
+Description   & Request creation of a new account  \\
+Body & \texttt{RequestRegistration} \\
+Responses     & \everyrow{}\begin{tabu}{X[0.5]|X[3]|X[2]} 
+\textbf{Code} & \textbf{Description} & \textbf{Body} \\
+\hline \textbf{200} & OK &\\
+\hline \textbf{400} & Invalid data &\\
+\end{tabu}\everyrow{\tabucline[0.5pt]-} \\
+\end{tabu}
+\end{table}
+\begin{table}[H]
+\tabulinesep=4pt\everyrow{\tabucline[0.5pt]-}
+\begin{tabu} to \textwidth {@{}|X|X[5]|} \hline
+\textbf{GET}  & \texttt{/register/confirm} \\
+Description   & Submit email confirmation  \\
+Parameters    & \everyrow{}\begin{tabu}{X|X}
+\textbf{Name} & \textbf{Type} \\
+\hline code & \texttt{string} \\
+\end{tabu}\everyrow{\tabucline[0.5pt]-}\\
+Responses     & \everyrow{}\begin{tabu}{X[0.5]|X[3]|X[2]} 
+\textbf{Code} & \textbf{Description} & \textbf{Body} \\
+\hline \textbf{201} & successful operation &\\
+\hline \textbf{400} & Invalid code &\\
+\end{tabu}\everyrow{\tabucline[0.5pt]-} \\
+\end{tabu}
+\end{table}
+\begin{table}[H]
+\tabulinesep=4pt\everyrow{\tabucline[0.5pt]-}
+\begin{tabu} to \textwidth {@{}|X|X[5]|} \hline
+\textbf{POST}  & \texttt{/shop/\{shop\_id\}/booking/new} \\
+Description   & Request a booking for a shop  \\
+Parameters    & \everyrow{}\begin{tabu}{X|X}
+\textbf{Name} & \textbf{Type} \\
+\hline shop\_id & \texttt{string} \\
+\end{tabu}\everyrow{\tabucline[0.5pt]-}\\
+Body & \texttt{RequestBooking} \\
+Responses     & \everyrow{}\begin{tabu}{X[0.5]|X[3]|X[2]} 
+\textbf{Code} & \textbf{Description} & \textbf{Body} \\
+\hline \textbf{200} & OK &\texttt{TokenBooking}\\
+\hline \textbf{400} & Error &\\
+\end{tabu}\everyrow{\tabucline[0.5pt]-} \\
+\end{tabu}
+\end{table}
+\begin{table}[H]
+\tabulinesep=4pt\everyrow{\tabucline[0.5pt]-}
+\begin{tabu} to \textwidth {@{}|X|X[5]|} \hline
+\textbf{GET}  & \texttt{/shop/\{shop\_id\}/booking/availability} \\
+Description   & Get information about the time slot availability for bookings  \\
+Parameters    & \everyrow{}\begin{tabu}{X|X}
+\textbf{Name} & \textbf{Type} \\
+\hline shop\_id & \texttt{string} \\
+\hline day & \texttt{string} \\
+\end{tabu}\everyrow{\tabucline[0.5pt]-}\\
+Responses     & \everyrow{}\begin{tabu}{X[0.5]|X[3]|X[2]} 
+\textbf{Code} & \textbf{Description} & \textbf{Body} \\
+\hline \textbf{200} & OK &\texttt{BookingAvailability}\\
+\hline \textbf{400} & Error &\\
+\end{tabu}\everyrow{\tabucline[0.5pt]-} \\
+\end{tabu}
+\end{table}
+\begin{table}[H]
+\tabulinesep=4pt\everyrow{\tabucline[0.5pt]-}
+\begin{tabu} to \textwidth {@{}|X|X[5]|} \hline
+\textbf{POST}  & \texttt{/staff/manage/create-account/\{shop\_id\}} \\
+Description   & Generate a temporary staff account for activation  \\
+Body & \texttt{string} \\
+Responses     & \everyrow{}\begin{tabu}{X[0.5]|X[3]|X[2]} 
+\textbf{Code} & \textbf{Description} & \textbf{Body} \\
+\hline \textbf{200} & OK &\texttt{StaffTempAccount}\\
+\hline \textbf{400} & Invalid email &\\
+\end{tabu}\everyrow{\tabucline[0.5pt]-} \\
+\end{tabu}
+\end{table}
+\begin{table}[H]
+\tabulinesep=4pt\everyrow{\tabucline[0.5pt]-}
+\begin{tabu} to \textwidth {@{}|X|X[5]|} \hline
+\textbf{POST}  & \texttt{/staff/manage/shop/add} \\
+Description   & Add a new shop to the database  \\
+Body & \texttt{string} \\
+Responses     & \everyrow{}\begin{tabu}{X[0.5]|X[3]|X[2]} 
+\textbf{Code} & \textbf{Description} & \textbf{Body} \\
+\hline \textbf{200} & OK &\texttt{Shop}\\
+\end{tabu}\everyrow{\tabucline[0.5pt]-} \\
+\end{tabu}
+\end{table}
+\begin{table}[H]
+\tabulinesep=4pt\everyrow{\tabucline[0.5pt]-}
+\begin{tabu} to \textwidth {@{}|X|X[5]|} \hline
+\textbf{POST}  & \texttt{/staff/manage/shop/list} \\
+Description   & Get a list of all managed shops  \\
+Responses     & \everyrow{}\begin{tabu}{X[0.5]|X[3]|X[2]} 
+\textbf{Code} & \textbf{Description} & \textbf{Body} \\
+\hline \textbf{200} & OK &\texttt{Array<SearchResult>}\\
+\end{tabu}\everyrow{\tabucline[0.5pt]-} \\
+\end{tabu}
+\end{table}
+\begin{table}[H]
+\tabulinesep=4pt\everyrow{\tabucline[0.5pt]-}
+\begin{tabu} to \textwidth {@{}|X|X[5]|} \hline
+\textbf{POST}  & \texttt{/staff/manage/shop/\{shop\_id\}/edit} \\
+Description   & Edit an existing shop listing  \\
+Parameters    & \everyrow{}\begin{tabu}{X|X}
+\textbf{Name} & \textbf{Type} \\
+\hline shop\_id & \texttt{string} \\
+\end{tabu}\everyrow{\tabucline[0.5pt]-}\\
+Body & \texttt{Shop} \\
+Responses     & \everyrow{}\begin{tabu}{X[0.5]|X[3]|X[2]} 
+\textbf{Code} & \textbf{Description} & \textbf{Body} \\
+\hline \textbf{200} & OK &\\
+\end{tabu}\everyrow{\tabucline[0.5pt]-} \\
+\end{tabu}
+\end{table}
+\begin{table}[H]
+\tabulinesep=4pt\everyrow{\tabucline[0.5pt]-}
+\begin{tabu} to \textwidth {@{}|X|X[5]|} \hline
+\textbf{POST}  & \texttt{/staff/manage/shop/\{shop\_id\}/show} \\
+Description   & Make shop public and reachable from customers  \\
+Parameters    & \everyrow{}\begin{tabu}{X|X}
+\textbf{Name} & \textbf{Type} \\
+\hline shop\_id & \texttt{string} \\
+\end{tabu}\everyrow{\tabucline[0.5pt]-}\\
+Responses     & \everyrow{}\begin{tabu}{X[0.5]|X[3]|X[2]} 
+\textbf{Code} & \textbf{Description} & \textbf{Body} \\
+\hline \textbf{200} & OK &\\
+\end{tabu}\everyrow{\tabucline[0.5pt]-} \\
+\end{tabu}
+\end{table}
+\begin{table}[H]
+\tabulinesep=4pt\everyrow{\tabucline[0.5pt]-}
+\begin{tabu} to \textwidth {@{}|X|X[5]|} \hline
+\textbf{POST}  & \texttt{/staff/manage/shop/\{shop\_id\}/hide} \\
+Description   & Make shop private and hidden from customers  \\
+Parameters    & \everyrow{}\begin{tabu}{X|X}
+\textbf{Name} & \textbf{Type} \\
+\hline shop\_id & \texttt{string} \\
+\end{tabu}\everyrow{\tabucline[0.5pt]-}\\
+Responses     & \everyrow{}\begin{tabu}{X[0.5]|X[3]|X[2]} 
+\textbf{Code} & \textbf{Description} & \textbf{Body} \\
+\hline \textbf{200} & OK &\\
+\end{tabu}\everyrow{\tabucline[0.5pt]-} \\
+\end{tabu}
+\end{table}
+\begin{table}[H]
+\tabulinesep=4pt\everyrow{\tabucline[0.5pt]-}
+\begin{tabu} to \textwidth {@{}|X|X[5]|} \hline
+\textbf{GET}  & \texttt{/search} \\
+Description   & Search for a shop by name  \\
+Parameters    & \everyrow{}\begin{tabu}{X|X}
+\textbf{Name} & \textbf{Type} \\
+\hline q & \texttt{string} \\
+\end{tabu}\everyrow{\tabucline[0.5pt]-}\\
+Responses     & \everyrow{}\begin{tabu}{X[0.5]|X[3]|X[2]} 
+\textbf{Code} & \textbf{Description} & \textbf{Body} \\
+\hline \textbf{200} & OK &\texttt{Array<SearchResult>}\\
+\end{tabu}\everyrow{\tabucline[0.5pt]-} \\
+\end{tabu}
+\end{table}
+\begin{table}[H]
+\tabulinesep=4pt\everyrow{\tabucline[0.5pt]-}
+\begin{tabu} to \textwidth {@{}|X|X[5]|} \hline
+\textbf{GET}  & \texttt{/shop/\{shop\_id\}} \\
+Description   & Get available shop information  \\
+Parameters    & \everyrow{}\begin{tabu}{X|X}
+\textbf{Name} & \textbf{Type} \\
+\hline shop\_id & \texttt{string} \\
+\end{tabu}\everyrow{\tabucline[0.5pt]-}\\
+Responses     & \everyrow{}\begin{tabu}{X[0.5]|X[3]|X[2]} 
+\textbf{Code} & \textbf{Description} & \textbf{Body} \\
+\hline \textbf{200} & OK &\texttt{Shop}\\
+\end{tabu}\everyrow{\tabucline[0.5pt]-} \\
+\end{tabu}
+\end{table}
+\begin{table}[H]
+\tabulinesep=4pt\everyrow{\tabucline[0.5pt]-}
+\begin{tabu} to \textwidth {@{}|X|X[5]|} \hline
+\textbf{GET}  & \texttt{/staff/shop/\{shop\_id\}/ticket/queue} \\
+Description   & Get detailed information about the current queue status  \\
+Parameters    & \everyrow{}\begin{tabu}{X|X}
+\textbf{Name} & \textbf{Type} \\
+\hline shop\_id & \texttt{string} \\
+\end{tabu}\everyrow{\tabucline[0.5pt]-}\\
+Responses     & \everyrow{}\begin{tabu}{X[0.5]|X[3]|X[2]} 
+\textbf{Code} & \textbf{Description} & \textbf{Body} \\
+\hline \textbf{200} & OK &\texttt{Queue}\\
+\end{tabu}\everyrow{\tabucline[0.5pt]-} \\
+\end{tabu}
+\end{table}
+\begin{table}[H]
+\tabulinesep=4pt\everyrow{\tabucline[0.5pt]-}
+\begin{tabu} to \textwidth {@{}|X|X[5]|} \hline
+\textbf{GET}  & \texttt{/staff/shop/\{shop\_id\}/booking/list} \\
+Description   & Get detailed information about the current and future bookings  \\
+Parameters    & \everyrow{}\begin{tabu}{X|X}
+\textbf{Name} & \textbf{Type} \\
+\hline shop\_id & \texttt{string} \\
+\end{tabu}\everyrow{\tabucline[0.5pt]-}\\
+Responses     & \everyrow{}\begin{tabu}{X[0.5]|X[3]|X[2]} 
+\textbf{Code} & \textbf{Description} & \textbf{Body} \\
+\hline \textbf{200} & OK &\texttt{BookingList}\\
+\end{tabu}\everyrow{\tabucline[0.5pt]-} \\
+\end{tabu}
+\end{table}
+\begin{table}[H]
+\tabulinesep=4pt\everyrow{\tabucline[0.5pt]-}
+\begin{tabu} to \textwidth {@{}|X|X[5]|} \hline
+\textbf{GET}  & \texttt{/staff/shop/\{shop\_id\}/token/info} \\
+Description   & Get token information and validity  \\
+Parameters    & \everyrow{}\begin{tabu}{X|X}
+\textbf{Name} & \textbf{Type} \\
+\hline shop\_id & \texttt{string} \\
+\hline uid & \texttt{string} \\
+\end{tabu}\everyrow{\tabucline[0.5pt]-}\\
+Responses     & \everyrow{}\begin{tabu}{X[0.5]|X[3]|X[2]} 
+\textbf{Code} & \textbf{Description} & \textbf{Body} \\
+\hline \textbf{200} & OK &\texttt{TokenTicket}\\
+\hline \textbf{400} & Ticket does not exist &\\
+\end{tabu}\everyrow{\tabucline[0.5pt]-} \\
+\end{tabu}
+\end{table}
+\begin{table}[H]
+\tabulinesep=4pt\everyrow{\tabucline[0.5pt]-}
+\begin{tabu} to \textwidth {@{}|X|X[5]|} \hline
+\textbf{POST}  & \texttt{/staff/shop/\{shop\_id\}/ticket/new-substitute} \\
+Description   & Request creation of a substitute ticket  \\
+Parameters    & \everyrow{}\begin{tabu}{X|X}
+\textbf{Name} & \textbf{Type} \\
+\hline shop\_id & \texttt{string} \\
+\end{tabu}\everyrow{\tabucline[0.5pt]-}\\
+Body & \texttt{RequestTicket} \\
+Responses     & \everyrow{}\begin{tabu}{X[0.5]|X[3]|X[2]} 
+\textbf{Code} & \textbf{Description} & \textbf{Body} \\
+\hline \textbf{200} & OK &\texttt{TokenTicket}\\
+\hline \textbf{400} & Error &\\
+\end{tabu}\everyrow{\tabucline[0.5pt]-} \\
+\end{tabu}
+\end{table}
+\begin{table}[H]
+\tabulinesep=4pt\everyrow{\tabucline[0.5pt]-}
+\begin{tabu} to \textwidth {@{}|X|X[5]|} \hline
+\textbf{POST}  & \texttt{/staff/shop/\{shop\_id\}/token/log-entry} \\
+Description   & Log entry, consume the token and update shop occupancy information  \\
+Parameters    & \everyrow{}\begin{tabu}{X|X}
+\textbf{Name} & \textbf{Type} \\
+\hline shop\_id & \texttt{string} \\
+\end{tabu}\everyrow{\tabucline[0.5pt]-}\\
+Body & \texttt{TokenCode} \\
+Responses     & \everyrow{}\begin{tabu}{X[0.5]|X[3]|X[2]} 
+\textbf{Code} & \textbf{Description} & \textbf{Body} \\
+\hline \textbf{200} & OK &\\
+\hline \textbf{400} & Error &\\
+\end{tabu}\everyrow{\tabucline[0.5pt]-} \\
+\end{tabu}
+\end{table}
+\begin{table}[H]
+\tabulinesep=4pt\everyrow{\tabucline[0.5pt]-}
+\begin{tabu} to \textwidth {@{}|X|X[5]|} \hline
+\textbf{POST}  & \texttt{/staff/shop/\{shop\_id\}/token/log-exit} \\
+Description   & Log exit, update shop occupancy information  \\
+Parameters    & \everyrow{}\begin{tabu}{X|X}
+\textbf{Name} & \textbf{Type} \\
+\hline shop\_id & \texttt{string} \\
+\end{tabu}\everyrow{\tabucline[0.5pt]-}\\
+Body & \texttt{TokenCode} \\
+Responses     & \everyrow{}\begin{tabu}{X[0.5]|X[3]|X[2]} 
+\textbf{Code} & \textbf{Description} & \textbf{Body} \\
+\hline \textbf{200} & OK &\\
+\hline \textbf{400} & Error &\\
+\end{tabu}\everyrow{\tabucline[0.5pt]-} \\
+\end{tabu}
+\end{table}
+\begin{table}[H]
+\tabulinesep=4pt\everyrow{\tabucline[0.5pt]-}
+\begin{tabu} to \textwidth {@{}|X|X[5]|} \hline
+\textbf{POST}  & \texttt{/staff/login} \\
+Description   & Log in and return authentication cookie  \\
+Body & \texttt{RequestLogin} \\
+Responses     & \everyrow{}\begin{tabu}{X[0.5]|X[3]|X[2]} 
+\textbf{Code} & \textbf{Description} & \textbf{Body} \\
+\hline \textbf{200} & OK &\\
+\end{tabu}\everyrow{\tabucline[0.5pt]-} \\
+\end{tabu}
+\end{table}
+\begin{table}[H]
+\tabulinesep=4pt\everyrow{\tabucline[0.5pt]-}
+\begin{tabu} to \textwidth {@{}|X|X[5]|} \hline
+\textbf{POST}  & \texttt{/staff/register} \\
+Description   & Activate staff account and set password  \\
+Body & \texttt{StaffRequestRegistration} \\
+Responses     & \everyrow{}\begin{tabu}{X[0.5]|X[3]|X[2]} 
+\textbf{Code} & \textbf{Description} & \textbf{Body} \\
+\hline \textbf{200} & OK &\\
+\hline \textbf{400} & Invalid credentials &\\
+\end{tabu}\everyrow{\tabucline[0.5pt]-} \\
+\end{tabu}
+\end{table}
+\begin{table}[H]
+\tabulinesep=4pt\everyrow{\tabucline[0.5pt]-}
+\begin{tabu} to \textwidth {@{}|X|X[5]|} \hline
+\textbf{GET}  & \texttt{/ticket/est} \\
+Description   & Get the estimated waiting time for a ticket  \\
+Parameters    & \everyrow{}\begin{tabu}{X|X}
+\textbf{Name} & \textbf{Type} \\
+\hline uid & \texttt{string} \\
+\end{tabu}\everyrow{\tabucline[0.5pt]-}\\
+Responses     & \everyrow{}\begin{tabu}{X[0.5]|X[3]|X[2]} 
+\textbf{Code} & \textbf{Description} & \textbf{Body} \\
+\hline \textbf{200} & OK &\texttt{QueueEst}\\
+\hline \textbf{400} & Invalid or expired code &\\
+\end{tabu}\everyrow{\tabucline[0.5pt]-} \\
+\end{tabu}
+\end{table}
+\begin{table}[H]
+\tabulinesep=4pt\everyrow{\tabucline[0.5pt]-}
+\begin{tabu} to \textwidth {@{}|X|X[5]|} \hline
+\textbf{POST}  & \texttt{/shop/\{shop\_id\}/ticket/new} \\
+Description   & Request a ticket for a shop  \\
+Parameters    & \everyrow{}\begin{tabu}{X|X}
+\textbf{Name} & \textbf{Type} \\
+\hline shop\_id & \texttt{string} \\
+\end{tabu}\everyrow{\tabucline[0.5pt]-}\\
+Body & \texttt{RequestTicket} \\
+Responses     & \everyrow{}\begin{tabu}{X[0.5]|X[3]|X[2]} 
+\textbf{Code} & \textbf{Description} & \textbf{Body} \\
+\hline \textbf{200} & OK &\texttt{TokenTicket}\\
+\hline \textbf{400} & Error &\\
+\end{tabu}\everyrow{\tabucline[0.5pt]-} \\
+\end{tabu}
+\end{table}
+\begin{table}[H]
+\tabulinesep=4pt\everyrow{\tabucline[0.5pt]-}
+\begin{tabu} to \textwidth {@{}|X|X[5]|} \hline
+\textbf{GET}  & \texttt{/shop/\{shop\_id\}/ticket/queue} \\
+Description   & Get information about the queue status and approximate waiting time  \\
+Parameters    & \everyrow{}\begin{tabu}{X|X}
+\textbf{Name} & \textbf{Type} \\
+\hline shop\_id & \texttt{string} \\
+\end{tabu}\everyrow{\tabucline[0.5pt]-}\\
+Responses     & \everyrow{}\begin{tabu}{X[0.5]|X[3]|X[2]} 
+\textbf{Code} & \textbf{Description} & \textbf{Body} \\
+\hline \textbf{200} & OK &\texttt{QueueEst}\\
+\end{tabu}\everyrow{\tabucline[0.5pt]-} \\
+\end{tabu}
+\end{table}
+\begin{table}[H]
+\tabulinesep=4pt\everyrow{\tabucline[0.5pt]-}
+\begin{tabu} to \textwidth {@{}|X|X[5]|} \hline
+\textbf{GET}  & \texttt{/tokens} \\
+Description   & Get active tokens for the customer  \\
+Responses     & \everyrow{}\begin{tabu}{X[0.5]|X[3]|X[2]} 
+\textbf{Code} & \textbf{Description} & \textbf{Body} \\
+\hline \textbf{200} & OK &\texttt{Tokens}\\
+\end{tabu}\everyrow{\tabucline[0.5pt]-} \\
+\end{tabu}
+\end{table}
+\subsubsection{Models}
+
+\begin{center}\textbf{BookingAvailability}: \texttt{Array<\{dept\_id: string, time: TimeSpan, available: integer,\}>}\end{center}
+
+\begin{center}\textbf{BookingList}: \texttt{Array<TokenBooking>}\end{center}
+
+
+    \begin{table}[H]
+    \centering
+    \textbf{Department}\\
+    \everyrow{\tabucline[0.5pt]-}
+    \begin{tabu} to 0.55\textwidth {|X|X|} \hline
+    Field & Type \\
+    uid & \texttt{string} \\
+description & \texttt{string} \\
+capacity & \texttt{integer} \\
+\end{tabu}
+\end{table}
+
+\begin{center}\textbf{Queue}: \texttt{Array<TokenTicket>}\end{center}
+
+
+    \begin{table}[H]
+    \centering
+    \textbf{QueueEst}\\
+    \everyrow{\tabucline[0.5pt]-}
+    \begin{tabu} to 0.55\textwidth {|X|X|} \hline
+    Field & Type \\
+    people & \texttt{integer} \\
+est & \texttt{string} \\
+\end{tabu}
+\end{table}
+
+
+    \begin{table}[H]
+    \centering
+    \textbf{RequestBooking}\\
+    \everyrow{\tabucline[0.5pt]-}
+    \begin{tabu} to 0.55\textwidth {|X|X|} \hline
+    Field & Type \\
+    shop\_id & \texttt{string} \\
+department\_ids & \texttt{Array<string>} \\
+start\_time & \texttt{string} \\
+end\_time & \texttt{string} \\
+\end{tabu}
+\end{table}
+
+
+    \begin{table}[H]
+    \centering
+    \textbf{RequestLogin}\\
+    \everyrow{\tabucline[0.5pt]-}
+    \begin{tabu} to 0.55\textwidth {|X|X|} \hline
+    Field & Type \\
+    email & \texttt{string} \\
+password & \texttt{string} \\
+remember & \texttt{boolean} \\
+\end{tabu}
+\end{table}
+
+
+    \begin{table}[H]
+    \centering
+    \textbf{RequestRegistration}\\
+    \everyrow{\tabucline[0.5pt]-}
+    \begin{tabu} to 0.55\textwidth {|X|X|} \hline
+    Field & Type \\
+    email & \texttt{string} \\
+password & \texttt{string} \\
+\end{tabu}
+\end{table}
+
+
+    \begin{table}[H]
+    \centering
+    \textbf{RequestTicket}\\
+    \everyrow{\tabucline[0.5pt]-}
+    \begin{tabu} to 0.55\textwidth {|X|X|} \hline
+    Field & Type \\
+    shop\_id & \texttt{string} \\
+department\_ids & \texttt{Array<string>} \\
+\end{tabu}
+\end{table}
+
+\begin{center}\textbf{Schedule}: \texttt{Array<TimeSpan>}\end{center}
+
+
+    \begin{table}[H]
+    \centering
+    \textbf{SearchResult}\\
+    \everyrow{\tabucline[0.5pt]-}
+    \begin{tabu} to 0.55\textwidth {|X|X|} \hline
+    Field & Type \\
+    uid & \texttt{string} \\
+name & \texttt{string} \\
+image & \texttt{string} \\
+description & \texttt{string} \\
+\end{tabu}
+\end{table}
+
+
+    \begin{table}[H]
+    \centering
+    \textbf{Shop}\\
+    \everyrow{\tabucline[0.5pt]-}
+    \begin{tabu} to 0.55\textwidth {|X|X|} \hline
+    Field & Type \\
+    uid & \texttt{string} \\
+name & \texttt{string} \\
+description & \texttt{string} \\
+image & \texttt{string} \\
+location & \texttt{string} \\
+departments & \texttt{Array<Department>} \\
+weekly-schedule & weekly-schedule \\
+\end{tabu}
+\end{table}
+
+
+    \begin{table}[H]
+    \centering
+    \textbf{StaffRequestRegistration}\\
+    \everyrow{\tabucline[0.5pt]-}
+    \begin{tabu} to 0.55\textwidth {|X|X|} \hline
+    Field & Type \\
+    email & \texttt{string} \\
+token & \texttt{string} \\
+password & \texttt{string} \\
+\end{tabu}
+\end{table}
+
+
+    \begin{table}[H]
+    \centering
+    \textbf{StaffTempAccount}\\
+    \everyrow{\tabucline[0.5pt]-}
+    \begin{tabu} to 0.55\textwidth {|X|X|} \hline
+    Field & Type \\
+    email & \texttt{string} \\
+token & \texttt{string} \\
+\end{tabu}
+\end{table}
+
+
+    \begin{table}[H]
+    \centering
+    \textbf{TimeSpan}\\
+    \everyrow{\tabucline[0.5pt]-}
+    \begin{tabu} to 0.55\textwidth {|X|X|} \hline
+    Field & Type \\
+    start & \texttt{string} \\
+end & \texttt{string} \\
+\end{tabu}
+\end{table}
+
+
+    \begin{table}[H]
+    \centering
+    \textbf{TokenBooking}\\
+    \everyrow{\tabucline[0.5pt]-}
+    \begin{tabu} to 0.55\textwidth {|X|X|} \hline
+    Field & Type \\
+    uid & \texttt{string} \\
+shop\_id & \texttt{string} \\
+department\_ids & \texttt{Array<string>} \\
+start\_time & \texttt{string} \\
+end\_time & \texttt{string} \\
+\end{tabu}
+\end{table}
+
+
+    \begin{table}[H]
+    \centering
+    \textbf{TokenCode}\\
+    \everyrow{\tabucline[0.5pt]-}
+    \begin{tabu} to 0.55\textwidth {|X|X|} \hline
+    Field & Type \\
+    uid & \texttt{string} \\
+\end{tabu}
+\end{table}
+
+
+    \begin{table}[H]
+    \centering
+    \textbf{TokenTicket}\\
+    \everyrow{\tabucline[0.5pt]-}
+    \begin{tabu} to 0.55\textwidth {|X|X|} \hline
+    Field & Type \\
+    uid & \texttt{string} \\
+shop\_id & \texttt{string} \\
+department\_ids & \texttt{Array<string>} \\
+creation & \texttt{string} \\
+expiration & \texttt{string} \\
+state & \texttt{string} \\
+\end{tabu}
+\end{table}
+
+
+    \begin{table}[H]
+    \centering
+    \textbf{Tokens}\\
+    \everyrow{\tabucline[0.5pt]-}
+    \begin{tabu} to 0.55\textwidth {|X|X|} \hline
+    Field & Type \\
+    tickets & \texttt{Array<TokenTicket>} \\
+bookings & \texttt{Array<TokenBooking>} \\
+\end{tabu}
+\end{table}
+
+

@@ -1,0 +1,785 @@
+openapi: "3.0.3"
+info:
+  title: Clup
+  version: "1.0"
+  description: Clup REST API specification
+# servers:
+#   - url: https://127.0.0.1:5000/v1
+paths:
+  /login:
+    post:
+      tags:
+        - "account"
+      summary: "Logs in and returns the authentication  cookie"
+      requestBody:
+        required: true
+        description: "A JSON object containing the login and password."
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RequestLogin"
+      security: []
+      responses:
+        "200":
+          description: OK
+          headers:
+            Set-Cookie:
+              schema:
+                type: string
+                example: SESSIONID=abcdef12345ABCD; Path=/;
+        "400":
+          description: Invalid Credentials
+
+  /register:
+    post:
+      tags:
+        - "account"
+      summary: "Request creation of a new account"
+      security: []
+      requestBody:
+        description: "Credentials"
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RequestRegistration"
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Invalid data
+  /register/confirm:
+    get:
+      tags:
+        - "account"
+      summary: "Submit email confirmation"
+      description: "Finalizes account creation"
+      operationId: "confirm_registration"
+      parameters:
+        - in: "query"
+          name: "code"
+          description: "Confirmation code received by email"
+          required: true
+          schema:
+            type: "string"
+      security: []
+      responses:
+        "201":
+          description: "successful operation"
+        "400":
+          description: "Invalid code"
+  /search:
+    get:
+      tags:
+        - "shop"
+      summary: Search for a shop by name
+      description: Search for a shop by name
+      parameters:
+        - in: query
+          name: "q"
+          required: true
+          description: "Search string"
+          schema:
+            type: string
+      security: []
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/SearchResult"
+
+  /tokens:
+    get:
+      summary: Get active tokens for the customer
+      tags:
+        - "token"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Tokens"
+
+              
+      security:
+        - customerAuth: []
+
+  /ticket/est:
+    get:
+      summary: Get the estimated waiting time for a ticket
+      tags:
+        - "ticket"
+      parameters:
+        - in: "query"
+          name: "uid"
+          description: "Ticket unique identifier"
+          required: true
+          schema:
+            type: "string"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/QueueEst"
+        "400":
+          description: "Invalid or expired code"
+      security:
+        - customerAuth: []
+
+  /shop/{shop_id}:
+    get:
+      tags:
+        - "shop"
+      summary: "Get available shop information"
+      parameters:
+        - in: path
+          name: "shop_id"
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Shop"
+
+  /shop/{shop_id}/ticket/new:
+    post:
+      tags:
+        - "ticket"
+      summary: Request a ticket for a shop
+      parameters:
+        - in: path
+          name: "shop_id"
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RequestTicket"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TokenTicket"
+        "400":
+          description: Error
+      security:
+        - customerAuth: []
+
+  /shop/{shop_id}/ticket/queue:
+    get:
+      summary: Get information about the queue status and approximate waiting time
+      parameters:
+        - in: path
+          name: "shop_id"
+          required: true
+          schema:
+            type: string
+      tags:
+        - "ticket"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+                schema:
+                  $ref: "#/components/schemas/QueueEst"
+
+  /shop/{shop_id}/booking/new:
+    post:
+      tags:
+        - "booking"
+      summary: Request a booking for a shop
+      parameters:
+        - in: path
+          name: "shop_id"
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RequestBooking"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TokenBooking"
+        "400":
+          description: Error
+      security:
+        - customerAuth: []
+
+  /shop/{shop_id}/booking/availability:
+    get:
+      summary: Get information about the time slot availability for bookings
+      parameters:
+        - in: path
+          name: "shop_id"
+          required: true
+          schema:
+            type: string
+        - in: query
+          name: "day"
+          required: false
+          schema:
+            type: string
+            format: date
+      tags:
+        - "booking"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BookingAvailability"
+        "400":
+          description: Error
+
+  /staff/login:
+    post:
+      summary: Log in and return authentication cookie
+      tags:
+        - "staff-account"
+      requestBody:
+        required: true
+        description: "A JSON object containing the login and password."
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RequestLogin"
+      responses:
+        "200":
+          description: OK
+          headers:
+            Set-Cookie:
+              schema:
+                type: string
+                example: SESSIONID=abcdef12345ABCD; Path=/;
+
+
+  /staff/register:
+    post:
+      summary: Activate staff account and set password
+      tags:
+        - "staff-account"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/StaffRequestRegistration"
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Invalid credentials
+
+  /staff/shop/{shop_id}/ticket/queue:
+    get:
+      summary: Get detailed information about the current queue status
+      parameters:
+        - in: path
+          name: "shop_id"
+          required: true
+          schema:
+            type: string
+      tags:
+        - "staff"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Queue"
+      security:
+        - staffAuth: []
+
+  /staff/shop/{shop_id}/booking/list:
+    get:
+      summary: Get detailed information about the current and future bookings
+      parameters:
+        - in: path
+          name: "shop_id"
+          required: true
+          schema:
+            type: string
+      tags:
+        - "staff"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BookingList"
+      security:
+        - staffAuth: []
+
+  /staff/shop/{shop_id}/token/info:
+    get:
+      summary: Get token information and validity
+      parameters:
+        - in: path
+          name: "shop_id"
+          required: true
+          schema:
+            type: string
+        - in: query
+          name: "uid"
+          required: true
+          schema:
+            type: string
+      tags:
+        - "staff"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TokenTicket"
+        "400":
+          description: Ticket does not exist
+      security:
+        - staffAuth: []
+
+  /staff/shop/{shop_id}/ticket/new-substitute:
+    post:
+      tags:
+        - "staff"
+      summary: Request creation of a substitute ticket
+      parameters:
+        - in: path
+          name: "shop_id"
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RequestTicket"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TokenTicket"
+        "400":
+          description: Error
+      security:
+        - staffAuth: []
+
+  /staff/shop/{shop_id}/token/log-entry:
+    post:
+      summary: Log entry, consume the token and update shop occupancy information
+      parameters:
+        - in: path
+          name: "shop_id"
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TokenCode"
+      tags:
+        - "staff"
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Error
+      security:
+        - staffAuth: []
+
+  /staff/shop/{shop_id}/token/log-exit:
+    post:
+      tags:
+        - "staff"
+      summary: Log exit, update shop occupancy information
+      parameters:
+        - in: path
+          name: "shop_id"
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TokenCode"
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Error
+      security:
+        - staffAuth: []
+
+  /staff/manage/create-account/{shop_id}:
+    post:
+      summary: Generate a temporary staff account for activation
+      tags: 
+        - "manage"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StaffTempAccount"
+        "400":
+          description: Invalid email
+      security:
+        - staffAuth: []
+
+  /staff/manage/shop/add:
+    post:
+      summary: Add a new shop to the database
+      tags:
+        - "manage"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Shop"
+      security:
+        - staffAuth: []
+
+  /staff/manage/shop/list:
+    post:
+      summary: Get a list of all managed shops
+      tags:
+        - "manage"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/SearchResult"
+      security:
+        - staffAuth: []
+
+  /staff/manage/shop/{shop_id}/edit:
+    post:
+      summary: Edit an existing shop listing
+      tags:
+        - "manage"
+      parameters:
+        - in: path
+          name: shop_id
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Shop"
+      responses:
+        "200":
+          description: OK
+      security:
+        - staffAuth: []
+
+  /staff/manage/shop/{shop_id}/show:
+    post:
+      summary: Make shop public and reachable from customers
+      tags:
+        - "manage"
+      parameters:
+        - in: path
+          name: shop_id
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+      security:
+        - staffAuth: []
+
+  /staff/manage/shop/{shop_id}/hide:
+    post:
+      summary: Make shop private and hidden from customers
+      tags:
+        - "manage"
+      parameters:
+        - in: path
+          name: shop_id
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+      security:
+        - staffAuth: []
+
+components:
+  schemas:
+    RequestRegistration:
+      type: object
+      properties:
+        email:
+          type: string
+        password:
+          type: string
+    RequestLogin:
+      type: object
+      properties:
+        email:
+          type: string
+        password:
+          type: string
+        remember:
+          type: boolean
+    StaffTempAccount:
+      type: object
+      properties:
+        email:
+          type: string
+        token:
+          type: string
+    StaffRequestRegistration:
+      type: object
+      properties:
+        email:
+          type: string
+        token:
+          type: string
+        password:
+          type: string
+    RequestBooking:
+      type: object
+      properties:
+        shop_id:
+          type: string
+        department_ids:
+          type: array
+          items:
+            type: string
+        start_time:
+          type: string
+          format: date-time
+        end_time:
+          type: string
+          format: date-time
+    RequestTicket:
+      type: object
+      properties:
+        shop_id:
+          type: string
+        department_ids:
+          type: array
+          items:
+            type: string
+    TokenBooking:
+      type: object
+      properties:
+        uid:
+          type: string
+        shop_id:
+          type: string
+        department_ids:
+          type: array
+          items:
+            type: string
+        start_time:
+          type: string
+          format: date-time
+        end_time:
+          type: string
+          format: date-time
+    TokenTicket:
+      type: object
+      properties:
+        uid:
+          type: string
+        shop_id:
+          type: string
+        department_ids:
+          type: array
+          items:
+            type: string
+        creation:
+          type: string
+          format: date-time
+        expiration:
+          type: string
+          format: date-time
+        state:
+          type: string
+          enum:
+            - "valid"
+            - "expired"
+    TokenCode:
+      type: object
+      properties:
+        uid:
+          type: string
+    Tokens:
+      type: object
+      properties:
+        tickets:
+          type: array
+          items:
+            $ref: "#/components/schemas/TokenTicket"
+        bookings:
+          type: array
+          items:
+            $ref: "#/components/schemas/TokenBooking"
+    Queue:
+      type: array
+      items:
+        $ref: "#/components/schemas/TokenTicket"
+    QueueEst:
+      type: object
+      properties:
+        people:
+          type: integer
+        est:
+          type: string
+          format: date-time
+    BookingList:
+      type: array
+      items:
+        $ref: "#/components/schemas/TokenBooking"
+    Shop:
+      type: object
+      properties:
+        uid:
+          type: string
+        name: 
+          type: string
+        description: 
+          type: string
+        image:
+          type: string
+          format: url
+        location:
+          type: string
+        departments:
+          type: array
+          items:
+            $ref: "#/components/schemas/Department"
+        weekly-schedule:
+          type: object
+          properties:
+            mo:
+              $ref: "#/components/schemas/Schedule"
+            tu:
+              $ref: "#/components/schemas/Schedule"
+            we:
+              $ref: "#/components/schemas/Schedule"
+            th:
+              $ref: "#/components/schemas/Schedule"
+            fr:
+              $ref: "#/components/schemas/Schedule"
+            sa:
+              $ref: "#/components/schemas/Schedule"
+            su:
+              $ref: "#/components/schemas/Schedule"
+    ShopOccupancy:
+      type: object
+      description: department_uid, occupancy map
+      additionalProperties:
+        type: integer
+    Schedule:
+      type: array
+      items:
+        type: object
+        $ref: "#/components/schemas/TimeSpan"
+    TimeSpan:
+      type: object
+      properties:
+        start:
+          type: string
+          format: partial-time
+          description: rfc3339 section-5.6 partial-time
+        end:
+          type: string
+          format: partial-time
+          description: rfc3339 section-5.6 partial-time
+    Department:
+      type: object
+      properties:
+        uid:
+          type: string
+        description:
+          type: string
+        capacity:
+          type: integer
+    SearchResult:
+      type: object
+      properties:
+        uid: 
+          type: string
+        name:
+          type: string
+        image:
+          type: string
+          format: url
+        description:
+          type: string
+    BookingAvailability:
+      type: array
+      items:
+        type: object
+        properties:
+          dept_id:
+            type: string
+          time:
+            $ref: "#/components/schemas/TimeSpan"
+          available:
+            type: integer
+
+        
+
+  securitySchemes:
+    customerAuth:
+      type: apiKey
+      in: cookie
+      name: SESSIONID
+    staffAuth:
+      type: apiKey
+      in: cookie
+      name: SESSIONID
