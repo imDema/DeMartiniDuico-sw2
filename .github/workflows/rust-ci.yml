@@ -25,11 +25,12 @@ jobs:
     - name: Cache sqlx-cli
       uses: actions/cache@v2
       with:
-        path: "~/.cargo/bin"
+        path: "~/.cargo/"
         key: |
-          cargo-sqlx
-          sqlx
-    - name: Database setup # Could be omitted if sqlx-data.json is guaranteed to be updated
+          .crates.toml
+          bin/cargo-sqlx
+          bin/sqlx
+    - name: Database setup
       run: |
         cargo install sqlx-cli --no-default-features --features postgres
         cargo sqlx database create
