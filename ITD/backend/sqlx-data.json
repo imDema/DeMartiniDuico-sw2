@@ -1,0 +1,306 @@
+{
+  "db": "PostgreSQL",
+  "03d46125f0eed546c501c991be795ecabce53dcc61e43ae63e308090f2cf35db": {
+    "query": "INSERT INTO temp_customer(code, email, salt, digest) VALUES ($1, $2, $3, $4) RETURNING code, email, salt, digest",
+    "describe": {
+      "columns": [
+        {
+          "ordinal": 0,
+          "name": "code",
+          "type_info": "Bytea"
+        },
+        {
+          "ordinal": 1,
+          "name": "email",
+          "type_info": "Varchar"
+        },
+        {
+          "ordinal": 2,
+          "name": "salt",
+          "type_info": "Bytea"
+        },
+        {
+          "ordinal": 3,
+          "name": "digest",
+          "type_info": "Bytea"
+        }
+      ],
+      "parameters": {
+        "Left": [
+          "Bytea",
+          "Varchar",
+          "Bytea",
+          "Bytea"
+        ]
+      },
+      "nullable": [
+        false,
+        false,
+        false,
+        false
+      ]
+    }
+  },
+  "192bbea17da9300e27f0e91881ecab1e12822fb0bd323ee435da970a6286be32": {
+    "query": "SELECT email FROM customer WHERE email = $1",
+    "describe": {
+      "columns": [
+        {
+          "ordinal": 0,
+          "name": "email",
+          "type_info": "Varchar"
+        }
+      ],
+      "parameters": {
+        "Left": [
+          "Text"
+        ]
+      },
+      "nullable": [
+        false
+      ]
+    }
+  },
+  "336867a89e201d271bb47283d8bb3fe9f48c341c99f517e21139994379c13f9e": {
+    "query": "SELECT id, email, salt, digest FROM customer WHERE id = $1",
+    "describe": {
+      "columns": [
+        {
+          "ordinal": 0,
+          "name": "id",
+          "type_info": "Int4"
+        },
+        {
+          "ordinal": 1,
+          "name": "email",
+          "type_info": "Varchar"
+        },
+        {
+          "ordinal": 2,
+          "name": "salt",
+          "type_info": "Bytea"
+        },
+        {
+          "ordinal": 3,
+          "name": "digest",
+          "type_info": "Bytea"
+        }
+      ],
+      "parameters": {
+        "Left": [
+          "Int4"
+        ]
+      },
+      "nullable": [
+        false,
+        false,
+        false,
+        false
+      ]
+    }
+  },
+  "85033be72c9ba421351009670c386b66a9a9c9105f476f2af057be31f839cd9b": {
+    "query": "INSERT INTO customer(email, salt, digest) VALUES ($1, $2, $3) RETURNING id, email, salt, digest",
+    "describe": {
+      "columns": [
+        {
+          "ordinal": 0,
+          "name": "id",
+          "type_info": "Int4"
+        },
+        {
+          "ordinal": 1,
+          "name": "email",
+          "type_info": "Varchar"
+        },
+        {
+          "ordinal": 2,
+          "name": "salt",
+          "type_info": "Bytea"
+        },
+        {
+          "ordinal": 3,
+          "name": "digest",
+          "type_info": "Bytea"
+        }
+      ],
+      "parameters": {
+        "Left": [
+          "Varchar",
+          "Bytea",
+          "Bytea"
+        ]
+      },
+      "nullable": [
+        false,
+        false,
+        false,
+        false
+      ]
+    }
+  },
+  "9b6804990c87b18d7156a551fee08dfcaa357c36837141c59bfc6f014c43e4b2": {
+    "query": "SELECT id, email, salt, digest FROM customer WHERE email = $1",
+    "describe": {
+      "columns": [
+        {
+          "ordinal": 0,
+          "name": "id",
+          "type_info": "Int4"
+        },
+        {
+          "ordinal": 1,
+          "name": "email",
+          "type_info": "Varchar"
+        },
+        {
+          "ordinal": 2,
+          "name": "salt",
+          "type_info": "Bytea"
+        },
+        {
+          "ordinal": 3,
+          "name": "digest",
+          "type_info": "Bytea"
+        }
+      ],
+      "parameters": {
+        "Left": [
+          "Text"
+        ]
+      },
+      "nullable": [
+        false,
+        false,
+        false,
+        false
+      ]
+    }
+  },
+  "9d6b9e5bdcdce27dc0b21f3829e18230c8677d02a5b0959e95bcc25569eb242e": {
+    "query": "DELETE FROM temp_customer WHERE code = $1",
+    "describe": {
+      "columns": [],
+      "parameters": {
+        "Left": [
+          "Bytea"
+        ]
+      },
+      "nullable": []
+    }
+  },
+  "aa458e84cef3ac8a168c6463e51842c5137bf7e7aa6ded0fe7dfbdf415d3e260": {
+    "query": "SELECT id, email, salt, digest FROM customer",
+    "describe": {
+      "columns": [
+        {
+          "ordinal": 0,
+          "name": "id",
+          "type_info": "Int4"
+        },
+        {
+          "ordinal": 1,
+          "name": "email",
+          "type_info": "Varchar"
+        },
+        {
+          "ordinal": 2,
+          "name": "salt",
+          "type_info": "Bytea"
+        },
+        {
+          "ordinal": 3,
+          "name": "digest",
+          "type_info": "Bytea"
+        }
+      ],
+      "parameters": {
+        "Left": []
+      },
+      "nullable": [
+        false,
+        false,
+        false,
+        false
+      ]
+    }
+  },
+  "d7a5799ee117b1079e9b8ae61836d3c2eb99dfb3c3b0c84abccf85d46e66961f": {
+    "query": "UPDATE customer SET salt = $1, digest = $2 WHERE id = $3 RETURNING id, email, salt, digest",
+    "describe": {
+      "columns": [
+        {
+          "ordinal": 0,
+          "name": "id",
+          "type_info": "Int4"
+        },
+        {
+          "ordinal": 1,
+          "name": "email",
+          "type_info": "Varchar"
+        },
+        {
+          "ordinal": 2,
+          "name": "salt",
+          "type_info": "Bytea"
+        },
+        {
+          "ordinal": 3,
+          "name": "digest",
+          "type_info": "Bytea"
+        }
+      ],
+      "parameters": {
+        "Left": [
+          "Bytea",
+          "Bytea",
+          "Int4"
+        ]
+      },
+      "nullable": [
+        false,
+        false,
+        false,
+        false
+      ]
+    }
+  },
+  "dbbbc72cf10924b67b2167fcb998a87b5854022f68b84ab259353e254adb57b7": {
+    "query": "SELECT code, email, salt, digest FROM temp_customer WHERE code = $1",
+    "describe": {
+      "columns": [
+        {
+          "ordinal": 0,
+          "name": "code",
+          "type_info": "Bytea"
+        },
+        {
+          "ordinal": 1,
+          "name": "email",
+          "type_info": "Varchar"
+        },
+        {
+          "ordinal": 2,
+          "name": "salt",
+          "type_info": "Bytea"
+        },
+        {
+          "ordinal": 3,
+          "name": "digest",
+          "type_info": "Bytea"
+        }
+      ],
+      "parameters": {
+        "Left": [
+          "Bytea"
+        ]
+      },
+      "nullable": [
+        false,
+        false,
+        false,
+        false
+      ]
+    }
+  }
+}

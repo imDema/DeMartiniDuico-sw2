@@ -1,4 +1,4 @@
-SET ROLE clup;
+-- SET ROLE clup;
 
 DROP TABLE IF EXISTS customer;
 CREATE TABLE customer (

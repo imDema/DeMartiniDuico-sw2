@@ -12,7 +12,7 @@ pub fn endpoints(cfg: &mut web::ServiceConfig) {
     cfg.service(register);
     cfg.service(confirm);
 }
-
+#[allow(dead_code)]
 #[derive(Deserialize)]
 struct RequestLogin {
     email: String,
