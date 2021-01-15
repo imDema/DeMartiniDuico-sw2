@@ -22,10 +22,18 @@ jobs:
         SESSION_KEY: "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"
     steps:
     - uses: actions/checkout@v2
+    - name: Cache sqlx-cli
+      uses: actions/cache@v2
+      with:
+        path: "~/.cargo/bin"
+        key: |
+          cargo-sqlx
+          sqlx
     - name: Database setup # Could be omitted if sqlx-data.json is guaranteed to be updated
-      run: | 
-        cargo install sqlx-cli
-        cargo sqlx prepare -- --lib
+      run: |
+        cargo install sqlx-cli --no-default-features --features postgres
+        cargo sqlx database create
+        cargo sqlx migrate run
     - name: Build
       run: cargo build --verbose
     - name: Run tests
