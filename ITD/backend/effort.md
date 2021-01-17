@@ -7,3 +7,4 @@
 | 2021-10-01 | 2h   | Customer Authentication |
 | 2021-14-01 | 2h   | Customer Authentication |
 | 2021-15-01 | 2h   | Setup CI                |
+| 2021-17-01 | 2h   | Testing                 |

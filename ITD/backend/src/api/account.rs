@@ -4,7 +4,7 @@ use crate::utils::session;
 use actix_web::{web, get, post, Responder, HttpResponse};
 use actix_session::Session;
 use sqlx::PgPool;
-use serde::Deserialize;
+use serde::{Serialize, Deserialize};
 
 pub fn endpoints(cfg: &mut web::ServiceConfig) {
     cfg.service(login);
@@ -13,11 +13,11 @@ pub fn endpoints(cfg: &mut web::ServiceConfig) {
     cfg.service(confirm);
 }
 #[allow(dead_code)]
-#[derive(Deserialize)]
-struct RequestLogin {
-    email: String,
-    password: String,
-    remember: Option<bool>,
+#[derive(Deserialize, Serialize, Debug)]
+pub struct RequestLogin {
+    pub email: String,
+    pub password: String,
+    pub remember: Option<bool>,
 }
 // TODO: remember
 #[post("/login")]
@@ -49,15 +49,17 @@ async fn logout(_conn: web::Data<PgPool>, session: Session) -> HttpResponse {
     HttpResponse::Ok().finish()
 }
 
-#[derive(Deserialize)]
-struct RequestRegistration {
-    email: String,
-    password: String,
+#[derive(Deserialize, Serialize, Debug)]
+pub struct RequestRegistration {
+    pub email: String,
+    pub password: String,
 }
 #[post("/register")]
 async fn register(conn: web::Data<PgPool>, body: web::Json<RequestRegistration>) -> HttpResponse {
     let conn = conn.into_inner();
     let req = body.into_inner();
+
+    // if req.password.len() < 12 {return HttpResponse::BadRequest().body("Password too short")} // Left out for tesing purposes
 
     let code = PersistentCustomer::create(&conn, &req.email, &req.password).await;
     match code {
@@ -68,9 +70,9 @@ async fn register(conn: web::Data<PgPool>, body: web::Json<RequestRegistration>)
 }
 
 
-#[derive(Deserialize)]
-struct ConfirmQuery {
-    code: String
+#[derive(Deserialize, Serialize, Debug)]
+pub struct ConfirmQuery {
+    pub code: String
 }
 #[get("/register/confirm")]
 async fn confirm(conn: web::Data<PgPool>, query: web::Query<ConfirmQuery>) -> impl Responder {
@@ -88,4 +90,3 @@ async fn confirm(conn: web::Data<PgPool>, query: web::Query<ConfirmQuery>) -> im
         HttpResponse::BadRequest().body("Invalid code format")
     }
 }
-

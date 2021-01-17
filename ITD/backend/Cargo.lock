@@ -727,8 +727,11 @@ name = "clup"
 version = "0.1.0"
 dependencies = [
  "actix-redis",
+ "actix-rt",
+ "actix-service",
  "actix-session",
  "actix-web",
+ "async-trait",
  "chrono",
  "dotenv",
  "futures",
@@ -736,11 +739,9 @@ dependencies = [
  "image",
  "lazy_static",
  "log",
- "parking_lot",
  "pretty_env_logger",
  "rand 0.8.2",
  "rand_pcg",
- "regex",
  "rust-argon2",
  "serde",
  "sqlx",

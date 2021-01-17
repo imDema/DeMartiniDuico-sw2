@@ -2,16 +2,13 @@ use sqlx::{PgPool, Postgres};
 use sqlx::postgres::PgPoolOptions;
 use sqlx::migrate::*;
 
-use std::env;
-
 pub mod models;
 pub mod api;
 pub mod utils;
 pub mod migrations;
 
 
-pub async fn setup_db() -> PgPool {
-    let conn_url = env::var("DATABASE_URL").expect("DATABASE_URL environment variable must be set");
+pub async fn setup_db(conn_url: &str) -> PgPool {
     log::info!("db_conn: {}", &conn_url);
     
     if !Postgres::database_exists(&conn_url).await.unwrap_or_else(|e| panic!("Could not connect to postgres: {}", e)) {
@@ -21,6 +18,6 @@ pub async fn setup_db() -> PgPool {
         .max_connections(8)
         .connect(&conn_url).await.unwrap_or_else(|e| panic!("Could not connect to postgres: {}", e));
     
-    migrations::migrate(&pool).await.unwrap_or_else(|e| panic!("Failed to run migration; {}", e));
+    migrations::migrate(&pool).await.unwrap_or_else(|e| panic!("Failed to run migration: {}", e));
     pool
 }

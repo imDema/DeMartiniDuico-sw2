@@ -11,14 +11,14 @@ async fn main() -> std::io::Result<()> {
     dotenv::dotenv().ok();
     pretty_env_logger::init();
 
-    let db_pool = clup::setup_db().await;
-    
+    let conn_url = env::var("DATABASE_URL").expect("DATABASE_URL environment variable must be set");
+    let db_pool = clup::setup_db(&conn_url).await;
+
     let redis_url = env::var("REDIS_URL").expect("REDIS_URL environment variable must be set");
     let session_key = env::var("SESSION_KEY").expect("SESSION_KEY environment variable must be set");
     let key = hex::decode(session_key).expect("Invalid SESSION_KEY format. Expected hex");
-
-    let api_url = env::var("API_URL").unwrap_or("0.0.0.0:5000".into());
     
+    let api_url = env::var("API_URL").unwrap_or("0.0.0.0:5000".into());
     HttpServer::new(move || {
         App::new()
         .wrap(Logger::default())
