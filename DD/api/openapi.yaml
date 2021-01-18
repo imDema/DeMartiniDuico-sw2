@@ -30,11 +30,24 @@ paths:
         "400":
           description: Invalid Credentials
 
+  /logout:
+    get:
+      tags:
+        - "account"
+      summary: "Log out and terminate session"
+      security: []
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Not Logged in
+
   /register:
     post:
       tags:
         - "account"
       summary: "Request creation of a new account"
+      # description: "Note: minimum password length is 12"
       security: []
       requestBody:
         description: "Credentials"
