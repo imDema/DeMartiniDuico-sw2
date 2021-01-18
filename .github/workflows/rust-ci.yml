@@ -2,7 +2,6 @@ name: Rust
 
 on:
   push:
-    branches: [ main, impl ]
   pull_request:
     branches: [ main ]
 
@@ -22,17 +21,23 @@ jobs:
         SESSION_KEY: "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"
     steps:
     - uses: actions/checkout@v2
-    - name: Cache sqlx-cli
+    - name: Cache crates and sqlx cli tools
       uses: actions/cache@v2
       with:
-        path: "~/.cargo/"
-        key: |
-          .crates.toml
-          bin/cargo-sqlx
-          bin/sqlx
+        path: |
+          ~/.cargo/registry/index/
+          ~/.cargo/registry/cache/
+          ~/.cargo/git/db/
+          ~/.cargo/bin/
+          ~/.cargo/.crates.toml
+          ~/.cargo/.crates2.json
+          ./ITD/backend/target
+        key: ${{ runner.os }}-cargo-v1-${{ hashFiles('**/Cargo.lock') }}
+        restore-keys: ${{ runner.os }}-cargo-v1-
+        working-directory: .
     - name: Database setup
       run: |
-        cargo install sqlx-cli --no-default-features --features postgres
+        cargo install sqlx-cli --no-default-features --features postgres --locked
         cargo sqlx database create
         cargo sqlx migrate run
     - name: Build
