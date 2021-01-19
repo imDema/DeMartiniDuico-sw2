@@ -2,9 +2,6 @@
 mod common;
 
 use std::env;
-use std::fmt::Debug;
-
-use actix_web::dev::ServiceResponse;
 use actix_web::{App, http};
 use actix_web::middleware::Logger;
 use actix_web::http::{HeaderMap, StatusCode};
