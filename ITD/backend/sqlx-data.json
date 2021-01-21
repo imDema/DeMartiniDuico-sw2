@@ -61,6 +61,82 @@
       ]
     }
   },
+  "2a768241ea4005d197883fce4d60ba2443d2da8a238e221e64d3d66da6988189": {
+    "query": "SELECT id, shop_id, description, capacity FROM department\n            WHERE shop_id = $1",
+    "describe": {
+      "columns": [
+        {
+          "ordinal": 0,
+          "name": "id",
+          "type_info": "Int4"
+        },
+        {
+          "ordinal": 1,
+          "name": "shop_id",
+          "type_info": "Int4"
+        },
+        {
+          "ordinal": 2,
+          "name": "description",
+          "type_info": "Varchar"
+        },
+        {
+          "ordinal": 3,
+          "name": "capacity",
+          "type_info": "Int4"
+        }
+      ],
+      "parameters": {
+        "Left": [
+          "Int4"
+        ]
+      },
+      "nullable": [
+        false,
+        false,
+        false,
+        false
+      ]
+    }
+  },
+  "2de403104534f99a2abe89fbb5f5ed7edf5a8d891007d099dac3f0c9ed30dc95": {
+    "query": "SELECT shop_id, dow, open, close FROM schedule\n            WHERE shop_id = $1\n            ORDER BY dow, open",
+    "describe": {
+      "columns": [
+        {
+          "ordinal": 0,
+          "name": "shop_id",
+          "type_info": "Int4"
+        },
+        {
+          "ordinal": 1,
+          "name": "dow",
+          "type_info": "Int2"
+        },
+        {
+          "ordinal": 2,
+          "name": "open",
+          "type_info": "Timetz"
+        },
+        {
+          "ordinal": 3,
+          "name": "close",
+          "type_info": "Timetz"
+        }
+      ],
+      "parameters": {
+        "Left": [
+          "Int4"
+        ]
+      },
+      "nullable": [
+        false,
+        false,
+        false,
+        false
+      ]
+    }
+  },
   "336867a89e201d271bb47283d8bb3fe9f48c341c99f517e21139994379c13f9e": {
     "query": "SELECT id, email, salt, digest FROM customer WHERE id = $1",
     "describe": {
@@ -173,6 +249,50 @@
         false,
         false,
         false,
+        false
+      ]
+    }
+  },
+  "9c67f4835eadeb4646631d8182db2de109c29223d38af60fe637369b1636e7b5": {
+    "query": "SELECT id, name, description, image, location FROM shop\n            WHERE id = $1",
+    "describe": {
+      "columns": [
+        {
+          "ordinal": 0,
+          "name": "id",
+          "type_info": "Int4"
+        },
+        {
+          "ordinal": 1,
+          "name": "name",
+          "type_info": "Varchar"
+        },
+        {
+          "ordinal": 2,
+          "name": "description",
+          "type_info": "Varchar"
+        },
+        {
+          "ordinal": 3,
+          "name": "image",
+          "type_info": "Varchar"
+        },
+        {
+          "ordinal": 4,
+          "name": "location",
+          "type_info": "Varchar"
+        }
+      ],
+      "parameters": {
+        "Left": [
+          "Int4"
+        ]
+      },
+      "nullable": [
+        false,
+        false,
+        false,
+        true,
         false
       ]
     }
