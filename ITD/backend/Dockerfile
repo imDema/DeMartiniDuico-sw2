@@ -1,7 +1,9 @@
-from rust:1.49-alpine
-RUN apk add --no-cache musl-dev
+from rust:1.49-slim as builder
 WORKDIR /usr/clup
 COPY . .
 RUN cargo install --path .
 
-CMD ["main"]
+FROM debian:stable-slim
+WORKDIR /usr/clup
+COPY --from=builder /usr/local/cargo/bin/main .
+CMD ["./main"]
