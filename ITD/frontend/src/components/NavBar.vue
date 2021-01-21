@@ -29,7 +29,7 @@
         this.$bvModal.show('login-modal')
       },
       logout(){
-        //this.$cookies.remove(session)  // return this
+        //GET /logout
       }
     },
   }

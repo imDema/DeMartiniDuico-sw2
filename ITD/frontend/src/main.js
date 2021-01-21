@@ -8,6 +8,7 @@ import Autocomplete from '@trevoreyre/autocomplete-vue'
 import './custom.scss';
 import './autocompletion-style.css';
 import router from './router'
+import store from './store'
 
 Vue.use(Autocomplete)
 Vue.use(BootstrapVue)
@@ -15,12 +16,13 @@ Vue.use(BootstrapVueIcons)
 Vue.use({
   install (Vue) {
   Vue.prototype.$api = axios.create({
-    baseURL: 'https://httpbin.org'
+    baseURL: 'http://localhost:5000'
   })
 }
 })
 new Vue({
   el: '#app',
   router,
+  store,
   render: h => h(App)
 })

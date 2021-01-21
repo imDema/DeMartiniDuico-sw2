@@ -81,6 +81,7 @@
       },
       async onSubmit(evt) {
         evt.preventDefault();
+        var wasRegistration = this.isRegistration;
         let endpoint = this.isRegistration?"/register":"/login"
         this.$api.post(endpoint, {
           email: this.form.email,
@@ -89,6 +90,7 @@
         })
         .then(res => {
           console.log(res.data.args);
+          this.$emit(wasRegistration?'successful-registration':'successful-login');
         }).catch(err => {
           console.log(err);
         });
