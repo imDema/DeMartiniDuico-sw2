@@ -1,6 +1,6 @@
 <template>
     <b-modal id="login-modal" no-close-on-esc no-close-on-backdrop hide-header-close hide-footer busy>
-    <LoginForm id="login-form" :prop-registration="isRegistration" @switch-action="isRegistration=$event" @successful-login="close" @successful-registration="close"/>  
+    <LoginForm id="login-form" :prop-registration="isRegistration" @switch-action="isRegistration=$event" @successful-login="slowClose" @successful-registration="isRegistration=false"/>  
     <template #modal-header>
         <div class="modal_header">{{modal_header}}</div>
     </template>
@@ -27,6 +27,9 @@ export default {
     methods: {
         close(){
             this.$bvModal.hide('login-modal');
+        },
+        slowClose(){
+            setTimeout(this.close, 500);
         }
     }
 }

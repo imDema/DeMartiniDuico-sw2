@@ -16,7 +16,7 @@
       <b-collapse id="nav-collapse" is-nav>
       <b-navbar-nav class="ml-auto">
         <b-nav-item href="#" @click="displayLogin">Display login</b-nav-item>
-        <b-nav-item href="#" @clock="logout">Logout</b-nav-item>
+        <b-nav-item href="#" @click="logout">Logout</b-nav-item>
       </b-navbar-nav>
       </b-collapse>
   </b-navbar>
@@ -29,7 +29,21 @@
         this.$bvModal.show('login-modal')
       },
       logout(){
-        //GET /logout
+        //OPTIONAL 
+        //show modal:
+        //Are you sure you want to logout?
+        this.$api.get("/logout")
+        .then( res => {
+          if(res.status == '200'){
+            this.$store.commit('logged_out')
+            console.log('successful logout')
+            this.displayLogin()
+          }
+        })
+        .catch( err => {
+          console.log(err)
+          console.log('failed logout')
+        })
       }
     },
   }
