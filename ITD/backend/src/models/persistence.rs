@@ -3,7 +3,6 @@ use std::num::ParseIntError;
 const K: u32 = 0xdeadbeef; // TODO: Use environment variable instead of constant
 const N: u32 = 32;
 
-
 fn round_fn(x: u16, k: u32) -> u16 {
     // Simple key transformation
     let x = x as u32;

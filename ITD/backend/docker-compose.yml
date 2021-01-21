@@ -1,0 +1,24 @@
+version: "3"
+services:
+  clup:
+    build: .
+    ports:
+      - "5000:5000"
+    environment:
+      DATABASE_URL: "postgresql://clup:postgres@postgres:5432/clup_sqlx"
+      REDIS_URL: "redis:6379"
+      SESSION_KEY: "${SESSION_KEY}"
+      RUST_LOG: "info"
+    depends_on:
+      - redis
+      - postgres
+    links:
+      - redis
+      - postgres
+  redis:
+    image: redis
+  postgres:
+    image: postgres
+    environment:
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_USER: clup

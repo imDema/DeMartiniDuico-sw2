@@ -30,11 +30,24 @@ paths:
         "400":
           description: Invalid Credentials
 
+  /logout:
+    get:
+      tags:
+        - "account"
+      summary: "Log out and terminate session"
+      security: []
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Not Logged in
+
   /register:
     post:
       tags:
         - "account"
       summary: "Request creation of a new account"
+      # description: "Note: minimum password length is 12"
       security: []
       requestBody:
         description: "Credentials"
@@ -449,6 +462,12 @@ paths:
           application/json:
             schema:
               type: string
+      parameters:
+        - in: path
+          name: "shop_id"
+          required: true
+          schema:
+            type: string
       responses:
         "200":
           description: OK
@@ -646,11 +665,8 @@ components:
         expiration:
           type: string
           format: date-time
-        state:
-          type: string
-          enum:
-            - "valid"
-            - "expired"
+        valid:
+          type: boolean
     TokenCode:
       type: object
       properties:
@@ -702,35 +718,19 @@ components:
           items:
             $ref: "#/components/schemas/Department"
         weekly-schedule:
-          type: object
-          properties:
-            mo:
-              $ref: "#/components/schemas/Schedule"
-            tu:
-              $ref: "#/components/schemas/Schedule"
-            we:
-              $ref: "#/components/schemas/Schedule"
-            th:
-              $ref: "#/components/schemas/Schedule"
-            fr:
-              $ref: "#/components/schemas/Schedule"
-            sa:
-              $ref: "#/components/schemas/Schedule"
-            su:
-              $ref: "#/components/schemas/Schedule"
+          type: array
+          items:
+            $ref: "#/components/schemas/Schedule"
     ShopOccupancy:
       type: object
       description: department_uid, occupancy map
       additionalProperties:
         type: integer
     Schedule:
-      type: array
-      items:
-        type: object
-        $ref: "#/components/schemas/TimeSpan"
-    TimeSpan:
       type: object
       properties:
+        dow:
+          type: integer
         start:
           type: string
           format: partial-time
@@ -768,7 +768,7 @@ components:
           dept_id:
             type: string
           time:
-            $ref: "#/components/schemas/TimeSpan"
+            $ref: "#/components/schemas/Schedule"
           available:
             type: integer
 

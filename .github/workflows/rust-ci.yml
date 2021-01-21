@@ -2,7 +2,6 @@ name: Rust
 
 on:
   push:
-    branches: [ main, impl ]
   pull_request:
     branches: [ main ]
 
@@ -18,21 +17,27 @@ jobs:
         working-directory: ./ITD/backend
     env:
         DATABASE_URL: "postgresql://clup:postgres@localhost/clup_sqlx"
-        # REDIS_URL: "127.0.0.1:6379"
+        REDIS_URL: "localhost:6379"
         SESSION_KEY: "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"
     steps:
     - uses: actions/checkout@v2
-    - name: Cache sqlx-cli
+    - name: Cache crates and sqlx cli tools
       uses: actions/cache@v2
       with:
-        path: "~/.cargo/"
-        key: |
-          .crates.toml
-          bin/cargo-sqlx
-          bin/sqlx
+        path: |
+          ~/.cargo/registry/index/
+          ~/.cargo/registry/cache/
+          ~/.cargo/git/db/
+          ~/.cargo/bin/
+          ~/.cargo/.crates.toml
+          ~/.cargo/.crates2.json
+          ./ITD/backend/target
+        key: ${{ runner.os }}-cargo-v1-${{ hashFiles('**/Cargo.lock') }}
+        restore-keys: ${{ runner.os }}-cargo-v1-
+        working-directory: .
     - name: Database setup
       run: |
-        cargo install sqlx-cli --no-default-features --features postgres
+        cargo install sqlx-cli --no-default-features --features postgres --locked
         cargo sqlx database create
         cargo sqlx migrate run
     - name: Build
@@ -50,6 +55,15 @@ jobs:
         - 5432:5432
         options: >-
           --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+      redis:
+        image: redis
+        ports:
+        - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
