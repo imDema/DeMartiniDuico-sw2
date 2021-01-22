@@ -26,8 +26,9 @@ export default {
   created(){
           this.$api.get("/checkauth")
         .then(res => {
-            let isAuthenticated = res.data == "true";
+            let isAuthenticated = res.data == true;
             if(isAuthenticated){
+              console.log('true')
               this.$store.commit('logged_in')
             }else{
               this.$store.commit('logged_out')
