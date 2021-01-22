@@ -43,9 +43,9 @@
           {value: 3, text: 'Dairy products', selected: false}, 
           {value: 4, text: 'Canned food', selected: false}, 
           {value: 5, text: 'Cereals, Pasta etc.', selected: false}, 
-          //{value: 6, text: 'Beverages', selected: false}, 
-          //{value: 7, text: 'Frozen food', selected: false}, 
-          //{value: 8, text: 'Household items', selected: false}, 
+          {value: 6, text: 'Beverages', selected: false}, 
+          {value: 7, text: 'Frozen food', selected: false}, 
+          {value: 8, text: 'Household items', selected: false}, 
           ],
         show: true
       }

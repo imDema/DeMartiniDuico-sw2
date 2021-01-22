@@ -5,23 +5,39 @@
   <b-img class="logo-big" alt="CLup logo" :src="require('../assets/logo-CLup_1.png')" center fluid></b-img>
   </div>
   <AuthModal/>
-  <MainForm/>
+  <SearchForm/>
   </div>
 </template>
 
 <script>
 import NavBar from '../components/NavBar'
-import MainForm from '../components/MainForm'
+import SearchForm from '../components/SearchForm'
 import AuthModal from '../components/AuthModal'
 
 export default {
   name: 'App',
   components: {
     NavBar,
-    MainForm,
+    SearchForm,
     AuthModal
   },
   methods: {
+  },
+  created(){
+          this.$api.get("/checkauth")
+        .then(res => {
+            let isAuthenticated = res.data == "true";
+            if(isAuthenticated){
+              this.$store.commit('logged_in')
+            }else{
+              this.$store.commit('logged_out')
+              this.$bvModal.show('login-modal')
+            }
+        }).catch( (err) => {
+            this.$bvModal.show('login-modal')
+            console.log(err)
+            console.log('error with /checkauth')
+        });
   }
 }
 </script>

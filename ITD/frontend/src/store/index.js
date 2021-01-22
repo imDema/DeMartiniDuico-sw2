@@ -5,14 +5,14 @@ Vue.use(Vuex)
 
 export default new Vuex.Store({
   state: {
-    logged_in: false
+    loggedIn: false
   },
   mutations: {
     logged_in (state){
-      state.logged_in = true;
+      state.loggedIn = true;
     },
     logged_out (state){
-      state.logged_in = false;
+      state.loggedIn = false;
     }
     
   },

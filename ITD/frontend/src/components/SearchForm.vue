@@ -8,8 +8,10 @@
     </p>
     <SearchBar @submit="submitSearch"/>
     <b-row class="my-5">
-    <b-col col="6"><b-button class="h-100" variant="secondary" @click="selectTicket" block>Get a Ticket</b-button></b-col>
-    <b-col col="6"><b-button class="h-100" variant="primary" @click="selectBooking" block>Make a Booking</b-button></b-col>
+    <b-col cols="6"><b-button class="h-100" variant="success" id="ticket-button" @click="selectTicket" block>Get a Ticket</b-button></b-col>
+    <b-col cols="6"><b-button class="h-100" variant="primary" id="booking-button" block>Make a Booking</b-button>
+    <b-tooltip target="booking-button" triggers="hover" placement="bottom">Booking is not available in this demo</b-tooltip>
+    </b-col>
     </b-row>
     </div>
 </template>
@@ -20,15 +22,18 @@ import SearchBar from './SearchBar'
 export default {
     data() { 
         return {
-        errors: [],
-        isBooking: false,
+            errors: [],
+            isBooking: false,
+            searchChoice: {},
         }
     },
     components: {
         SearchBar,
     },
     methods: {
-        submitSearch(){},
+        submitSearch(choice){
+            this.searchChoice = choice;
+        },
         selectTicket() {
             this.isBooking = false;
             //if(this.step===0)

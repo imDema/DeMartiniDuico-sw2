@@ -84,6 +84,7 @@
         form: {
           email: '',
           password: '',
+          remember: [],
         },
         isRegistration: this.propRegistration,
         wrongCredentials: false,
@@ -105,6 +106,11 @@
         return password.length >= 8 && password.length <=20
       },
     },
+    watch: {
+      propRegistration(newValue) {
+        this.isRegistration = newValue
+      }
+    },
     methods: {
       switchAction(){
         this.isRegistration = !this.isRegistration
@@ -119,7 +125,7 @@
         this.$api.post(endpoint, {
           email: this.form.email,
           password: this.form.password,
-          remember: this.form.remember,
+          remember: !!this.form.remember,
         })
         .then(res => {
           if(wasRegistration){
@@ -128,17 +134,16 @@
               //BEGIN temp validation
               let url = this.$api.defaults.baseURL+"/register/confirm?code=" 
               + encodeURIComponent(code);
-              let win = window.open(url, '_blank');
-              win.focus();
+              console.log(url);
               //END temp
               this.$emit('successful-registration');
 
           }else{
             //login
             if(res.status == '200'){
-              this.$emit('successful-login')
+              this.$store.commit('logged_in')
               this.showSuccessfulLoginAlert()
-              this.$store.commmit('logged_in')
+              this.$emit('successful-login')
             }
           }
         }).catch( (err) => {
@@ -158,7 +163,7 @@
       resetForm(){
         this.form.email = ''
         this.form.password  = ''
-        this.form.remember = []
+        this.form.remember = false
       },
       validateForm(){
         return true;
