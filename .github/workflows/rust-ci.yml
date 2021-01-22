@@ -34,7 +34,6 @@ jobs:
           ./ITD/backend/target
         key: ${{ runner.os }}-cargo-v1-${{ hashFiles('**/Cargo.lock') }}
         restore-keys: ${{ runner.os }}-cargo-v1-
-        working-directory: .
     - name: Database setup
       run: |
         cargo install sqlx-cli --no-default-features --features postgres
