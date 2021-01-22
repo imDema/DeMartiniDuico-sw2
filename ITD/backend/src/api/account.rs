@@ -11,6 +11,7 @@ pub fn endpoints(cfg: &mut web::ServiceConfig) {
     cfg.service(logout);
     cfg.service(register);
     cfg.service(confirm);
+    cfg.service(checkauth);
 }
 #[allow(dead_code)]
 #[derive(Deserialize, Serialize, Debug)]
@@ -88,5 +89,15 @@ async fn confirm(conn: web::Data<PgPool>, query: web::Query<ConfirmQuery>) -> im
         }
     } else {
         HttpResponse::BadRequest().body("Invalid code format")
+    }
+}
+
+#[get("/checkauth")]
+async fn checkauth(session: Session) -> HttpResponse {
+    let uid = session::get_account(&session);
+    if let Some(uid) = uid {
+        HttpResponse::Ok().body("true")
+    } else {
+        HttpResponse::Ok().body("false")
     }
 }
