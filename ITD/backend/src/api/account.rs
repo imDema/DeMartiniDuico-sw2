@@ -95,7 +95,7 @@ async fn confirm(conn: web::Data<PgPool>, query: web::Query<ConfirmQuery>) -> im
 #[get("/checkauth")]
 async fn checkauth(session: Session) -> HttpResponse {
     let uid = session::get_account(&session);
-    if let Some(uid) = uid {
+    if let Some(_) = uid {
         HttpResponse::Ok().body("true")
     } else {
         HttpResponse::Ok().body("false")

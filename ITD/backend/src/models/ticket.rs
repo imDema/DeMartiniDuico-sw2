@@ -2,8 +2,7 @@ use serde::{Serialize, Deserialize};
 use sqlx::FromRow;
 use chrono::prelude::*;
 
-use super::shop::Department;
-
+#[derive(Debug)]
 pub struct Ticket {
     pub id: i32,
     pub shop_id: i32,
@@ -11,7 +10,7 @@ pub struct Ticket {
     pub expiration: DateTime<Utc>,
     pub valid: bool,
     pub active: bool,
-    pub departments: Vec<Department>,
+    pub department_ids: Vec<i32>,
 }
 
 #[derive(FromRow)]
