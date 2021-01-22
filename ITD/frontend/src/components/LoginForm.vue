@@ -52,6 +52,17 @@
           Wrong credentials. Try again.
         </b-alert>
         <b-alert
+          :show="accountAlreadyExistsCountdown"
+          dismissible
+          fade
+          class="position-fixed fixed-bottom m-0 rounded-0"
+          style="z-index: 2000;"
+          variant="danger"
+          @dismiss-count-down="accountAlreadyExistsCountdown=$event"
+        >
+          This email is already in use. Log-in instead.
+        </b-alert>
+        <b-alert
           :show="successfulLoginAlertCountdown"
           dismissible
           fade
@@ -87,8 +98,8 @@
           remember: [],
         },
         isRegistration: this.propRegistration,
-        wrongCredentials: false,
         wrongCredentialsAlertCountdown: 0,
+        accountAlreadyExistsCountdown: 0,        
         successfulLoginAlertCountdown:0,
       }
     },
@@ -125,7 +136,7 @@
         this.$api.post(endpoint, {
           email: this.form.email,
           password: this.form.password,
-          remember: !!this.form.remember,
+          remember: this.form.remember !== [],
         })
         .then(res => {
           if(wasRegistration){
@@ -149,9 +160,12 @@
         }).catch( (err) => {
           if(err.response){
             if(err.response.status == '401'){
-              this.wrongCredentials = true;
               this.form.password = '';
               this.showWrongCredentialsAlert();
+            }else if(err.response.status == '400'){
+              if(err.response.data == 'Account already exists'){
+                this.showAccountAlreadyExistsAlert();
+              }
             }
           }
         });
@@ -170,7 +184,10 @@
       },
       showWrongCredentialsAlert(){
         this.wrongCredentialsAlertCountdown = 3
-      },      
+      },
+      showAccountAlreadyExistsAlert(){
+        this.accountAlreadyExistsCountdown = 3
+      },    
       showSuccessfulLoginAlert(){
         this.successfulLoginAlertCountdown = 3
       }
