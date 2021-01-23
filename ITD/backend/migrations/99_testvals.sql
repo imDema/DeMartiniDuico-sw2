@@ -18,14 +18,14 @@ INSERT INTO department (id, shop_id, description, capacity) VALUES
 
     (4444666, 1234333, 'all', 4);
 
-INSERT INTO ticket (id, customer_id, shop_id, creation, expiration, valid, active) VALUES
-    (2222111, 1111222, 1234111, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, TRUE, TRUE),
-    (2222222, 1111333, 1234111, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, TRUE, TRUE),
-    (2222333, 1111222, 1234222, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, TRUE, TRUE);
+-- INSERT INTO ticket (id, customer_id, shop_id, creation, expiration, valid, active) VALUES
+--     (2222111, 1111222, 1234111, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, TRUE, TRUE),
+--     (2222222, 1111333, 1234111, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, TRUE, TRUE),
+--     (2222333, 1111222, 1234222, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, TRUE, TRUE);
 
-INSERT INTO ticket_department (ticket_id, department_id) VALUES
-    (2222111, 4444111),
-    (2222111, 4444222),
-    (2222222, 4444222),
-    (2222333, 4444444),
-    (2222333, 4444555);
+-- INSERT INTO ticket_department (ticket_id, department_id) VALUES
+--     (2222111, 4444111),
+--     (2222111, 4444222),
+--     (2222222, 4444222),
+--     (2222333, 4444444),
+--     (2222333, 4444555);

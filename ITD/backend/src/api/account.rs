@@ -12,6 +12,7 @@ pub fn endpoints(cfg: &mut web::ServiceConfig) {
     cfg.service(register);
     cfg.service(confirm);
     cfg.service(checkauth);
+    cfg.service(whoami);
 }
 #[allow(dead_code)]
 #[derive(Deserialize, Serialize, Debug)]
@@ -100,4 +101,27 @@ async fn checkauth(session: Session) -> HttpResponse {
     } else {
         HttpResponse::Ok().body("false")
     }
+}
+#[derive(Serialize)]
+struct WhoamiResponse {
+    authenticated: bool,
+    email: Option<String>,
+}
+#[get("/whoami")]
+async fn whoami(conn: web::Data<PgPool>, session: Session) -> HttpResponse {
+    let conn = conn.into_inner();
+    let uid = session::get_account(&session);
+    if let Some(uid) = uid {
+        let acc = PersistentCustomer::get(&conn, uid).await;
+        if let Ok(opt) = acc {
+            let body = opt.map_or(
+                WhoamiResponse{authenticated: false, email: None},
+                |acc| WhoamiResponse{
+                    authenticated: true,
+                    email: Some(acc.into_inner().email().to_owned()),
+                });
+            return HttpResponse::Ok().json(body)
+        }
+    }
+    HttpResponse::Ok().json(WhoamiResponse{authenticated: false, email: None})
 }
