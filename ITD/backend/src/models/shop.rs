@@ -1,12 +1,10 @@
 
-use sqlx::postgres::PgRow;
 use sqlx::postgres::types::PgTimeTz;
-use sqlx::{FromRow, PgPool, Row, query};
+use sqlx::{FromRow, PgPool};
 use sqlx::query_as;
 
-use futures::StreamExt;
+use super::ticket::{Ticket, TicketJoinRow, fold_ticketjoin_stream};
 
-use super::ticket::Ticket;
 #[allow(dead_code)]
 #[derive(FromRow)]
 pub struct Shop {
@@ -71,49 +69,19 @@ impl<'a> PersistentShop<'a> {
         .await?)
     }
 
-    fn parse_ticket_join(row: &PgRow) -> sqlx::Result<Ticket> {
-        let tick = Ticket{
-            id: row.try_get(0)?,
-            shop_id: row.try_get(1)?,
-            department_ids: vec![row.try_get(2)?],
-            creation: row.try_get("creation")?,
-            expiration: row.try_get("expiration")?,
-            valid: row.try_get("valid")?,
-            active: row.try_get("active")?,
-        };
-        Ok(tick)
-    }
-
-    pub async fn active_queue(&self) -> sqlx::Result<Vec<Ticket>> { // TODO: refactor
-        let tickets = query(r"SELECT ticket.id, ticket.shop_id, department.id, creation, expiration, valid, active FROM ticket, ticket_department, department
+    pub async fn active_queue(&self) -> sqlx::Result<Vec<Ticket>> {
+        let ticket_stream = query_as!(TicketJoinRow, r"SELECT ticket.id AS ticket_id, ticket.shop_id AS shop_id, department.id AS department_id, creation, expiration, valid, active FROM ticket, ticket_department, department
                 WHERE
                     ticket.shop_id = $1 AND
                     ticket_department.ticket_id = ticket.id AND
                     ticket_department.department_id = department.id AND
                     valid AND active
-                ORDER BY creation")
-            .bind(self.inner.id)
-            .fetch(self.conn)
-            .fold(Ok(Vec::new()), |acc: sqlx::Result<Vec<Ticket>>, row| async {
-                acc.and_then(|mut acc| {
-                    row.and_then(|row| {
-                        if let Some(last) = acc.last_mut() {
-                            let id: i32 = row.try_get(0)?;
-                            if id == last.id {
-                                last.department_ids.push(row.try_get(2)?);
-                                return Ok(acc);
-                            }
-                        }
-                        let tick = Self::parse_ticket_join(&row)?;
-                        acc.push(tick);
-                        Ok(acc)
-                    }).map_err(|err| {log::error!("{}", &err); err})
-                })
-            }).await;
+                ORDER BY creation",
+                self.inner.id)
+            .fetch(self.conn);
 
-        tickets
+        fold_ticketjoin_stream(ticket_stream).await
     }
-
 }
 
 

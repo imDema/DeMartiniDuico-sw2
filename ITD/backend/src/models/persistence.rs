@@ -84,7 +84,7 @@ mod tests {
     // Pseudo encryption quality testing
     use image::{ImageBuffer, Rgb};
 
-    const TEST_DIR: &'static str = "/tmp";
+    const TEST_DIR: &'static str = "/mnt/c/Users/Dema/Desktop/feist";
     const V: f32 = 1.0;
     const S: f32 = 1.0;
     fn num_to_col(num: u32) -> Rgb<u8> {
