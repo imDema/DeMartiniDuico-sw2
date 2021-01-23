@@ -1,4 +1,8 @@
 <template>
+<div>
+    <div class="mt-3 logo-container">
+    <b-img class="logo-big" alt="CLup logo" :src="require('../assets/logo-CLup_1.png')" center fluid></b-img>
+    </div>
     <div class="container px-4">
     <p v-if="errors.length">
     <b>Please correct the following error(s):</b>
@@ -14,6 +18,7 @@
     </b-col>
     </b-row>
     </div>
+</div>
 </template>
 
 <script>
@@ -36,6 +41,10 @@ export default {
         },
         selectTicket() {
             this.isBooking = false;
+            if(!this.searchChoice){
+                alert('pick a result')
+            }
+            this.$emit('get-ticket', this.searchChoice)
             //if(this.step===0)
             // this.next();
         },

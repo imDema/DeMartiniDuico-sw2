@@ -51,9 +51,9 @@ export default {
         // .catch(console.log);
 
         return [
-          {id: 1, value: "Unes Milano"}, 
-          {id: 2, value: "Unes Monza"}, 
-          {id: 3, value: "Unes Sesto San Giovanni"}
+          {id: 1, value: "Unes Milano", maps_url: "https://www.openstreetmap.org/#map=6/42.088/12.564"}, 
+          {id: 2, value: "Unes Monza", maps_url: "https://www.openstreetmap.org/#map=6/42.088/12.564"}, 
+          {id: 3, value: "Unes Sesto San Giovanni", maps_url: "https://www.openstreetmap.org/#map=6/42.088/12.564"}
         ];
     },
     getResultValue(result){

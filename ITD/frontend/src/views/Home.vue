@@ -1,27 +1,48 @@
 <template>
   <div>
-  <NavBar/>
-  <div class="mt-3 logo-container">
-  <b-img class="logo-big" alt="CLup logo" :src="require('../assets/logo-CLup_1.png')" center fluid></b-img>
-  </div>
-  <AuthModal/>
-  <SearchForm/>
+  <nav-bar/>
+  <auth-modal/>
+  <search-form v-show="step==0" @get-ticket="getTicket"/>
+  <booking-form v-show="step==1" :store="searchChoice" @back="back"/>
   </div>
 </template>
 
 <script>
-import NavBar from '../components/NavBar'
-import SearchForm from '../components/SearchForm'
-import AuthModal from '../components/AuthModal'
+import NavBar from '../components/NavBar.vue'
+import SearchForm from '../components/SearchForm.vue'
+import AuthModal from '../components/AuthModal.vue'
+import BookingForm from '../components/BookingForm.vue'
 
 export default {
   name: 'App',
   components: {
     NavBar,
     SearchForm,
-    AuthModal
+    AuthModal,
+    BookingForm,
+  },
+  data() {
+    return {
+      step: 0,
+      searchChoice: {},
+    }
   },
   methods: {
+    getTicket(searchChoice){
+      if(!searchChoice){
+        console.log('get-ticket event without params')
+        return
+      }
+      this.searchChoice = searchChoice
+      this.step = 1
+    },
+    back(){
+      this.resetSearch()
+      this.step = 0
+    },
+    resetSearch(){
+      this.searchChoice = {}
+    }
   },
   created(){
           this.$api.get("/checkauth")

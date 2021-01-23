@@ -1,9 +1,7 @@
 <template>
-    <!--<BookingForm v-if="step === 1" :isBooking="isBooking" @submit="next"/>-->
-
-  <div class="container">
- <h2>Unes Milano</h2>
-<div class="py-2">
+  <div class="container my-4">
+  <h2 class="my-2">{{store.value}}<b-button :href="store.maps_url" target="_blank" class="mx-2" variant="outline-secondary"><b-icon-map/>Open in Maps </b-button></h2>
+  <b-form class="py-2" novalidate>
       <b-form-group id="input-group-3" label="Categories:" label-for="input-3">         
         <b-form-checkbox v-for="cat in categories" :key="cat.value" :value="cat.value" :checked="form.categories.indexOf(cat.value)!==-1" v-model="form.categories">
           {{ cat.text }}
@@ -14,8 +12,12 @@
       <b-form-datepicker v-model="form.datetime.date" class="mb-2" required></b-form-datepicker>
       <b-form-timepicker v-model="form.datetime.time" class="mb-2" required></b-form-timepicker>
     </b-form-group>
-      <b-button @click="submitTicket" type="submit" variant="primary" block>Submit</b-button>
-  </div>
+    <b-row class="my-4">
+    <b-col cols="6"><b-button @click="$emit('back')" block><b-icon-arrow-left/> Back</b-button> </b-col>
+    <b-col cols="6"><b-button @click="submitTicket" type="submit" variant="primary" block>Submit</b-button></b-col>
+    </b-row>
+    <b-tooltip target="booking-button" triggers="hover" placement="bottom">Booking is not available in this demo</b-tooltip>
+  </b-form>
   </div>
 </template>
 
@@ -25,18 +27,9 @@
       return {
         form: {
           step: 0,
-          lastStep: 3,
           categories: [],
-          city: {stores: {}},
-          store: null,
           datetime: { date: null, time: null}
         },
-        cities: [
-          { text: 'Select One', value: null, disabled: true}, 
-          {text: 'Milan', value: {name: 'Milan', stores: [{ text: 'Select a store', value: null, disabled: true},'unes', 'pippo', 'ciccio']}},
-          {text: 'Rome', value: {name: 'Rome', stores: [{ text: 'Select a store', value: null, disabled: true}, 'unes', 'romeo shop', 'carrefurto']}},
-          {text: 'Turin', value: {name: 'Turin', stores: [{ text: 'Select a store', value: null, disabled: true}, 'unes', 'scotti market', 'esselunga']}},
-        ],
         categories: [
           {value: 1, text: 'Meat and Fish', selected: false}, 
           {value: 2, text: 'Bread', selected: false}, 
@@ -54,6 +47,14 @@
       isBooking: { 
         type: Boolean,
         default: false,
+      },
+      store: {
+        type: Object,
+      }
+    },
+    computed: {
+      categoriesValidation(){
+        return true
       }
     },
     methods: {
@@ -63,15 +64,20 @@
       next() {
       this.step++;
       },
-      submitForm(evt) {
-      evt.preventDefault();
-          if(this.step==this.lastStep){
-              alert('Submit to blah and show blah and etc.');
-          }
-      },
       submitTicket() {
-        if(!this.form.city || !this.form.store)
-          alert("Data missing");
+        if(!this.store.id){
+          alert("Store data missing");
+          return
+        }
+        let endpoint = "/shop/"+this.store.id+"/ticket/new"
+        this.$api.post(endpoint, {
+          department_ids: this.form.categories
+        })
+        .then(res => {
+          if(res.status == '200'){
+            this.$emit('success')
+          }
+        }).catch( () => {})
       },
       onSubmit(evt){
         evt.preventDefault()

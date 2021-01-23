@@ -1,5 +1,6 @@
 <template>
 <div>
+  <b-overlay :show="showOverlay" rounded="sm">
   <div class="container">
     <b-form @submit="onSubmit" @reset="onReset">
       <b-form-group
@@ -75,6 +76,8 @@
         </b-alert>
     </b-form>
   </div>
+  </b-overlay>
+
   <div class="border-top pt-2 mt-4 d-flex flex-row justify-content-end align-items-center">
     <div class="p-2">{{switch_text.text}}</div>
     <b-button variant="outline-primary" class="switch-action" @click="switchAction">{{switch_text.button}}</b-button>
@@ -101,6 +104,7 @@
         wrongCredentialsAlertCountdown: 0,
         accountAlreadyExistsCountdown: 0,        
         successfulLoginAlertCountdown:0,
+        showOverlay: false,
       }
     },
     computed:{
@@ -125,7 +129,9 @@
     methods: {
       switchAction(){
         this.isRegistration = !this.isRegistration
-        this.$emit('switch-action', this.isRegistration);
+        this.$emit('switch-action', this.isRegistration)
+        this.showOverlay = true
+        setTimeout( () => {this.showOverlay = false}, 300)
       },
       async onSubmit(evt) {
         evt.preventDefault();
