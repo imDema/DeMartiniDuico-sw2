@@ -1,7 +1,7 @@
 use std::pin::Pin;
 
 use serde::{Serialize, Deserialize};
-use sqlx::{FromRow, PgPool, Postgres, Transaction, query, query_as};
+use sqlx::{FromRow, PgPool, query, query_as};
 use futures::Stream;
 
 use rand::Rng;

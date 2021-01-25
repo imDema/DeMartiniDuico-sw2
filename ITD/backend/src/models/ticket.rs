@@ -1,12 +1,16 @@
-use serde::{Serialize, Deserialize};
-use sqlx::FromRow;
+
+use serde::Serialize;
+use sqlx::{FromRow, PgPool, query_as, query};
 use chrono::prelude::*;
 
-use futures::{Stream, StreamExt};
+use futures::StreamExt;
+
+use super::persistence::encode_serial;
 
 #[derive(Debug, PartialEq, Eq)]
 pub struct Ticket {
     pub id: i32,
+    pub customer_id: i32,
     pub shop_id: i32,
     pub creation: DateTime<Utc>,
     pub expiration: DateTime<Utc>,
@@ -15,59 +19,112 @@ pub struct Ticket {
     pub department_ids: Vec<i32>,
 }
 
-#[derive(FromRow)]
-pub(super) struct TicketJoinRow {
-    pub ticket_id: i32,
-    pub customer_id: i32,
-    pub shop_id: i32,
-    pub department_id: i32,
-    pub creation: DateTime<Utc>,
-    pub expiration: DateTime<Utc>,
-    pub valid: bool,
-    pub active: bool,
+#[derive(Debug, Serialize)]
+pub struct TicketResponse {
+    uid: String,
+    shop_id: String,
+    department_ids: Vec<String>,
+    creation: DateTime<Utc>,
+    expiration: DateTime<Utc>,
+    valid: bool,
+    active: bool,
 }
 
-impl From<TicketJoinRow> for Ticket {
-    fn from(row: TicketJoinRow) -> Self {
-        Ticket {
-            id: row.ticket_id,
-            shop_id: row.shop_id,
-            creation: row.creation,
-            expiration: row.expiration,
-            valid: row.valid,
-            active: row.active,
-            department_ids: vec![row.department_id],
+impl From<Ticket> for TicketResponse {
+    fn from(t: Ticket) -> Self {
+        let dids = t.department_ids
+            .into_iter()
+            .map(encode_serial)
+            .collect();
+        Self {
+            uid: encode_serial(t.id),
+            shop_id: encode_serial(t.shop_id),
+            department_ids: dids,
+            creation: t.creation,
+            expiration: t.expiration,
+            valid: t.valid,
+            active: t.active,
         }
     }
 }
 
-impl From<TicketRow> for Ticket {
-    fn from(row: TicketRow) -> Self {
-        Ticket {
-            id: row.id,
-            shop_id: row.shop_id,
-            creation: row.creation,
-            expiration: row.expiration,
-            valid: row.valid,
-            active: row.active,
-            department_ids: Vec::new(),
-        }
-    }
+pub struct PersistentTicket<'a> {
+    conn: &'a PgPool,
+    inner: Ticket,
 }
 
-pub(super) async fn fold_ticketjoin_stream<S: Stream<Item=sqlx::Result<TicketJoinRow>>>(rows: S) -> sqlx::Result<Vec<Ticket>> {
-    rows.fold(Ok(Vec::new()), |acc: sqlx::Result<Vec<Ticket>>, row| async {
-        let mut acc = acc?;
-        let row = row?;
-        if let Some(last) = acc.last_mut() {
-            if row.ticket_id == last.id {
-                last.department_ids.push(row.department_id);
-                return Ok(acc);
-            }
+impl<'a> PersistentTicket<'a> {
+    pub async fn get(conn: &'a PgPool, id: i32) -> sqlx::Result<Option<PersistentTicket<'a>>> {
+        let ticket = query_as!(TicketRow, r"SELECT ticket.id AS id, customer_id, ticket.shop_id AS shop_id, array_agg(department.id) AS department_ids, creation, expiration, valid, active FROM ticket, ticket_department, department
+            WHERE ticket_department.ticket_id = ticket.id AND
+                ticket_department.department_id = department.id AND
+                ticket.id = $1
+            GROUP BY ticket.id, customer_id, ticket.shop_id, creation, expiration, valid, active",
+            id)
+            .fetch_optional(conn)
+            .await?
+            .map(move |row| Self{conn, inner:row.into()});
+
+        Ok(ticket)
+    }
+
+    pub async fn get_for_customer(conn: &'a PgPool, customer_id: i32) -> sqlx::Result<Vec<Ticket>> {
+        query_as!(TicketRow, r"SELECT ticket.id AS id, customer_id, ticket.shop_id AS shop_id, array_agg(department.id) AS department_ids, creation, expiration, valid, active FROM ticket, ticket_department, department
+            WHERE ticket_department.ticket_id = ticket.id AND
+                ticket_department.department_id = department.id AND
+                ticket.customer_id = $1
+            GROUP BY ticket.id, customer_id, ticket.shop_id, creation, expiration, valid, active
+            ORDER BY creation",
+            customer_id)
+            .fetch(conn)
+            .fold(Ok(Vec::new()), |acc: sqlx::Result<Vec<Ticket>>, x| async {
+                let mut acc = acc?;
+                acc.push(x?.into());
+                Ok(acc)
+            }).await
+    }
+
+    pub async fn new(conn: &'a PgPool, customer_id: i32, shop_id: i32, department_ids: Vec<i32>) -> sqlx::Result<PersistentTicket<'a>> {
+        let mut tx = conn.begin().await?;
+
+        let row = query!(r"INSERT INTO ticket (customer_id, shop_id, creation, expiration, valid, active) VALUES
+            ($1, $2, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, TRUE, TRUE)
+            RETURNING id",
+            customer_id, shop_id)
+            .fetch_one(&mut tx).await?;
+
+        for did in department_ids {
+            query!(r"INSERT INTO ticket_department (ticket_id, department_id)
+                VALUES ($1, $2)",
+                row.id, did)
+                .execute(&mut tx).await?;
         }
-        acc.push(row.into());
-        Ok(acc)
-    }).await
+
+        tx.commit().await?;
+        let ticket = PersistentTicket::get(conn, row.id).await?.unwrap(); // TODO: check unwrap
+
+        Ok(ticket)
+    }
+
+    pub async fn queue(conn: &PgPool, shop_id: i32, valid: bool, active: bool) -> sqlx::Result<Vec<Ticket>> {
+        query_as!(TicketRow, r"SELECT ticket.id AS id, customer_id, ticket.shop_id AS shop_id, array_agg(department.id) AS department_ids, creation, expiration, valid, active FROM ticket, ticket_department, department
+                WHERE
+                    ticket.shop_id = $1 AND
+                    ticket_department.ticket_id = ticket.id AND
+                    ticket_department.department_id = department.id AND
+                    valid = $2 AND active = $3
+                GROUP BY ticket.id, customer_id, ticket.shop_id, creation, expiration, valid, active
+                ORDER BY creation",
+                shop_id, valid, active)
+            .fetch(conn)
+            .fold(Ok(Vec::new()), |acc: sqlx::Result<Vec<Ticket>>, x| async {
+                let mut acc = acc?;
+                acc.push(x?.into());
+                Ok(acc)
+            }).await
+    }
+
+    pub fn into_inner(self) -> Ticket {self.inner}
 }
 
 #[derive(FromRow)]
@@ -79,11 +136,78 @@ pub(super) struct TicketRow {
     pub expiration: DateTime<Utc>,
     pub valid: bool,
     pub active: bool,
+    pub department_ids: Option<Vec<i32>>,
 } 
 
-#[derive(FromRow, Serialize, Deserialize)]
-pub struct TicketDepartment {
-    pub ticket_id: i32,
-    pub department_id: i32,
+impl From<TicketRow> for Ticket {
+    fn from(row: TicketRow) -> Self {
+        Ticket {
+            id: row.id,
+            customer_id: row.customer_id,
+            shop_id: row.shop_id,
+            creation: row.creation,
+            expiration: row.expiration,
+            valid: row.valid,
+            active: row.active,
+            department_ids: row.department_ids.unwrap_or_default(),
+        }
+    }
 }
 
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use std::error::Error;
+    use std::time::Duration;
+
+    #[actix_rt::test]
+    async fn new_ticket_test() -> Result<(), Box<dyn Error>> {
+        dotenv::dotenv().ok();
+        let conn_url = std::env::var("DATABASE_URL").unwrap();
+        let conn = crate::setup_db(&conn_url).await;
+        // let ids = init_test_shops(&conn).await?; TODO:
+
+        // TODO: parametrize
+
+        let inserted = PersistentTicket::new(&conn, 1111222, 1234111, vec![4444111, 4444222])
+            .await?.into_inner();
+
+        let loaded = PersistentTicket::get(&conn, inserted.id).await?.map(PersistentTicket::into_inner);
+        let loaded = loaded.unwrap();
+        assert_eq!(&inserted, &loaded);
+
+        Ok(())
+    }
+    
+    #[actix_rt::test]
+    async fn queue_test() -> Result<(), Box<dyn Error>>{
+        dotenv::dotenv().ok();
+        let conn_url = std::env::var("DATABASE_URL").unwrap();
+        let conn = crate::setup_db(&conn_url).await;
+        // let ids = init_test_shops(&conn).await?; TODO:
+
+        // TODO: parametrize
+
+        let t1 = PersistentTicket::new(&conn, 1111222, 1234111, vec![4444111, 4444222])
+            .await?.into_inner();
+
+        std::thread::sleep(Duration::from_millis(10));
+        let t2 = PersistentTicket::new(&conn, 1111333, 1234111, vec![4444222])
+            .await?.into_inner();
+
+        let queue = PersistentTicket::queue(&conn, 1234111, true, true).await?;
+
+        for t in queue.iter() {
+            println!("{:?}", t);
+        }
+        // assert_eq!(2, queue.len()); TODO:
+        assert!(queue.contains(&t1));
+        assert!(queue.contains(&t2));
+
+        query!("DELETE FROM ticket WHERE id = $1 OR id = $2", t1.id, t2.id)
+            .execute(&conn).await?;
+
+        // drop_test_shops(&conn);
+        Ok(())
+    }
+}

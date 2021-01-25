@@ -54,6 +54,13 @@ pub fn decode_serial(s: &str) -> Result<i32, ParseIntError> {
     Ok(feistel(x, N, K) as i32)
 }
 
+pub fn decode_serial_vec(v: Vec<String>) -> Result<Vec<i32>, ParseIntError> {
+    v.iter()
+        .map(|s| &s[..])
+        .map(decode_serial)
+        .collect()
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

@@ -81,6 +81,24 @@ paths:
           description: "successful operation"
         "400":
           description: "Invalid code"
+  /whoami:
+    get:
+      tags:
+        - "account"
+      summary: "Get customer authentication status"
+      security: []
+      responses:
+        "200":
+          description: Ok
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  authenticated:
+                    type: boolean
+                  email:
+                    type: string
   /search:
     get:
       tags:
