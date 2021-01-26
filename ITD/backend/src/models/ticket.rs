@@ -5,7 +5,7 @@ use chrono::prelude::*;
 
 use futures::StreamExt;
 
-use super::persistence::encode_serial;
+use crate::utils::encoding::encode_serial;
 
 #[derive(Debug, PartialEq, Eq)]
 pub struct Ticket {

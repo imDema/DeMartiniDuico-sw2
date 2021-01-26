@@ -1,9 +1,9 @@
 use std::error::Error;
 
 use crate::models::account::PersistentCustomer;
-use crate::models::persistence::{decode_serial, decode_serial_vec, encode_serial};
 use crate::models::shop::PersistentShop;
 use crate::models::ticket::{PersistentTicket, TicketResponse};
+use crate::utils::encoding::{decode_serial, decode_serial_vec, encode_serial};
 use crate::utils::session;
 
 use actix_web::{web, get, post, HttpResponse};

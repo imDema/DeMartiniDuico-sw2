@@ -1,8 +1,9 @@
 use std::num::ParseIntError;
 
 const K: u32 = 0xdeadbeef; // TODO: Use environment variable instead of constant
-const N: u32 = 32;
+const N: usize = 32;
 
+#[inline]
 fn round_fn(x: u16, k: u32) -> u16 {
     // Simple key transformation
     let x = x as u32;
@@ -22,10 +23,29 @@ fn round_fn(x: u16, k: u32) -> u16 {
     xsh.rotate_right(rot)
 }
 
-fn feistel(x: u32, n: u32, k: u32) -> u32 {
+#[inline]
+fn key_round(k: u32) -> u32 {
+    k
+    .wrapping_mul(4212697711)
+    .wrapping_add(2697822563)
+}
+
+// LCG
+#[inline]
+fn round_keys(k: u32, n: usize) -> Vec<u32> {
+    let mut v = Vec::with_capacity(n);
+    v.push(key_round(k));
+    for i in 1..n {
+        v.push(key_round(v[i-1]));
+    }
+    v
+}
+
+fn feistel<I: Iterator<Item=u32>>(x: u32, keys: I) -> u32 {
     let mut l = (x >> 16) as u16;
     let mut r = (x & 0xFFFF) as u16;
-    for _ in 0..n {
+
+    for k in keys {
         let l1 = r;
         let r1 = l ^ round_fn(r, k);
         l = l1;
@@ -34,24 +54,34 @@ fn feistel(x: u32, n: u32, k: u32) -> u32 {
     (r as u32) << 16 | l as u32
 }
 
+fn feistel_encrypt(x: u32, n: usize, k: u32) -> u32 {
+    let keys = round_keys(k, n).into_iter();
+    feistel(x, keys)
+}
+
+fn feistel_decrypt(x: u32, n: usize, k: u32) -> u32 {
+    let keys = round_keys(k, n).into_iter().rev();
+    feistel(x, keys)
+}
+
 /// Pseudo encryption for serials, this **must not** be considered cryptographically secure since it has not been audited,
 /// Only use for non critical data.
 /// Intended for encoding serials to use in URLs and requests
 /// ```rust
-/// # use clup::models::persistence::{encode_serial, decode_serial};
+/// # use clup::utils::encoding::{encode_serial, decode_serial};
 /// let x = 1234;
 /// let enc = encode_serial(x);
 /// let dec = decode_serial(&enc);
 /// assert_eq!(Ok(x), dec);
 ///```
 pub fn encode_serial(id: i32) -> String {
-    format!("{:x}", feistel(id as u32, N, K))
+    format!("{:x}", feistel_encrypt(id as u32, N, K))
 }
 
 /// Decode integers encoded with encode_serial
 pub fn decode_serial(s: &str) -> Result<i32, ParseIntError> {
     let x = u32::from_str_radix(s, 16)?;
-    Ok(feistel(x, N, K) as i32)
+    Ok(feistel_decrypt(x, N, K) as i32)
 }
 
 pub fn decode_serial_vec(v: Vec<String>) -> Result<Vec<i32>, ParseIntError> {
@@ -70,9 +100,9 @@ mod tests {
     fn feistel_test() {
         let tests = (0..25000).chain(u32::MAX-25000..u32::MAX);
         for t in tests.into_iter() {
-            let enc = feistel(t, N, K);
+            let enc = feistel_encrypt(t, N, K);
 
-            let dec = feistel(enc, N, K);
+            let dec = feistel_decrypt(enc, N, K);
             assert_eq!(t, dec);
         }
     }
@@ -91,7 +121,7 @@ mod tests {
     // Pseudo encryption quality testing
     use image::{ImageBuffer, Rgb};
 
-    const TEST_DIR: &'static str = "/mnt/c/Users/Dema/Desktop/feist";
+    const TEST_DIR: &'static str = "/tmp";
     const V: f32 = 1.0;
     const S: f32 = 1.0;
     fn num_to_col(num: u32) -> Rgb<u8> {
@@ -122,11 +152,11 @@ mod tests {
         let (w, h) = (256, 256);
         let scale = 2;
         let tests = 0..w*h;
-        let first = 0..=16u32;
+        let first = 0..=16usize;
         let large = [32,64].iter().map(|x|*x);
         for n in first.chain(large.into_iter()) {
             let cols: Vec<Rgb<u8>> = tests.clone()
-                .map(|t| feistel(t, n, K))
+                .map(|t| feistel_encrypt(t, n, K))
                 .map(num_to_col)
                 .collect();
             let img = ImageBuffer::from_fn(w*scale, h*scale, |x,y| cols[(x/scale + y/scale*w) as usize]);
@@ -143,7 +173,7 @@ mod tests {
             let k1 = K ^ (1 << flip);
             let mut counts = [0; K_SIZE];
             for x in 0..SPACE {
-                let mut diff = feistel(x, N, K) ^ feistel(x, N, k1);
+                let mut diff = feistel_encrypt(x, N, K) ^ feistel_encrypt(x, N, k1);
                 for i in 0..K_SIZE {
                     counts[i] += diff & 1;
                     diff >>= 1;
@@ -165,7 +195,7 @@ mod tests {
             let mut counts = [0; K_SIZE];
             for x in 0..SPACE {
                 let x1 = x ^ (1 << flip);
-                let mut diff = feistel(x, N, K) ^ feistel(x1, N, K);
+                let mut diff = feistel_encrypt(x, N, K) ^ feistel_encrypt(x1, N, K);
                 for i in 0..K_SIZE {
                     counts[i] += diff & 1;
                     diff >>= 1;

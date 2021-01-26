@@ -1,7 +1,7 @@
 use actix_web::{HttpResponse, web, get};
 use sqlx::{PgPool, query};
 
-use crate::models::persistence::encode_serial;
+use crate::utils::encoding::encode_serial;
 
 pub fn endpoints(cfg: &mut web::ServiceConfig) {
     cfg.service(ids);
