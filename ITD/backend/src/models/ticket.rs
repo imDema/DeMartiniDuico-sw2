@@ -159,55 +159,56 @@ mod tests {
     use super::*;
     use std::error::Error;
     use std::time::Duration;
+    use crate::utils::tests::{db, test_customer};
+    use crate::with_test_shop;
 
     #[actix_rt::test]
     async fn new_ticket_test() -> Result<(), Box<dyn Error>> {
-        dotenv::dotenv().ok();
-        let conn_url = std::env::var("DATABASE_URL").unwrap();
-        let conn = crate::setup_db(&conn_url).await;
-        // let ids = init_test_shops(&conn).await?; TODO:
+        let conn = db().await;
 
-        // TODO: parametrize
+        with_test_shop!(&conn, shopid [d1, d2] {
+            let customer_id = test_customer(&conn).await?;
 
-        let inserted = PersistentTicket::new(&conn, 1111222, 1234111, vec![4444111, 4444222])
-            .await?.into_inner();
-
-        let loaded = PersistentTicket::get(&conn, inserted.id).await?.map(PersistentTicket::into_inner);
-        let loaded = loaded.unwrap();
-        assert_eq!(&inserted, &loaded);
-
+            let inserted = PersistentTicket::new(&conn, customer_id, shopid, vec![d1, d2])
+                .await?.into_inner();
+    
+            let loaded = PersistentTicket::get(&conn, inserted.id).await?.map(PersistentTicket::into_inner);
+            let loaded = loaded.unwrap();
+            assert_eq!(&inserted, &loaded);
+        });
         Ok(())
     }
     
     #[actix_rt::test]
     async fn queue_test() -> Result<(), Box<dyn Error>>{
-        dotenv::dotenv().ok();
-        let conn_url = std::env::var("DATABASE_URL").unwrap();
-        let conn = crate::setup_db(&conn_url).await;
-        // let ids = init_test_shops(&conn).await?; TODO:
+        let conn = db().await;
 
-        // TODO: parametrize
+        let id_c1 = test_customer(&conn).await?;
+        let id_c2 = test_customer(&conn).await?;
 
-        let t1 = PersistentTicket::new(&conn, 1111222, 1234111, vec![4444111, 4444222])
-            .await?.into_inner();
+        with_test_shop!(&conn, shopid [d0, d1, d2, d3] {
+            let t1 = PersistentTicket::new(&conn, id_c1, shopid, vec![d0, d3])
+                .await?.into_inner();
 
-        std::thread::sleep(Duration::from_millis(10));
-        let t2 = PersistentTicket::new(&conn, 1111333, 1234111, vec![4444222])
-            .await?.into_inner();
+            std::thread::sleep(Duration::from_millis(10));
+            let t2 = PersistentTicket::new(&conn, id_c2, shopid, vec![d1,d2,d3])
+                .await?.into_inner();
 
-        let queue = PersistentTicket::queue(&conn, 1234111, true, true).await?;
+            let queue = PersistentTicket::queue(&conn, shopid, true, true).await?;
 
-        for t in queue.iter() {
-            println!("{:?}", t);
-        }
-        // assert_eq!(2, queue.len()); TODO:
-        assert!(queue.contains(&t1));
-        assert!(queue.contains(&t2));
+            for t in queue.iter() {
+                println!("{:?}", t);
+            }
+            assert_eq!(2, queue.len());
+            assert!(queue.contains(&t1));
+            assert!(queue.contains(&t2));
 
-        query!("DELETE FROM ticket WHERE id = $1 OR id = $2", t1.id, t2.id)
-            .execute(&conn).await?;
+            assert_eq!(Some(&t1), queue.first());
 
-        // drop_test_shops(&conn);
+            query!("DELETE FROM ticket WHERE id = $1 OR id = $2", t1.id, t2.id)
+                .execute(&conn).await?;
+
+        });
         Ok(())
     }
 }

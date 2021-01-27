@@ -12,3 +12,6 @@
 | 2021-01-19 | 2h   | Shop                    |
 | 2021-01-21 | 3h   | Ticket & Docker         |
 | 2021-01-22 | 3h   | Shop                    |
+| 2021-01-25 | 3h   | Ticket                  |
+| 2021-01-26 | 1h   | Ticket & Testing        |
+| 2021-01-27 | 2h   | Testing                 |
