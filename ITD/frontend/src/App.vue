@@ -5,9 +5,10 @@
 <script>
 export default {
   created: function () {
-    this.$api.get("/checkauth")
+    this.$api.get("/whoami")
       .then(res => {
-          let isAuthenticated = res.data == true;
+          let isAuthenticated = res.data.authenticated == true;
+          this.$store.state.email = res.data.email;
           if(isAuthenticated){
             console.log('true')
             this.$store.commit('logged_in')

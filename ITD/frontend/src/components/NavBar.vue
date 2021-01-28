@@ -5,7 +5,9 @@
     CLup
   </b-navbar-brand>
   <b-navbar-nav class="ml-auto mr-2">
-    <b-nav-item to="/tokens">My tokens</b-nav-item>
+    <b-nav-item to="/tokens">
+     <b-icon icon="upc-scan"/> My tokens
+    </b-nav-item>
   </b-navbar-nav>
   <b-navbar-toggle target="nav-collapse">
       <template #default="{ expanded }">
@@ -14,9 +16,20 @@
       </template>
   </b-navbar-toggle>
       <b-collapse id="nav-collapse" is-nav>
-      <b-navbar-nav class="ml-auto">
+      <b-navbar-nav v-if="!$store.state.email" class="ml-auto">
+        <b-nav-text class="text-light">Logged out</b-nav-text>
+        <b-nav-item href="#" @click="displayLogin">
+          <b-icon icon="lock"/>   
+          Login
+        </b-nav-item>
+      </b-navbar-nav>
+      <b-navbar-nav v-if="$store.state.email" class="ml-auto">
         <!--<b-nav-item href="#" @click="displayLogin">Display login</b-nav-item>-->
-        <b-nav-item href="#" @click="logout">Logout</b-nav-item>
+        <b-nav-text class="text-light">Logged in as <span class="bold">{{$store.state.email}}</span></b-nav-text>
+        <b-nav-item href="#" @click="logout">   
+          <b-icon icon="power" aria-hidden="true"></b-icon> 
+          Logout
+          </b-nav-item>
       </b-navbar-nav>
       </b-collapse>
   </b-navbar>
@@ -24,6 +37,9 @@
 
 <script>
   export default {
+    computed:{
+
+    },
     methods: {
       displayLogin(){
         this.$bvModal.show('login-modal')

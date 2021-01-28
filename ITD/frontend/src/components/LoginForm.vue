@@ -84,6 +84,17 @@
         >
           Succesfully logged in.
         </b-alert>
+        <b-alert
+          :show="successfulRegistrationAlertCountdown"
+          dismissible
+          fade
+          class="position-fixed fixed-bottom m-0 rounded-0"
+          style="z-index: 2000;"
+          variant="success"
+          @dismiss-count-down="successfulRegistrationAlertCountdown=$event"
+        >
+          Succesfully signed up. Check your email inbox.
+        </b-alert>
     </b-form>
   </div>
   </b-overlay>
@@ -114,7 +125,7 @@
         wrongCredentialsAlertCountdown: 0,
         accountAlreadyExistsCountdown: 0,        
         successfulLoginAlertCountdown:0,
-        failedToConnectAlertCountdown: 0,
+        successfulRegistrationAlertCountdown: 0,
         showOverlay: false,
         isSubmitBusy: false,
       }
@@ -151,9 +162,10 @@
           return
         this.isSubmitBusy = true;
         var wasRegistration = this.isRegistration;
+        var email = this.form.email
         let endpoint = this.isRegistration?"/register":"/login"
         this.$api.post(endpoint, {
-          email: this.form.email,
+          email: email,
           password: this.form.password,
           remember: this.form.remember !== [],
         })
@@ -166,11 +178,13 @@
               + encodeURIComponent(code);
               console.log(url);
               //END temp
+              this.showSuccessfulRegistrationAlert();
               this.$emit('successful-registration');
           }else{
             //login
             if(res.status == '200'){
               this.$store.commit('logged_in')
+              this.$store.state.email = email
               this.showSuccessfulLoginAlert()
               this.$emit('successful-login')
             }
@@ -215,6 +229,9 @@
       showSuccessfulLoginAlert(){
         this.successfulLoginAlertCountdown = 3
       },
+      showSuccessfulRegistrationAlert(){
+        this.successfulRegistrationAlertCountdown = 3
+      }
     }
   }
 </script>
