@@ -1,11 +1,11 @@
 <template>
   <b-navbar type="dark" toggleable="lg" variant="primary">
-  <b-navbar-brand href="#">
+  <b-navbar-brand to="/">
     <img id="logo" :src="require('../assets/logo-CLup-mini.png')" class="d-inline-block" alt="logo"/>
     CLup
   </b-navbar-brand>
   <b-navbar-nav class="ml-auto mr-2">
-    <b-nav-item>My tokens</b-nav-item>
+    <b-nav-item to="/tokens">My tokens</b-nav-item>
   </b-navbar-nav>
   <b-navbar-toggle target="nav-collapse">
       <template #default="{ expanded }">
@@ -36,7 +36,8 @@
         .then( res => {
           if(res.status == '200'){
             this.$store.commit('logged_out')
-            console.log('successful logout')
+            this.$emit('logout')
+            this.$router.replace('/')
             this.displayLogin()
           }
         })

@@ -5,20 +5,22 @@
 <script>
 export default {
   created: function () {
-  // axios.interceptors.response.use(undefined, function (err) {
-  //   return new Promise(function (resolve, reject) {
-  //     if (err.status === 401 && err.config && !err.config.__isRetryRequest) {
-  //     // if you ever get an unauthorized, logout the user
-  //     //open login modal
-  //     }
-  //     throw err;
-  //   });
-  // });
-  
-  //IF auth fails
-  //set logout in vuex
-
-  }
+    this.$api.get("/checkauth")
+      .then(res => {
+          let isAuthenticated = res.data == true;
+          if(isAuthenticated){
+            console.log('true')
+            this.$store.commit('logged_in')
+          }else{
+            this.$store.commit('logged_out')
+            this.$bvModal.show('login-modal')
+          }
+      }).catch( (err) => {
+          this.$bvModal.show('login-modal')
+          console.log(err)
+          console.log('error with /checkauth')
+      });
+    }
 }
 </script>
 

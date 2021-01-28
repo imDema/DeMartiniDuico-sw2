@@ -29,18 +29,28 @@
           :state="validation"
         ></b-form-input>
         <b-form-text id="password-help-block">
-        Your password must be 8-20 characters long.
+        Your password must be at least 10 characters long.
         </b-form-text>
+        <div v-if="isRegistration" class="mb-4">
         <b-form-invalid-feedback :state="validation">Weak password.</b-form-invalid-feedback>
-        <b-form-valid-feedback :state="validation">Looks Good.</b-form-valid-feedback>
+        <b-form-valid-feedback   :state="validation">Looks Good.</b-form-valid-feedback>
+        </div>
       </b-form-group>
 
-      <b-form-group id="remember-me-group" novaldate>
+      <b-form-group v-show="!isRegistration" id="remember-me-group" novaldate>
         <b-form-checkbox-group v-model="form.remember" id="checkboxes-4">
           <b-form-checkbox value="remember-me">Remember me</b-form-checkbox>
         </b-form-checkbox-group>
       </b-form-group>
-      <b-button type="submit" variant="primary" class="btn-block">Submit</b-button>
+      <b-overlay       
+        :show="isSubmitBusy"
+        rounded
+        opacity="0.3"
+        spinner-small
+        spinner-variant="primary"
+        >
+        <b-button type="submit" variant="primary" class="btn-block">Submit</b-button>
+      </b-overlay>
         <b-alert
           :show="wrongCredentialsAlertCountdown"
           dismissible
@@ -104,7 +114,9 @@
         wrongCredentialsAlertCountdown: 0,
         accountAlreadyExistsCountdown: 0,        
         successfulLoginAlertCountdown:0,
+        failedToConnectAlertCountdown: 0,
         showOverlay: false,
+        isSubmitBusy: false,
       }
     },
     computed:{
@@ -118,7 +130,7 @@
       },
       validation() {
         var password = this.form.password
-        return password.length >= 8 && password.length <=20
+        return password.length >= 8 && password.length <=256
       },
     },
     watch: {
@@ -128,8 +140,8 @@
     },
     methods: {
       switchAction(){
-        this.isRegistration = !this.isRegistration
-        this.$emit('switch-action', this.isRegistration)
+        //this.isRegistration = !this.isRegistration
+        this.$emit('switch-action', !this.isRegistration)
         this.showOverlay = true
         setTimeout( () => {this.showOverlay = false}, 300)
       },
@@ -137,6 +149,7 @@
         evt.preventDefault();
         if(!this.validateForm)
           return
+        this.isSubmitBusy = true;
         var wasRegistration = this.isRegistration;
         let endpoint = this.isRegistration?"/register":"/login"
         this.$api.post(endpoint, {
@@ -154,7 +167,6 @@
               console.log(url);
               //END temp
               this.$emit('successful-registration');
-
           }else{
             //login
             if(res.status == '200'){
@@ -172,9 +184,15 @@
               if(err.response.data == 'Account already exists'){
                 this.showAccountAlreadyExistsAlert();
               }
+            }else{
+              this.$emit('connection-failure')
             }
+          }else{
+            this.$emit('connection-failure')
           }
-        });
+        }).finally( () => {
+          setTimeout( () => {this.isSubmitBusy = false}, 250)
+        })
       },
       onReset(evt) {
         evt.preventDefault()
@@ -196,7 +214,7 @@
       },    
       showSuccessfulLoginAlert(){
         this.successfulLoginAlertCountdown = 3
-      }
+      },
     }
   }
 </script>

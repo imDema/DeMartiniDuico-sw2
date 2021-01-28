@@ -14,6 +14,7 @@
     :get-result-value="getResultValue"
     auto-select
     @submit="onSubmit"
+    ref="autocomplete"
     ></Autocomplete>    
 </div>
 </template>
@@ -62,6 +63,9 @@ export default {
     onSubmit(result){
         this.$emit('submit', result);
         console.log("emit selected: " + result.value);
+    },
+    reset(){
+        this.$refs.autocomplete.value = ''
     }
   }
 

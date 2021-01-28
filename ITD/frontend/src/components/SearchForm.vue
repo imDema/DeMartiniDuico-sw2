@@ -10,7 +10,7 @@
       <li v-for="error in errors" :key="error">{{ error }}</li>
     </ul>
     </p>
-    <SearchBar @submit="submitSearch"/>
+    <SearchBar ref="searchbar" @submit="submitSearch"/>
     <b-row class="my-5">
     <b-col cols="6"><b-button class="h-100" variant="success" id="ticket-button" @click="selectTicket" block>Get a Ticket</b-button></b-col>
     <b-col cols="6"><b-button class="h-100" variant="primary" id="booking-button" block>Make a Booking</b-button>
@@ -28,7 +28,6 @@ export default {
     data() { 
         return {
             errors: [],
-            isBooking: false,
             searchChoice: {},
         }
     },
@@ -40,7 +39,6 @@ export default {
             this.searchChoice = choice;
         },
         selectTicket() {
-            this.isBooking = false;
             if(!this.searchChoice){
                 alert('pick a result')
             }
@@ -49,9 +47,12 @@ export default {
             // this.next();
         },
         selectBooking() {
-            this.isBooking = true;
+            //this.isBooking = true;
             //if(this.step===0)
             //    this.next();
+        },
+        reset(){
+            this.$refs.searchbar.reset()
         }
     }
 }
