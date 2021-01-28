@@ -1,12 +1,12 @@
 use std::pin::Pin;
 
 use serde::{Serialize, Deserialize};
-use sqlx::{FromRow, PgPool, Postgres, Transaction, query, query_as};
+use sqlx::{FromRow, PgPool, query, query_as};
 use futures::Stream;
 
 use rand::Rng;
 
-#[derive(Debug, Serialize, Deserialize, FromRow)]
+#[derive(Debug, Serialize, Deserialize, FromRow, PartialEq, Eq)]
 pub struct Customer {
     id: i32,
     email: String,
@@ -109,44 +109,31 @@ impl<'a> PersistentCustomer<'a> {
         }
     }
 
-    async fn finalize_transaction(tx: &mut Transaction<'_, Postgres>, code: &[u8]) -> sqlx::Result<Option<Customer>> {
+    pub async fn finalize(conn: &'a PgPool, code: &[u8]) -> sqlx::Result<Option<Customer>> {
+        let mut tx = conn.begin().await?;
+
         let temp = query!(r"SELECT code, email, salt, digest FROM temp_customer WHERE code = $1", code)
-            .fetch_optional(&mut *tx)
+            .fetch_optional(&mut tx)
             .await?;
         
-        if let Some(temp) = temp {
+        let result = if let Some(temp) = temp {
             let acc = query_as!(Customer,
                     r"INSERT INTO customer(email, salt, digest) VALUES ($1, $2, $3) RETURNING id, email, salt, digest",
                     &temp.email, &temp.salt, &temp.digest
-                ).fetch_one(&mut *tx)
+                ).fetch_one(&mut tx)
                 .await?;
 
             query!(r"DELETE FROM temp_customer WHERE code = $1", &code)
-                .execute(&mut *tx)
+                .execute(&mut tx)
                 .await?;
 
             Ok(Some(acc))
         } else {
             Ok(None)
-        }
-    }
+        };
 
-    pub async fn finalize(conn: &'a PgPool, code: &[u8]) -> sqlx::Result<Option<Customer>> {
-        let mut tx = conn.begin().await?;
-
-        let result = Self::finalize_transaction(&mut tx, code).await;
-
-        match result {
-            Ok(ok) => {
-                tx.commit().await?;
-                Ok(ok)
-            }
-            Err(e) => {
-                log::error!("{}", e);
-                tx.rollback().await?;
-                Ok(None)
-            }
-        }
+        tx.commit().await?;
+        result
     }
 
     pub async fn update_password(&'a mut self, password: &str) -> sqlx::Result<&'a mut PersistentCustomer<'a>> {
@@ -176,6 +163,8 @@ pub struct TempCustomer {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::utils::tests::{db, del_customer};
+
     #[test]
     fn authentication_test() {
         let pass = "Please use a long password!".as_bytes();
@@ -192,5 +181,32 @@ mod tests {
         assert!(!cust.verify_authentication(&"Another password!".as_bytes()));
         assert!(!cust.verify_authentication(&"please use a long password!".as_bytes()));
         assert!(!cust.verify_authentication(&"Please use a long password".as_bytes()));
+    }
+
+    #[actix_rt::test]
+    async fn create_customer_test() -> sqlx::Result<()> {
+        let conn = db().await;
+        let (email, password) = ("test-email123@mail.com", "securepassword");
+
+        let token = PersistentCustomer::create(&conn, email, password)
+            .await?
+            .expect("No temporary account was created");
+
+        let account = PersistentCustomer::finalize(&conn, &token)
+            .await?
+            .expect("No customer was created");
+
+        assert_eq!(email, account.email);
+
+        let loaded = PersistentCustomer::get(&conn, account.id)
+            .await?
+            .expect("Could not find the recently created account!")
+            .into_inner();
+
+        assert_eq!(account, loaded);
+        
+        del_customer(&conn, account.id).await?;
+
+        Ok(())
     }
 }

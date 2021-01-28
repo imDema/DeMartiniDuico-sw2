@@ -175,6 +175,68 @@
       ]
     }
   },
+  "556544636de71c84b1f448fb039dec6b2d1f24041041bef5baf257124aa90af7": {
+    "query": "SELECT ticket.id AS ticket_id, customer_id, ticket.shop_id AS shop_id, department.id AS department_id, creation, expiration, valid, active FROM ticket, ticket_department, department\n                WHERE\n                    ticket.shop_id = $1 AND\n                    ticket_department.ticket_id = ticket.id AND\n                    ticket_department.department_id = department.id AND\n                    valid AND active\n                ORDER BY creation",
+    "describe": {
+      "columns": [
+        {
+          "ordinal": 0,
+          "name": "ticket_id",
+          "type_info": "Int4"
+        },
+        {
+          "ordinal": 1,
+          "name": "customer_id",
+          "type_info": "Int4"
+        },
+        {
+          "ordinal": 2,
+          "name": "shop_id",
+          "type_info": "Int4"
+        },
+        {
+          "ordinal": 3,
+          "name": "department_id",
+          "type_info": "Int4"
+        },
+        {
+          "ordinal": 4,
+          "name": "creation",
+          "type_info": "Timestamptz"
+        },
+        {
+          "ordinal": 5,
+          "name": "expiration",
+          "type_info": "Timestamptz"
+        },
+        {
+          "ordinal": 6,
+          "name": "valid",
+          "type_info": "Bool"
+        },
+        {
+          "ordinal": 7,
+          "name": "active",
+          "type_info": "Bool"
+        }
+      ],
+      "parameters": {
+        "Left": [
+          "Int4"
+        ]
+      },
+      "nullable": [
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false
+      ]
+    }
+  },
   "85033be72c9ba421351009670c386b66a9a9c9105f476f2af057be31f839cd9b": {
     "query": "INSERT INTO customer(email, salt, digest) VALUES ($1, $2, $3) RETURNING id, email, salt, digest",
     "describe": {
@@ -345,6 +407,19 @@
       ]
     }
   },
+  "d6b88b5bb41866fecff3ebd175063914925c00c08b9ce7b36b7c0fd4c93c4a67": {
+    "query": "INSERT INTO ticket_department (ticket_id, department_id)\n                VALUES ($1, $2)",
+    "describe": {
+      "columns": [],
+      "parameters": {
+        "Left": [
+          "Int4",
+          "Int4"
+        ]
+      },
+      "nullable": []
+    }
+  },
   "d7a5799ee117b1079e9b8ae61836d3c2eb99dfb3c3b0c84abccf85d46e66961f": {
     "query": "UPDATE customer SET salt = $1, digest = $2 WHERE id = $3 RETURNING id, email, salt, digest",
     "describe": {
@@ -416,6 +491,63 @@
         ]
       },
       "nullable": [
+        false,
+        false,
+        false,
+        false
+      ]
+    }
+  },
+  "fe3597ec6f3683cf5370c4be16d325bd938fe443abd3e6f01629be19bd03ae3e": {
+    "query": "INSERT INTO ticket (customer_id, shop_id, creation, expiration, valid, active) VALUES\n            ($1, $2, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, TRUE, TRUE)\n            RETURNING id, customer_id, shop_id, creation, expiration, valid, active",
+    "describe": {
+      "columns": [
+        {
+          "ordinal": 0,
+          "name": "id",
+          "type_info": "Int4"
+        },
+        {
+          "ordinal": 1,
+          "name": "customer_id",
+          "type_info": "Int4"
+        },
+        {
+          "ordinal": 2,
+          "name": "shop_id",
+          "type_info": "Int4"
+        },
+        {
+          "ordinal": 3,
+          "name": "creation",
+          "type_info": "Timestamptz"
+        },
+        {
+          "ordinal": 4,
+          "name": "expiration",
+          "type_info": "Timestamptz"
+        },
+        {
+          "ordinal": 5,
+          "name": "valid",
+          "type_info": "Bool"
+        },
+        {
+          "ordinal": 6,
+          "name": "active",
+          "type_info": "Bool"
+        }
+      ],
+      "parameters": {
+        "Left": [
+          "Int4",
+          "Int4"
+        ]
+      },
+      "nullable": [
+        false,
+        false,
+        false,
         false,
         false,
         false,

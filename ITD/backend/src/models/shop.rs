@@ -1,19 +1,16 @@
 
 use sqlx::postgres::types::PgTimeTz;
-use sqlx::{FromRow, PgPool, query};
+use sqlx::{FromRow, PgPool};
 use sqlx::query_as;
 
-// use futures::{Stream, TryStream, StreamExt, TryStreamExt};
-
-// use super::ticket::Ticket;
 #[allow(dead_code)]
 #[derive(FromRow)]
 pub struct Shop {
-    id: i32,
-    name: String,
-    description: String,
-    image: Option<String>,
-    location: String,
+    pub id: i32,
+    pub name: String,
+    pub description: String,
+    pub image: Option<String>,
+    pub location: String,
 }
 
 #[allow(dead_code)]
@@ -70,13 +67,6 @@ impl<'a> PersistentShop<'a> {
         .await?)
     }
 
-    // pub async fn active_queue(&self) -> sqlx::Result<Vec<Ticket>> {
-    //     query(r"SELECT id, shop_id, creation, expiration, valid FROM ticket
-    //             WHERE shop_id = $1
-    //             ORDER BY creation")
-    //         .bind(self.inner.id)
-    //         .fetch(self.conn)
-    //         .map
-    // }
-
+    pub fn into_inner(self) -> Shop {self.inner}
+    pub fn inner(&self) -> &Shop {&self.inner}
 }
