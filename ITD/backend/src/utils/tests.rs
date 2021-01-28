@@ -51,22 +51,6 @@ pub async fn test_department(conn: &PgPool, shopid: i32) -> sqlx::Result<i32> {
         .id)
 }
 
-// #[macro_export]
-// macro_rules! shop {
-//     ($conn:expr, $id:expr) => {{
-//         test_shop($conn, $id).await?;
-//         $id
-//     }};
-//     ($conn:expr, $id:expr, [$($did:expr),+]) => {{
-//         shop!($conn, $id);
-//         $(
-//             crate::utils::tests::test_department($conn, $did, $id).await?;
-//         )+
-//         $id
-//     }};
-// }
-
-
 #[macro_export]
 macro_rules! with_test_shop {
     ($conn:expr, $($s:ident [$($di:ident),*]),+ $block:expr) => {{

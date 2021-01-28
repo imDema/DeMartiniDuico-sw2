@@ -12,8 +12,9 @@ pub struct Ticket {
     pub id: i32,
     pub customer_id: i32,
     pub shop_id: i32,
-    pub creation: DateTime<Utc>,
-    pub expiration: DateTime<Utc>,
+    pub creation: NaiveDateTime,
+    pub expiration: NaiveDateTime,
+    pub est_minutes: i32,
     pub valid: bool,
     pub active: bool,
     pub department_ids: Vec<i32>,
@@ -24,8 +25,8 @@ pub struct TicketResponse {
     uid: String,
     shop_id: String,
     department_ids: Vec<String>,
-    creation: DateTime<Utc>,
-    expiration: DateTime<Utc>,
+    creation: NaiveDateTime,
+    expiration: NaiveDateTime,
     valid: bool,
     active: bool,
 }
@@ -48,6 +49,7 @@ impl From<Ticket> for TicketResponse {
     }
 }
 
+#[allow(dead_code)]
 pub struct PersistentTicket<'a> {
     conn: &'a PgPool,
     inner: Ticket,
@@ -55,7 +57,7 @@ pub struct PersistentTicket<'a> {
 
 impl<'a> PersistentTicket<'a> {
     pub async fn get(conn: &'a PgPool, id: i32) -> sqlx::Result<Option<PersistentTicket<'a>>> {
-        let ticket = query_as!(TicketRow, r"SELECT ticket.id AS id, customer_id, ticket.shop_id AS shop_id, array_agg(department.id) AS department_ids, creation, expiration, valid, active FROM ticket, ticket_department, department
+        let ticket = query_as!(TicketRow, r"SELECT ticket.id AS id, customer_id, ticket.shop_id AS shop_id, array_agg(department.id) AS department_ids, creation, expiration, entry, exit, est_minutes, valid, active FROM ticket, ticket_department, department
             WHERE ticket_department.ticket_id = ticket.id AND
                 ticket_department.department_id = department.id AND
                 ticket.id = $1
@@ -69,7 +71,7 @@ impl<'a> PersistentTicket<'a> {
     }
 
     pub async fn get_for_customer(conn: &'a PgPool, customer_id: i32) -> sqlx::Result<Vec<Ticket>> {
-        query_as!(TicketRow, r"SELECT ticket.id AS id, customer_id, ticket.shop_id AS shop_id, array_agg(department.id) AS department_ids, creation, expiration, valid, active FROM ticket, ticket_department, department
+        query_as!(TicketRow, r"SELECT ticket.id AS id, customer_id, ticket.shop_id AS shop_id, array_agg(department.id) AS department_ids, creation, expiration, entry, exit, est_minutes, valid, active FROM ticket, ticket_department, department
             WHERE ticket_department.ticket_id = ticket.id AND
                 ticket_department.department_id = department.id AND
                 ticket.customer_id = $1
@@ -84,13 +86,13 @@ impl<'a> PersistentTicket<'a> {
             }).await
     }
 
-    pub async fn new(conn: &'a PgPool, customer_id: i32, shop_id: i32, department_ids: Vec<i32>) -> sqlx::Result<PersistentTicket<'a>> {
+    pub async fn new(conn: &'a PgPool, customer_id: i32, shop_id: i32, department_ids: Vec<i32>, est_minutes: i32) -> sqlx::Result<PersistentTicket<'a>> {
         let mut tx = conn.begin().await?;
 
-        let row = query!(r"INSERT INTO ticket (customer_id, shop_id, creation, expiration, valid, active) VALUES
-            ($1, $2, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, TRUE, TRUE)
+        let row = query!(r"INSERT INTO ticket (customer_id, shop_id, creation, expiration, est_minutes, valid, active) VALUES
+            ($1, $2, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, $3, TRUE, TRUE)
             RETURNING id",
-            customer_id, shop_id)
+            customer_id, shop_id, est_minutes)
             .fetch_one(&mut tx).await?;
 
         for did in department_ids {
@@ -107,7 +109,7 @@ impl<'a> PersistentTicket<'a> {
     }
 
     pub async fn queue(conn: &PgPool, shop_id: i32, valid: bool, active: bool) -> sqlx::Result<Vec<Ticket>> {
-        query_as!(TicketRow, r"SELECT ticket.id AS id, customer_id, ticket.shop_id AS shop_id, array_agg(department.id) AS department_ids, creation, expiration, valid, active FROM ticket, ticket_department, department
+        query_as!(TicketRow, r"SELECT ticket.id AS id, customer_id, ticket.shop_id AS shop_id, array_agg(department.id) AS department_ids, creation, expiration, entry, exit, est_minutes, valid, active FROM ticket, ticket_department, department
                 WHERE
                     ticket.shop_id = $1 AND
                     ticket_department.ticket_id = ticket.id AND
@@ -132,8 +134,11 @@ pub(super) struct TicketRow {
     pub id: i32,
     pub customer_id: i32,
     pub shop_id: i32,
-    pub creation: DateTime<Utc>,
-    pub expiration: DateTime<Utc>,
+    pub creation: NaiveDateTime,
+    pub expiration: NaiveDateTime,
+    pub entry: Option<NaiveDateTime>,
+    pub exit: Option<NaiveDateTime>,
+    pub est_minutes: i32,
     pub valid: bool,
     pub active: bool,
     pub department_ids: Option<Vec<i32>>,
@@ -145,8 +150,9 @@ impl From<TicketRow> for Ticket {
             id: row.id,
             customer_id: row.customer_id,
             shop_id: row.shop_id,
-            creation: row.creation,
+            creation: row.creation.into(),
             expiration: row.expiration,
+            est_minutes: row.est_minutes,
             valid: row.valid,
             active: row.active,
             department_ids: row.department_ids.unwrap_or_default(),
@@ -169,7 +175,7 @@ mod tests {
         with_test_shop!(&conn, shopid [d1, d2] {
             let customer_id = test_customer(&conn).await?;
 
-            let inserted = PersistentTicket::new(&conn, customer_id, shopid, vec![d1, d2])
+            let inserted = PersistentTicket::new(&conn, customer_id, shopid, vec![d1, d2], 25)
                 .await?.into_inner();
     
             let loaded = PersistentTicket::get(&conn, inserted.id).await?.map(PersistentTicket::into_inner);
@@ -187,11 +193,11 @@ mod tests {
         let id_c2 = test_customer(&conn).await?;
 
         with_test_shop!(&conn, shopid [d0, d1, d2, d3] {
-            let t1 = PersistentTicket::new(&conn, id_c1, shopid, vec![d0, d3])
+            let t1 = PersistentTicket::new(&conn, id_c1, shopid, vec![d0, d3], 25)
                 .await?.into_inner();
 
             std::thread::sleep(Duration::from_millis(10));
-            let t2 = PersistentTicket::new(&conn, id_c2, shopid, vec![d1,d2,d3])
+            let t2 = PersistentTicket::new(&conn, id_c2, shopid, vec![d1,d2,d3], 25)
                 .await?.into_inner();
 
             let queue = PersistentTicket::queue(&conn, shopid, true, true).await?;
