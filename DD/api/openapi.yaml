@@ -643,8 +643,8 @@ components:
     RequestTicket:
       type: object
       properties:
-        shop_id:
-          type: string
+        est_minutes:
+          type: integer
         department_ids:
           type: array
           items:
