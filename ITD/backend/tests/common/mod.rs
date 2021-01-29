@@ -1,5 +1,7 @@
 pub mod requests;
 
+use regex::Regex;
+
 #[macro_export]
 macro_rules! setup_app {
     () => {{
@@ -22,4 +24,30 @@ macro_rules! setup_app {
             .configure(api::dev::endpoints)
         ).await
     }}
+}
+
+#[macro_export]
+macro_rules! quick_create_customer {
+    ($app:expr) => {{
+        use rand::{RngCore, thread_rng};
+        let (email, password) = (format!("{:x}@test.com", thread_rng().next_u64()), format!("{:x}", thread_rng().next_u64()));
+        let r = req!(register(&email, &password), $app);
+        let code = read_utf8_body(r).await;
+        let r = req!(confirm(&code), $app);
+        assert_eq!(r.status(), actix_web::http::StatusCode::OK);
+        let r = req!(login(&email, &password, None), $app);
+        assert_eq!(r.status(), actix_web::http::StatusCode::OK);
+        let cookies = r.headers().get("Set-Cookie").unwrap();
+        let session = common::extract_session_cookie(cookies.to_str().unwrap()).unwrap().to_owned();
+        (email, password, session)
+    }};
+}
+
+pub fn extract_session_cookie(cookies: &str) -> Option<&str> {
+    lazy_static::lazy_static!(
+        static ref RE: Regex = Regex::new("actix-session=[^;]+").unwrap();
+    );
+    RE.captures(cookies)
+        .and_then(|caps| caps.get(0))
+        .map(|c| c.as_str())
 }

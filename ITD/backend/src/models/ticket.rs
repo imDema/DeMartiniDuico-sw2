@@ -1,5 +1,5 @@
 
-use serde::Serialize;
+use serde::{Serialize, Deserialize};
 use sqlx::{FromRow, PgPool, query_as, query};
 use chrono::prelude::*;
 
@@ -20,15 +20,15 @@ pub struct Ticket {
     pub department_ids: Vec<i32>,
 }
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, Deserialize, PartialEq)]
 pub struct TicketResponse {
-    uid: String,
-    shop_id: String,
-    department_ids: Vec<String>,
-    creation: NaiveDateTime,
-    expiration: NaiveDateTime,
-    valid: bool,
-    active: bool,
+    pub uid: String,
+    pub shop_id: String,
+    pub department_ids: Vec<String>,
+    pub creation: NaiveDateTime,
+    pub expiration: NaiveDateTime,
+    pub valid: bool,
+    pub active: bool,
 }
 
 impl From<Ticket> for TicketResponse {
@@ -102,10 +102,18 @@ impl<'a> PersistentTicket<'a> {
                 .execute(&mut tx).await?;
         }
 
-        tx.commit().await?;
-        let ticket = PersistentTicket::get(conn, row.id).await?.unwrap(); // TODO: check unwrap
+        let ticket_row = query_as!(TicketRow, r"SELECT ticket.id AS id, customer_id, ticket.shop_id AS shop_id, array_agg(department.id) AS department_ids, creation, expiration, entry, exit, est_minutes, valid, active FROM ticket, ticket_department, department
+            WHERE
+            ticket_department.ticket_id = ticket.id AND
+                ticket_department.department_id = department.id AND
+                ticket.id = $1
+            GROUP BY ticket.id, customer_id, ticket.shop_id, creation, expiration, valid, active",
+            row.id)
+            .fetch_one(&mut tx)
+            .await?;
 
-        Ok(ticket)
+        tx.commit().await?;
+        Ok(Self{conn, inner:ticket_row.into()})
     }
 
     pub async fn queue(conn: &PgPool, shop_id: i32, valid: bool, active: bool) -> sqlx::Result<Vec<Ticket>> {

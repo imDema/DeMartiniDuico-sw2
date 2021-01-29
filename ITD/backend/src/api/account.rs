@@ -26,7 +26,7 @@ pub struct RequestLogin {
 async fn login(conn: web::Data<PgPool>, body: web::Json<RequestLogin>, session: Session) -> HttpResponse {
     let conn = conn.into_inner();
     let req = body.into_inner();
-    let error = HttpResponse::Unauthorized().body("Invalid email or password");
+    let error = HttpResponse::BadRequest().body("Invalid email or password");
     let acc = PersistentCustomer::find(&conn, &req.email).await;
     
     if let Ok(Some(acc)) = acc {
@@ -37,9 +37,11 @@ async fn login(conn: web::Data<PgPool>, body: web::Json<RequestLogin>, session: 
             // session.renew();
             HttpResponse::Ok().finish()
         } else {
+            log::debug!("Invalid password");
             error
         }
     } else {
+        log::debug!("Account does not exist");
         error
     }
 }

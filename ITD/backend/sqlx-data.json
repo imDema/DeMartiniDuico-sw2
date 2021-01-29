@@ -507,6 +507,86 @@
       ]
     }
   },
+  "a71f384fa5cb06cd42c1ac3d83c21ed6a022f520e8c23feda6ebaf59e57c0e85": {
+    "query": "SELECT ticket.id AS id, customer_id, ticket.shop_id AS shop_id, array_agg(department.id) AS department_ids, creation, expiration, entry, exit, est_minutes, valid, active FROM ticket, ticket_department, department\n            WHERE\n            ticket_department.ticket_id = ticket.id AND\n                ticket_department.department_id = department.id AND\n                ticket.id = $1\n            GROUP BY ticket.id, customer_id, ticket.shop_id, creation, expiration, valid, active",
+    "describe": {
+      "columns": [
+        {
+          "ordinal": 0,
+          "name": "id",
+          "type_info": "Int4"
+        },
+        {
+          "ordinal": 1,
+          "name": "customer_id",
+          "type_info": "Int4"
+        },
+        {
+          "ordinal": 2,
+          "name": "shop_id",
+          "type_info": "Int4"
+        },
+        {
+          "ordinal": 3,
+          "name": "department_ids",
+          "type_info": "Int4Array"
+        },
+        {
+          "ordinal": 4,
+          "name": "creation",
+          "type_info": "Timestamp"
+        },
+        {
+          "ordinal": 5,
+          "name": "expiration",
+          "type_info": "Timestamp"
+        },
+        {
+          "ordinal": 6,
+          "name": "entry",
+          "type_info": "Timestamp"
+        },
+        {
+          "ordinal": 7,
+          "name": "exit",
+          "type_info": "Timestamp"
+        },
+        {
+          "ordinal": 8,
+          "name": "est_minutes",
+          "type_info": "Int4"
+        },
+        {
+          "ordinal": 9,
+          "name": "valid",
+          "type_info": "Bool"
+        },
+        {
+          "ordinal": 10,
+          "name": "active",
+          "type_info": "Bool"
+        }
+      ],
+      "parameters": {
+        "Left": [
+          "Int4"
+        ]
+      },
+      "nullable": [
+        false,
+        false,
+        false,
+        null,
+        false,
+        false,
+        true,
+        true,
+        false,
+        false,
+        false
+      ]
+    }
+  },
   "aa458e84cef3ac8a168c6463e51842c5137bf7e7aa6ded0fe7dfbdf415d3e260": {
     "query": "SELECT id, email, salt, digest FROM customer",
     "describe": {
