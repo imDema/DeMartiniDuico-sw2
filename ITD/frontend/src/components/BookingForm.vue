@@ -12,6 +12,7 @@
       <b-form-datepicker v-model="form.datetime.date" class="mb-2" required></b-form-datepicker>
       <b-form-timepicker v-model="form.datetime.time" class="mb-2" required></b-form-timepicker>
     </b-form-group>
+  <queue :shop_id="store.id"/>
     <b-row class="my-4">
     <b-col cols="6"><b-button @click="$emit('back')" block><b-icon-arrow-left/> Back</b-button> </b-col>
     <b-col cols="6"><b-button @click="submitTicket" type="submit" variant="primary" block>Submit</b-button></b-col>
@@ -22,7 +23,11 @@
 </template>
 
 <script>
+import Queue from "./Queue"
   export default {
+    components:{
+      Queue
+    },
     data() {
       return {
         form: {
