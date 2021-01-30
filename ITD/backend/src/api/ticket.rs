@@ -3,7 +3,7 @@ use std::error::Error;
 use crate::models::account::PersistentCustomer;
 use crate::models::shop::PersistentShop;
 use crate::models::ticket::{PersistentTicket, TicketResponse};
-use crate::utils::encoding::{decode_serial, decode_serial_vec, encode_serial};
+use crate::utils::encoding::{decode_serial, decode_serial_vec};
 use crate::utils::session;
 
 use actix_web::{web, get, post, HttpResponse};
@@ -13,14 +13,16 @@ use sqlx::PgPool;
 use serde::{Serialize, Deserialize};
 
 pub fn endpoints(cfg: &mut web::ServiceConfig) {
-    cfg.service(ticket_new);
     cfg.service(tokens);
+    cfg.service(ticket_new);
+    cfg.service(ticket_est);
+    cfg.service(ticket_queue);
 }
 
-#[derive(Deserialize)]
-struct TicketNewRequest {
-    est_minutes: i32,
-    department_ids: Vec<String>,
+#[derive(Serialize, Deserialize)]
+pub struct TicketNewRequest {
+    pub est_minutes: i32,
+    pub department_ids: Vec<String>,
 }
 #[post("/shop/{shop_id}/ticket/new")]
 async fn ticket_new(conn: web::Data<PgPool>, shop_id: web::Path<String>, body: web::Json<TicketNewRequest>, session: Session) -> HttpResponse {
@@ -30,8 +32,12 @@ async fn ticket_new(conn: web::Data<PgPool>, shop_id: web::Path<String>, body: w
     let uid = if let Some(uid) = session::get_account(&session) {
         uid
     } else {
-        return HttpResponse::Unauthorized().finish();
+        return HttpResponse::Forbidden().finish();
     };
+
+    if req.department_ids.len() == 0 {
+        return HttpResponse::BadRequest().body("Must specify departments");
+    }
 
     match ticket_new_inner(&conn, uid, &shop_id, req).await {
         Ok(resp) => resp,
@@ -55,7 +61,7 @@ async fn ticket_new_inner<'a>(conn: &'a PgPool, customer_id: i32, shop_id: &str,
     let tick = PersistentTicket::new(&conn, customer_id, shop.inner().id, ids, req.est_minutes)
         .await?
         .into_inner();
-    Ok(HttpResponse::Ok().body(format!("Created: {}", encode_serial(tick.id))))
+    Ok(HttpResponse::Ok().json(TicketResponse::from(tick)))
 }
 
 #[get("/shop/{shop_id}/ticket/queue")]
@@ -76,7 +82,7 @@ async fn ticket_queue(conn: web::Data<PgPool>, shop_id: web::Path<String>, sessi
             }
         }
     } else {
-        HttpResponse::Unauthorized().finish()
+        HttpResponse::Forbidden().finish()
     }
 }
 async fn ticket_queue_inner(conn: &PgPool, shop_id: i32) -> sqlx::Result<HttpResponse> {
@@ -93,10 +99,10 @@ async fn ticket_queue_inner(conn: &PgPool, shop_id: i32) -> sqlx::Result<HttpRes
     }))
 }
 
-#[derive(Serialize)]
-struct TokensResponse {
-    tickets: Vec<TicketResponse>,
-    booking: Vec<()>,
+#[derive(Serialize, Deserialize)]
+pub struct TokensResponse {
+    pub tickets: Vec<TicketResponse>,
+    pub bookings: Vec<()>,
 }
 #[get("/tokens")]
 async fn tokens(conn: web::Data<PgPool>, session: Session) -> HttpResponse {
@@ -104,7 +110,7 @@ async fn tokens(conn: web::Data<PgPool>, session: Session) -> HttpResponse {
     let uid = if let Some(uid) = session::get_account(&session) {
         uid
     } else {
-        return HttpResponse::Unauthorized().finish();
+        return HttpResponse::Forbidden().finish();
     };
 
     match tokens_inner(&conn, uid).await {
@@ -125,7 +131,7 @@ async fn tokens_inner(conn: &PgPool, uid: i32) -> sqlx::Result<HttpResponse> {
 
         let resp = TokensResponse {
             tickets: ticket_resp,
-            booking: Vec::new(),
+            bookings: Vec::new(),
         };
 
         Ok(HttpResponse::Ok().json(resp))
@@ -163,7 +169,7 @@ async fn ticket_est(conn: web::Data<PgPool>, query: web::Query<TicketEstQuery>, 
             }
         }
     } else {
-        HttpResponse::Unauthorized().finish()
+        HttpResponse::Forbidden().finish()
     }
 }
 async fn ticket_est_inner(conn: &PgPool, cid: i32, tid: i32) -> sqlx::Result<HttpResponse> {

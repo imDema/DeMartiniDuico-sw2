@@ -1,6 +1,6 @@
 
 mod common;
-use common::requests::*;
+use common::{extract_session_cookie, requests::*};
 
 use actix_web::http;
 use actix_web::http::{HeaderMap, StatusCode};
@@ -15,7 +15,7 @@ async fn register_test() {
     let (email, password) = (format!("{:x}@test.com", usr), format!("{:x}", pass));
     
     // Register
-    let resp = req!(&mut app, register(email.clone(), password.clone()));
+    let resp = req!(register(&email, &password), &mut app);
     assert_eq!(resp.status(), StatusCode::OK);
 
     let code = test::read_body(resp).await;
@@ -24,27 +24,27 @@ async fn register_test() {
     // Confirm
     let code = String::from_utf8(Vec::from(&code[..])).unwrap();
     
-    let resp = req!(&mut app, confirm(code));
+    let resp = req!(confirm(&code), &mut app);
     assert_eq!(resp.status(), http::StatusCode::OK);
 
     //Login
-    let resp = req!(&mut app, login(email.clone(), "wrongpass".into(), None));
-    assert_eq!(resp.status(), http::StatusCode::UNAUTHORIZED);
+    let resp = req!(login(&email, "wrongpass".into(), None), &mut app);
+    assert_eq!(resp.status(), http::StatusCode::BAD_REQUEST);
 
-    let resp = req!(&mut app, login(email.clone(), password.clone(), None));
+    let resp = req!(login(&email, &password, None), &mut app);
     assert_eq!(resp.status(), http::StatusCode::OK);
 
     let headers: &HeaderMap = resp.headers();
     let cookies = headers.get("Set-Cookie").unwrap();
     let session = extract_session_cookie(cookies.to_str().unwrap()).unwrap();
     
-    let resp = req!(&mut app, whoami().header("Cookie", session));
+    let resp = req!(whoami(), session, &mut app);
     assert_eq!(resp.status(), http::StatusCode::OK);
 
     let resp_body = read_utf8_body(resp).await;
     assert!(resp_body.contains(&email));
 
-    let resp = req!(&mut app, whoami());
+    let resp = req!(whoami(), &mut app);
     assert_eq!(resp.status(), http::StatusCode::OK);
 
     let resp_body = read_utf8_body(resp).await;

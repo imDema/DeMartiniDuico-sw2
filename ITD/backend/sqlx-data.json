@@ -41,28 +41,8 @@
       ]
     }
   },
-  "192bbea17da9300e27f0e91881ecab1e12822fb0bd323ee435da970a6286be32": {
-    "query": "SELECT email FROM customer WHERE email = $1",
-    "describe": {
-      "columns": [
-        {
-          "ordinal": 0,
-          "name": "email",
-          "type_info": "Varchar"
-        }
-      ],
-      "parameters": {
-        "Left": [
-          "Text"
-        ]
-      },
-      "nullable": [
-        false
-      ]
-    }
-  },
-  "1b985141770f55945c0aa791e43583c4fae29c3490876cf9747a32f189b22ae5": {
-    "query": "SELECT ticket.id AS id, customer_id, ticket.shop_id AS shop_id, array_agg(department.id) AS department_ids, creation, expiration, entry, exit, est_minutes, valid, active FROM ticket, ticket_department, department\n            WHERE ticket_department.ticket_id = ticket.id AND\n                ticket_department.department_id = department.id AND\n                ticket.customer_id = $1\n            GROUP BY ticket.id, customer_id, ticket.shop_id, creation, expiration, valid, active\n            ORDER BY creation",
+  "084c060b0242e50d7b74e2675e751d1b281ef4e1d351f91e8da164f3e8a73ed8": {
+    "query": "SELECT ticket.id AS id, customer_id, ticket.shop_id AS shop_id, shop.name as shop_name, array_agg(department.id) AS department_ids, creation, expiration, entry, exit, est_minutes, valid, active\n            FROM ticket, ticket_department, department, shop\n            WHERE ticket_department.ticket_id = ticket.id AND\n                ticket.shop_id = shop.id AND\n                ticket_department.department_id = department.id AND\n                ticket.id = $1\n            GROUP BY ticket.id, customer_id, ticket.shop_id, shop.name, creation, expiration, valid, active",
     "describe": {
       "columns": [
         {
@@ -82,41 +62,46 @@
         },
         {
           "ordinal": 3,
+          "name": "shop_name",
+          "type_info": "Varchar"
+        },
+        {
+          "ordinal": 4,
           "name": "department_ids",
           "type_info": "Int4Array"
         },
         {
-          "ordinal": 4,
+          "ordinal": 5,
           "name": "creation",
           "type_info": "Timestamp"
         },
         {
-          "ordinal": 5,
+          "ordinal": 6,
           "name": "expiration",
           "type_info": "Timestamp"
         },
         {
-          "ordinal": 6,
+          "ordinal": 7,
           "name": "entry",
           "type_info": "Timestamp"
         },
         {
-          "ordinal": 7,
+          "ordinal": 8,
           "name": "exit",
           "type_info": "Timestamp"
         },
         {
-          "ordinal": 8,
+          "ordinal": 9,
           "name": "est_minutes",
           "type_info": "Int4"
         },
         {
-          "ordinal": 9,
+          "ordinal": 10,
           "name": "valid",
           "type_info": "Bool"
         },
         {
-          "ordinal": 10,
+          "ordinal": 11,
           "name": "active",
           "type_info": "Bool"
         }
@@ -130,6 +115,7 @@
         false,
         false,
         false,
+        false,
         null,
         false,
         false,
@@ -137,6 +123,26 @@
         true,
         false,
         false,
+        false
+      ]
+    }
+  },
+  "192bbea17da9300e27f0e91881ecab1e12822fb0bd323ee435da970a6286be32": {
+    "query": "SELECT email FROM customer WHERE email = $1",
+    "describe": {
+      "columns": [
+        {
+          "ordinal": 0,
+          "name": "email",
+          "type_info": "Varchar"
+        }
+      ],
+      "parameters": {
+        "Left": [
+          "Text"
+        ]
+      },
+      "nullable": [
         false
       ]
     }
@@ -543,8 +549,8 @@
       ]
     }
   },
-  "b916ed855589ee79d899592da6731b284d2d3042a45b6d768e3cd2f1bd3cf949": {
-    "query": "SELECT ticket.id AS id, customer_id, ticket.shop_id AS shop_id, array_agg(department.id) AS department_ids, creation, expiration, entry, exit, est_minutes, valid, active FROM ticket, ticket_department, department\n                WHERE\n                    ticket.shop_id = $1 AND\n                    ticket_department.ticket_id = ticket.id AND\n                    ticket_department.department_id = department.id AND\n                    valid = $2 AND active = $3\n                GROUP BY ticket.id, customer_id, ticket.shop_id, creation, expiration, valid, active\n                ORDER BY creation",
+  "b0f4db74b2c552ed138915dea757d43b0712b9865473223791683f85d7d3e4d5": {
+    "query": "SELECT ticket.id AS id, customer_id, ticket.shop_id AS shop_id, shop.name as shop_name, array_agg(department.id) AS department_ids, creation, expiration, entry, exit, est_minutes, valid, active\n            FROM ticket, ticket_department, department, shop\n            WHERE\n                ticket_department.ticket_id = ticket.id AND\n                ticket.shop_id = shop.id AND\n                ticket_department.department_id = department.id AND\n                ticket.id = $1\n            GROUP BY ticket.id, customer_id, ticket.shop_id, shop.name, creation, expiration, valid, active",
     "describe": {
       "columns": [
         {
@@ -564,53 +570,57 @@
         },
         {
           "ordinal": 3,
+          "name": "shop_name",
+          "type_info": "Varchar"
+        },
+        {
+          "ordinal": 4,
           "name": "department_ids",
           "type_info": "Int4Array"
         },
         {
-          "ordinal": 4,
+          "ordinal": 5,
           "name": "creation",
           "type_info": "Timestamp"
         },
         {
-          "ordinal": 5,
+          "ordinal": 6,
           "name": "expiration",
           "type_info": "Timestamp"
         },
         {
-          "ordinal": 6,
+          "ordinal": 7,
           "name": "entry",
           "type_info": "Timestamp"
         },
         {
-          "ordinal": 7,
+          "ordinal": 8,
           "name": "exit",
           "type_info": "Timestamp"
         },
         {
-          "ordinal": 8,
+          "ordinal": 9,
           "name": "est_minutes",
           "type_info": "Int4"
         },
         {
-          "ordinal": 9,
+          "ordinal": 10,
           "name": "valid",
           "type_info": "Bool"
         },
         {
-          "ordinal": 10,
+          "ordinal": 11,
           "name": "active",
           "type_info": "Bool"
         }
       ],
       "parameters": {
         "Left": [
-          "Int4",
-          "Bool",
-          "Bool"
+          "Int4"
         ]
       },
       "nullable": [
+        false,
         false,
         false,
         false,
@@ -653,86 +663,6 @@
         ]
       },
       "nullable": []
-    }
-  },
-  "d583bac4360896f0f83c36aba7f68a1150f2623b27ab6f2efd988734e1ffcb2e": {
-    "query": "SELECT ticket.id AS id, customer_id, ticket.shop_id AS shop_id, array_agg(department.id) AS department_ids, creation, expiration, entry, exit, est_minutes, valid, active FROM ticket, ticket_department, department\n            WHERE ticket_department.ticket_id = ticket.id AND\n                ticket_department.department_id = department.id AND\n                ticket.id = $1\n            GROUP BY ticket.id, customer_id, ticket.shop_id, creation, expiration, valid, active",
-    "describe": {
-      "columns": [
-        {
-          "ordinal": 0,
-          "name": "id",
-          "type_info": "Int4"
-        },
-        {
-          "ordinal": 1,
-          "name": "customer_id",
-          "type_info": "Int4"
-        },
-        {
-          "ordinal": 2,
-          "name": "shop_id",
-          "type_info": "Int4"
-        },
-        {
-          "ordinal": 3,
-          "name": "department_ids",
-          "type_info": "Int4Array"
-        },
-        {
-          "ordinal": 4,
-          "name": "creation",
-          "type_info": "Timestamp"
-        },
-        {
-          "ordinal": 5,
-          "name": "expiration",
-          "type_info": "Timestamp"
-        },
-        {
-          "ordinal": 6,
-          "name": "entry",
-          "type_info": "Timestamp"
-        },
-        {
-          "ordinal": 7,
-          "name": "exit",
-          "type_info": "Timestamp"
-        },
-        {
-          "ordinal": 8,
-          "name": "est_minutes",
-          "type_info": "Int4"
-        },
-        {
-          "ordinal": 9,
-          "name": "valid",
-          "type_info": "Bool"
-        },
-        {
-          "ordinal": 10,
-          "name": "active",
-          "type_info": "Bool"
-        }
-      ],
-      "parameters": {
-        "Left": [
-          "Int4"
-        ]
-      },
-      "nullable": [
-        false,
-        false,
-        false,
-        null,
-        false,
-        false,
-        true,
-        true,
-        false,
-        false,
-        false
-      ]
     }
   },
   "d6b88b5bb41866fecff3ebd175063914925c00c08b9ce7b36b7c0fd4c93c4a67": {
@@ -782,6 +712,94 @@
       },
       "nullable": [
         false,
+        false,
+        false,
+        false
+      ]
+    }
+  },
+  "d84426d7e616af65d16a0da524be7cb589b6e862d54d114f32bc3e6aff6f867c": {
+    "query": "SELECT ticket.id AS id, customer_id, ticket.shop_id AS shop_id, shop.name as shop_name, array_agg(department.id) AS department_ids, creation, expiration, entry, exit, est_minutes, valid, active\n                FROM ticket, ticket_department, department, shop\n                WHERE\n                    ticket.shop_id = $1 AND\n                    ticket.shop_id = shop.id AND\n                    ticket_department.ticket_id = ticket.id AND\n                    ticket_department.department_id = department.id AND\n                    valid = $2 AND active = $3\n                GROUP BY ticket.id, customer_id, ticket.shop_id, shop.name, creation, expiration, valid, active\n                ORDER BY creation",
+    "describe": {
+      "columns": [
+        {
+          "ordinal": 0,
+          "name": "id",
+          "type_info": "Int4"
+        },
+        {
+          "ordinal": 1,
+          "name": "customer_id",
+          "type_info": "Int4"
+        },
+        {
+          "ordinal": 2,
+          "name": "shop_id",
+          "type_info": "Int4"
+        },
+        {
+          "ordinal": 3,
+          "name": "shop_name",
+          "type_info": "Varchar"
+        },
+        {
+          "ordinal": 4,
+          "name": "department_ids",
+          "type_info": "Int4Array"
+        },
+        {
+          "ordinal": 5,
+          "name": "creation",
+          "type_info": "Timestamp"
+        },
+        {
+          "ordinal": 6,
+          "name": "expiration",
+          "type_info": "Timestamp"
+        },
+        {
+          "ordinal": 7,
+          "name": "entry",
+          "type_info": "Timestamp"
+        },
+        {
+          "ordinal": 8,
+          "name": "exit",
+          "type_info": "Timestamp"
+        },
+        {
+          "ordinal": 9,
+          "name": "est_minutes",
+          "type_info": "Int4"
+        },
+        {
+          "ordinal": 10,
+          "name": "valid",
+          "type_info": "Bool"
+        },
+        {
+          "ordinal": 11,
+          "name": "active",
+          "type_info": "Bool"
+        }
+      ],
+      "parameters": {
+        "Left": [
+          "Int4",
+          "Bool",
+          "Bool"
+        ]
+      },
+      "nullable": [
+        false,
+        false,
+        false,
+        false,
+        null,
+        false,
+        false,
+        true,
+        true,
         false,
         false,
         false
@@ -842,6 +860,92 @@
         ]
       },
       "nullable": [
+        false
+      ]
+    }
+  },
+  "ed2c0b97690a8ad498acc51290de285de46618c729b6c51a49eb8dd674cf4d6a": {
+    "query": "SELECT ticket.id AS id, customer_id, ticket.shop_id AS shop_id, shop.name as shop_name, array_agg(department.id) AS department_ids, creation, expiration, entry, exit, est_minutes, valid, active\n            FROM ticket, ticket_department, department, shop\n            WHERE ticket_department.ticket_id = ticket.id AND\n                ticket.shop_id = shop.id AND\n                ticket_department.department_id = department.id AND\n                ticket.customer_id = $1\n            GROUP BY ticket.id, customer_id, ticket.shop_id, shop.name, creation, expiration, valid, active\n            ORDER BY creation",
+    "describe": {
+      "columns": [
+        {
+          "ordinal": 0,
+          "name": "id",
+          "type_info": "Int4"
+        },
+        {
+          "ordinal": 1,
+          "name": "customer_id",
+          "type_info": "Int4"
+        },
+        {
+          "ordinal": 2,
+          "name": "shop_id",
+          "type_info": "Int4"
+        },
+        {
+          "ordinal": 3,
+          "name": "shop_name",
+          "type_info": "Varchar"
+        },
+        {
+          "ordinal": 4,
+          "name": "department_ids",
+          "type_info": "Int4Array"
+        },
+        {
+          "ordinal": 5,
+          "name": "creation",
+          "type_info": "Timestamp"
+        },
+        {
+          "ordinal": 6,
+          "name": "expiration",
+          "type_info": "Timestamp"
+        },
+        {
+          "ordinal": 7,
+          "name": "entry",
+          "type_info": "Timestamp"
+        },
+        {
+          "ordinal": 8,
+          "name": "exit",
+          "type_info": "Timestamp"
+        },
+        {
+          "ordinal": 9,
+          "name": "est_minutes",
+          "type_info": "Int4"
+        },
+        {
+          "ordinal": 10,
+          "name": "valid",
+          "type_info": "Bool"
+        },
+        {
+          "ordinal": 11,
+          "name": "active",
+          "type_info": "Bool"
+        }
+      ],
+      "parameters": {
+        "Left": [
+          "Int4"
+        ]
+      },
+      "nullable": [
+        false,
+        false,
+        false,
+        false,
+        null,
+        false,
+        false,
+        true,
+        true,
+        false,
+        false,
         false
       ]
     }

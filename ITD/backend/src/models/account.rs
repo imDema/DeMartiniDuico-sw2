@@ -7,7 +7,7 @@ use futures::Stream;
 use rand::Rng;
 
 #[derive(Debug, Serialize, Deserialize, FromRow, PartialEq, Eq)]
-pub struct Customer {
+pub struct Account {
     id: i32,
     email: String,
     salt: Vec<u8>,
@@ -19,7 +19,7 @@ pub struct HashedPass {
     digest: Vec<u8>,
 }
 
-impl Customer {
+impl Account {
     fn argon_conf<'a>() -> argon2::Config<'a> { argon2::Config::default() }
 
     pub fn verify_authentication(&self, password: &[u8]) -> bool {
@@ -45,13 +45,13 @@ impl Customer {
 type ConfirmationCode = Vec<u8>;
 
 pub struct PersistentCustomer<'a> {
-    inner: Customer,
+    inner: Account,
     conn: &'a PgPool,
 }
 
 impl<'a> PersistentCustomer<'a> {
     pub async fn get(conn: &'a PgPool, id: i32) -> sqlx::Result<Option<PersistentCustomer<'a>>> {
-        let acc = query_as!(Customer,
+        let acc = query_as!(Account,
             r"SELECT id, email, salt, digest FROM customer WHERE id = $1",
             id
         ).fetch_optional(conn)
@@ -61,7 +61,7 @@ impl<'a> PersistentCustomer<'a> {
     }
 
     pub async fn find(conn: &'a PgPool, email: &str) -> sqlx::Result<Option<PersistentCustomer<'a>>> {
-        let acc = query_as!(Customer,
+        let acc = query_as!(Account,
                 r"SELECT id, email, salt, digest FROM customer WHERE email = $1",
                 email
             ).fetch_optional(conn)
@@ -73,8 +73,8 @@ impl<'a> PersistentCustomer<'a> {
         }
     }
 
-    pub async fn get_stream(conn: &'a PgPool) -> sqlx::Result<Pin<Box<dyn Stream<Item = std::result::Result<Customer, sqlx::Error>> + 'a>>> {
-        let stream = query_as!(Customer, r"SELECT id, email, salt, digest FROM customer")
+    pub async fn get_stream(conn: &'a PgPool) -> sqlx::Result<Pin<Box<dyn Stream<Item = std::result::Result<Account, sqlx::Error>> + 'a>>> {
+        let stream = query_as!(Account, r"SELECT id, email, salt, digest FROM customer")
             // .map(|acc| PersistentCustomer{inner: acc, conn})
             .fetch(conn);
 
@@ -93,7 +93,7 @@ impl<'a> PersistentCustomer<'a> {
             .await?;
         
         if let None = exists {
-            let p = Customer::hash_password(password.as_bytes());
+            let p = Account::hash_password(password.as_bytes());
             let mut code = vec![0u8; 32];
             rand::thread_rng().fill(&mut code[..]); // WARN: not a crypto random generator
             let acc =  query_as!(TempCustomer,
@@ -109,7 +109,7 @@ impl<'a> PersistentCustomer<'a> {
         }
     }
 
-    pub async fn finalize(conn: &'a PgPool, code: &[u8]) -> sqlx::Result<Option<Customer>> {
+    pub async fn finalize(conn: &'a PgPool, code: &[u8]) -> sqlx::Result<Option<Account>> {
         let mut tx = conn.begin().await?;
 
         let temp = query!(r"SELECT code, email, salt, digest FROM temp_customer WHERE code = $1", code)
@@ -117,7 +117,7 @@ impl<'a> PersistentCustomer<'a> {
             .await?;
         
         let result = if let Some(temp) = temp {
-            let acc = query_as!(Customer,
+            let acc = query_as!(Account,
                     r"INSERT INTO customer(email, salt, digest) VALUES ($1, $2, $3) RETURNING id, email, salt, digest",
                     &temp.email, &temp.salt, &temp.digest
                 ).fetch_one(&mut tx)
@@ -137,8 +137,8 @@ impl<'a> PersistentCustomer<'a> {
     }
 
     pub async fn update_password(&'a mut self, password: &str) -> sqlx::Result<&'a mut PersistentCustomer<'a>> {
-        let p = Customer::hash_password(password.as_bytes());
-        let acc =  query_as!(Customer,
+        let p = Account::hash_password(password.as_bytes());
+        let acc =  query_as!(Account,
                 r"UPDATE customer SET salt = $1, digest = $2 WHERE id = $3 RETURNING id, email, salt, digest",
                 &p.salt, &p.digest, &self.inner.id
             ).fetch_one(self.conn)
@@ -147,8 +147,8 @@ impl<'a> PersistentCustomer<'a> {
         Ok(self)
     }
 
-    pub fn into_inner(self) -> Customer {self.inner}
-    pub fn inner(&self) -> &Customer {&self.inner}
+    pub fn into_inner(self) -> Account {self.inner}
+    pub fn inner(&self) -> &Account {&self.inner}
 }
 
 #[derive(Serialize, Deserialize, FromRow)]
@@ -168,9 +168,9 @@ mod tests {
     #[test]
     fn authentication_test() {
         let pass = "Please use a long password!".as_bytes();
-        let p = Customer::hash_password(&pass);
+        let p = Account::hash_password(&pass);
 
-        let cust = Customer{
+        let cust = Account{
             id: 123,
             email: "123@mail.com".to_owned(),
             salt: p.salt,
