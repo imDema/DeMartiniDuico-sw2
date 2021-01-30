@@ -673,6 +673,8 @@ components:
           type: string
         shop_id:
           type: string
+        shop_name:
+          type: string
         department_ids:
           type: array
           items:
