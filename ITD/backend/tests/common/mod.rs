@@ -21,6 +21,7 @@ macro_rules! setup_app {
             .wrap(actix_web::middleware::Logger::default())
             .configure(api::account::endpoints)
             .configure(api::ticket::endpoints)
+            .configure(api::shop::endpoints)
             .configure(api::dev::endpoints)
         ).await
     }}
