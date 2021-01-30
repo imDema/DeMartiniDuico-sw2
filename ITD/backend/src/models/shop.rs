@@ -1,6 +1,7 @@
-use serde::Serialize;
+use serde::{Serialize, Deserialize};
 
-use sqlx::postgres::types::PgTimeTz;
+use chrono::prelude::*;
+
 use sqlx::{FromRow, PgPool};
 use sqlx::query_as;
 
@@ -14,22 +15,32 @@ pub struct Shop {
     pub location: String,
 }
 
-#[allow(dead_code)]
-#[derive(FromRow)]
+#[derive(Serialize, Deserialize, FromRow, Debug)]
 pub struct Department {
-    id: i32,
+    uid: i32,
     shop_id: i32,
     description: String,
     capacity: i32
 }
 
 #[allow(dead_code)]
-#[derive(FromRow)]
+#[derive(FromRow, Deserialize, Serialize, Debug)]
 pub struct Schedule {
     shop_id: i32,
     dow: i16,
-    open: PgTimeTz,
-    close: PgTimeTz,
+    open: NaiveTime,
+    close: NaiveTime,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct ShopResponse {
+    pub uid: i32,
+    pub name: String,
+    pub description: String,
+    pub image: Option<String>,
+    pub location: String,
+    pub departments: Vec<Department>,
+    pub weekly_schedule: Vec<Schedule>,
 }
 
 pub struct PersistentShop<'a> {
@@ -39,14 +50,28 @@ pub struct PersistentShop<'a> {
 
 impl<'a> PersistentShop<'a> {
     pub async fn get(conn: &'a PgPool, id: i32) -> sqlx::Result<Option<PersistentShop<'a>>> {
-        let acc = query_as!(Shop,
+        let q = query_as!(Shop,
             r"SELECT id, name, description, image, location FROM shop
             WHERE id = $1",
             id
         ).fetch_optional(conn)
         .await?;
+        Ok(q.map(|q| Self {conn, inner: q}))
+    }
 
-        Ok(acc.map(|acc| Self{inner: acc, conn}))
+    pub async fn to_response(self) -> sqlx::Result<ShopResponse> {
+        let sched = self.schedule().await?;
+        let deps = self.departments().await?;
+
+        Ok(ShopResponse {
+            uid: self.inner.id,
+            name: self.inner.name,
+            description: self.inner.description,
+            image: self.inner.image,
+            location: self.inner.location,
+            departments: deps,
+            weekly_schedule: sched,
+        })
     }
 
     pub async fn schedule(&self) -> sqlx::Result<Vec<Schedule>> {
@@ -61,7 +86,7 @@ impl<'a> PersistentShop<'a> {
 
     pub async fn departments(&self) -> sqlx::Result<Vec<Department>> {
         Ok(query_as!(Department,
-            r"SELECT id, shop_id, description, capacity FROM department
+            r"SELECT id as uid, shop_id, description, capacity FROM department
             WHERE shop_id = $1",
             self.inner.id
         ).fetch_all(self.conn)

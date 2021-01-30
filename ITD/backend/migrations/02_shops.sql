@@ -20,8 +20,8 @@ DROP TABLE IF EXISTS schedule;
 CREATE TABLE schedule (
     shop_id INTEGER NOT NULL REFERENCES shop(id) ON DELETE CASCADE,
     dow SMALLINT NOT NULL,
-    open TIME WITH TIME ZONE NOT NULL,
-    close TIME WITH TIME ZONE NOT NULL,
+    open TIME NOT NULL,
+    close TIME NOT NULL,
     PRIMARY KEY (shop_id, dow, open),
     CHECK (dow > 0 AND dow <= 7)
 );

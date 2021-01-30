@@ -3,7 +3,7 @@ use crate::models::shop::PersistentShop;
 use crate::utils::encoding::decode_serial;
 use crate::utils::session;
 
-use actix_web::{web, post, HttpResponse};
+use actix_web::{web, get, HttpResponse};
 use actix_session::Session;
 use sqlx::PgPool;
 
@@ -11,7 +11,7 @@ pub fn endpoints(cfg: &mut web::ServiceConfig) {
     cfg.service(shop_info);
 }
 
-#[post("/shop/{shop_id}")]
+#[get("/shop/{shop_id}")]
 async fn shop_info(conn: web::Data<PgPool>, shop_id: web::Path<String>, session: Session) -> HttpResponse {
     let conn = conn.into_inner();
     let shop_id = if let Ok(s) = decode_serial(&shop_id.into_inner()) {
@@ -24,8 +24,9 @@ async fn shop_info(conn: web::Data<PgPool>, shop_id: web::Path<String>, session:
     }
 
     if let Ok(Some(s)) = PersistentShop::get(&conn, shop_id).await {
-        HttpResponse::Ok().json(s.into_inner())
-    } else {
-        HttpResponse::BadRequest().finish()
+        if let Ok(resp) = s.to_response().await {
+            return HttpResponse::Ok().json(resp);
+        }
     }
+    HttpResponse::BadRequest().finish()
 }

@@ -189,44 +189,6 @@
       ]
     }
   },
-  "2a768241ea4005d197883fce4d60ba2443d2da8a238e221e64d3d66da6988189": {
-    "query": "SELECT id, shop_id, description, capacity FROM department\n            WHERE shop_id = $1",
-    "describe": {
-      "columns": [
-        {
-          "ordinal": 0,
-          "name": "id",
-          "type_info": "Int4"
-        },
-        {
-          "ordinal": 1,
-          "name": "shop_id",
-          "type_info": "Int4"
-        },
-        {
-          "ordinal": 2,
-          "name": "description",
-          "type_info": "Varchar"
-        },
-        {
-          "ordinal": 3,
-          "name": "capacity",
-          "type_info": "Int4"
-        }
-      ],
-      "parameters": {
-        "Left": [
-          "Int4"
-        ]
-      },
-      "nullable": [
-        false,
-        false,
-        false,
-        false
-      ]
-    }
-  },
   "2de403104534f99a2abe89fbb5f5ed7edf5a8d891007d099dac3f0c9ed30dc95": {
     "query": "SELECT shop_id, dow, open, close FROM schedule\n            WHERE shop_id = $1\n            ORDER BY dow, open",
     "describe": {
@@ -244,12 +206,12 @@
         {
           "ordinal": 2,
           "name": "open",
-          "type_info": "Timetz"
+          "type_info": "Time"
         },
         {
           "ordinal": 3,
           "name": "close",
-          "type_info": "Timetz"
+          "type_info": "Time"
         }
       ],
       "parameters": {
@@ -540,6 +502,44 @@
       ],
       "parameters": {
         "Left": []
+      },
+      "nullable": [
+        false,
+        false,
+        false,
+        false
+      ]
+    }
+  },
+  "ad8f0803506417958db559952955db55f81d2b804c3d68fce9929bc7ac52c81f": {
+    "query": "SELECT id as uid, shop_id, description, capacity FROM department\n            WHERE shop_id = $1",
+    "describe": {
+      "columns": [
+        {
+          "ordinal": 0,
+          "name": "uid",
+          "type_info": "Int4"
+        },
+        {
+          "ordinal": 1,
+          "name": "shop_id",
+          "type_info": "Int4"
+        },
+        {
+          "ordinal": 2,
+          "name": "description",
+          "type_info": "Varchar"
+        },
+        {
+          "ordinal": 3,
+          "name": "capacity",
+          "type_info": "Int4"
+        }
+      ],
+      "parameters": {
+        "Left": [
+          "Int4"
+        ]
       },
       "nullable": [
         false,
