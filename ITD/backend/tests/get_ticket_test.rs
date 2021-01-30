@@ -11,7 +11,7 @@ use actix_web::http::StatusCode;
 use actix_web::test;
 
 #[actix_rt::test]
-async fn register_test() -> sqlx::Result<()> {
+async fn get_ticket_test() -> sqlx::Result<()> {
     let mut app = setup_app!();
 
     let (email, _, session) = quick_create_customer!(&mut app);
@@ -20,7 +20,7 @@ async fn register_test() -> sqlx::Result<()> {
     let r_body = read_utf8_body(r).await;
     assert!(r_body.contains(&email));
 
-    let (s0, d00, d01, s1, d10) = async { // TODO: use endpoints to create shop
+    let (s0, d00, d01, s1, d10) = async {
         let conn = setup_db(&std::env::var("DATABASE_URL").unwrap()).await;
         let sid = test_shop(&conn).await.unwrap();
         let s0 = encode_serial(sid);
@@ -85,7 +85,21 @@ macro_rules! check_tokens {
 
         assert_eq!(toks.bookings.len(), 0);
         $(
-        assert!(toks.tickets.contains($ticket));
+        let t = toks.tickets.iter().find(|&x| x.uid == $ticket.uid).expect("Ticket not found in tokens");
+
+        let mut d0 = t.department_ids.clone();
+        let mut d1 = $ticket.department_ids.clone();
+
+        d0.sort();
+        d1.sort();
+
+        assert_eq!(d0, d1);
+
+        assert_eq!(t.shop_id, $ticket.shop_id);
+        assert_eq!(t.shop_name, $ticket.shop_name);
+        assert_eq!(t.creation, $ticket.creation);
+        assert_eq!(t.valid, $ticket.valid);
+        assert_eq!(t.active, $ticket.active);
         )+
     };
 }

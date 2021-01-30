@@ -12,6 +12,7 @@ pub struct Ticket {
     pub id: i32,
     pub customer_id: i32,
     pub shop_id: i32,
+    pub shop_name: String,
     pub creation: NaiveDateTime,
     pub expiration: NaiveDateTime,
     pub est_minutes: i32,
@@ -24,6 +25,7 @@ pub struct Ticket {
 pub struct TicketResponse {
     pub uid: String,
     pub shop_id: String,
+    pub shop_name: String,
     pub department_ids: Vec<String>,
     pub creation: NaiveDateTime,
     pub expiration: NaiveDateTime,
@@ -40,6 +42,7 @@ impl From<Ticket> for TicketResponse {
         Self {
             uid: encode_serial(t.id),
             shop_id: encode_serial(t.shop_id),
+            shop_name: t.shop_name,
             department_ids: dids,
             creation: t.creation,
             expiration: t.expiration,
@@ -57,11 +60,13 @@ pub struct PersistentTicket<'a> {
 
 impl<'a> PersistentTicket<'a> {
     pub async fn get(conn: &'a PgPool, id: i32) -> sqlx::Result<Option<PersistentTicket<'a>>> {
-        let ticket = query_as!(TicketRow, r"SELECT ticket.id AS id, customer_id, ticket.shop_id AS shop_id, array_agg(department.id) AS department_ids, creation, expiration, entry, exit, est_minutes, valid, active FROM ticket, ticket_department, department
+        let ticket = query_as!(TicketRow, r"SELECT ticket.id AS id, customer_id, ticket.shop_id AS shop_id, shop.name as shop_name, array_agg(department.id) AS department_ids, creation, expiration, entry, exit, est_minutes, valid, active
+            FROM ticket, ticket_department, department, shop
             WHERE ticket_department.ticket_id = ticket.id AND
+                ticket.shop_id = shop.id AND
                 ticket_department.department_id = department.id AND
                 ticket.id = $1
-            GROUP BY ticket.id, customer_id, ticket.shop_id, creation, expiration, valid, active",
+            GROUP BY ticket.id, customer_id, ticket.shop_id, shop.name, creation, expiration, valid, active",
             id)
             .fetch_optional(conn)
             .await?
@@ -71,11 +76,13 @@ impl<'a> PersistentTicket<'a> {
     }
 
     pub async fn get_for_customer(conn: &'a PgPool, customer_id: i32) -> sqlx::Result<Vec<Ticket>> {
-        query_as!(TicketRow, r"SELECT ticket.id AS id, customer_id, ticket.shop_id AS shop_id, array_agg(department.id) AS department_ids, creation, expiration, entry, exit, est_minutes, valid, active FROM ticket, ticket_department, department
+        query_as!(TicketRow, r"SELECT ticket.id AS id, customer_id, ticket.shop_id AS shop_id, shop.name as shop_name, array_agg(department.id) AS department_ids, creation, expiration, entry, exit, est_minutes, valid, active
+            FROM ticket, ticket_department, department, shop
             WHERE ticket_department.ticket_id = ticket.id AND
+                ticket.shop_id = shop.id AND
                 ticket_department.department_id = department.id AND
                 ticket.customer_id = $1
-            GROUP BY ticket.id, customer_id, ticket.shop_id, creation, expiration, valid, active
+            GROUP BY ticket.id, customer_id, ticket.shop_id, shop.name, creation, expiration, valid, active
             ORDER BY creation",
             customer_id)
             .fetch(conn)
@@ -102,12 +109,14 @@ impl<'a> PersistentTicket<'a> {
                 .execute(&mut tx).await?;
         }
 
-        let ticket_row = query_as!(TicketRow, r"SELECT ticket.id AS id, customer_id, ticket.shop_id AS shop_id, array_agg(department.id) AS department_ids, creation, expiration, entry, exit, est_minutes, valid, active FROM ticket, ticket_department, department
+        let ticket_row = query_as!(TicketRow, r"SELECT ticket.id AS id, customer_id, ticket.shop_id AS shop_id, shop.name as shop_name, array_agg(department.id) AS department_ids, creation, expiration, entry, exit, est_minutes, valid, active
+            FROM ticket, ticket_department, department, shop
             WHERE
-            ticket_department.ticket_id = ticket.id AND
+                ticket_department.ticket_id = ticket.id AND
+                ticket.shop_id = shop.id AND
                 ticket_department.department_id = department.id AND
                 ticket.id = $1
-            GROUP BY ticket.id, customer_id, ticket.shop_id, creation, expiration, valid, active",
+            GROUP BY ticket.id, customer_id, ticket.shop_id, shop.name, creation, expiration, valid, active",
             row.id)
             .fetch_one(&mut tx)
             .await?;
@@ -117,13 +126,15 @@ impl<'a> PersistentTicket<'a> {
     }
 
     pub async fn queue(conn: &PgPool, shop_id: i32, valid: bool, active: bool) -> sqlx::Result<Vec<Ticket>> {
-        query_as!(TicketRow, r"SELECT ticket.id AS id, customer_id, ticket.shop_id AS shop_id, array_agg(department.id) AS department_ids, creation, expiration, entry, exit, est_minutes, valid, active FROM ticket, ticket_department, department
+        query_as!(TicketRow, r"SELECT ticket.id AS id, customer_id, ticket.shop_id AS shop_id, shop.name as shop_name, array_agg(department.id) AS department_ids, creation, expiration, entry, exit, est_minutes, valid, active
+                FROM ticket, ticket_department, department, shop
                 WHERE
                     ticket.shop_id = $1 AND
+                    ticket.shop_id = shop.id AND
                     ticket_department.ticket_id = ticket.id AND
                     ticket_department.department_id = department.id AND
                     valid = $2 AND active = $3
-                GROUP BY ticket.id, customer_id, ticket.shop_id, creation, expiration, valid, active
+                GROUP BY ticket.id, customer_id, ticket.shop_id, shop.name, creation, expiration, valid, active
                 ORDER BY creation",
                 shop_id, valid, active)
             .fetch(conn)
@@ -142,6 +153,7 @@ pub(super) struct TicketRow {
     pub id: i32,
     pub customer_id: i32,
     pub shop_id: i32,
+    pub shop_name: String,
     pub creation: NaiveDateTime,
     pub expiration: NaiveDateTime,
     pub entry: Option<NaiveDateTime>,
@@ -158,6 +170,7 @@ impl From<TicketRow> for Ticket {
             id: row.id,
             customer_id: row.customer_id,
             shop_id: row.shop_id,
+            shop_name: row.shop_name,
             creation: row.creation.into(),
             expiration: row.expiration,
             est_minutes: row.est_minutes,

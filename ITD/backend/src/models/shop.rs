@@ -1,10 +1,11 @@
+use serde::Serialize;
 
 use sqlx::postgres::types::PgTimeTz;
 use sqlx::{FromRow, PgPool};
 use sqlx::query_as;
 
 #[allow(dead_code)]
-#[derive(FromRow)]
+#[derive(FromRow, Serialize)]
 pub struct Shop {
     pub id: i32,
     pub name: String,

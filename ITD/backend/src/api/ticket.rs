@@ -13,8 +13,10 @@ use sqlx::PgPool;
 use serde::{Serialize, Deserialize};
 
 pub fn endpoints(cfg: &mut web::ServiceConfig) {
-    cfg.service(ticket_new);
     cfg.service(tokens);
+    cfg.service(ticket_new);
+    cfg.service(ticket_est);
+    cfg.service(ticket_queue);
 }
 
 #[derive(Serialize, Deserialize)]
@@ -32,6 +34,10 @@ async fn ticket_new(conn: web::Data<PgPool>, shop_id: web::Path<String>, body: w
     } else {
         return HttpResponse::Forbidden().finish();
     };
+
+    if req.department_ids.len() == 0 {
+        return HttpResponse::BadRequest().body("Must specify departments");
+    }
 
     match ticket_new_inner(&conn, uid, &shop_id, req).await {
         Ok(resp) => resp,

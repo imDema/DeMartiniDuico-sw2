@@ -1,3 +1,4 @@
+use actix_service::ServiceFactory;
 use actix_web::middleware::Logger;
 use actix_web::{App, HttpServer, web};
 use actix_redis::RedisSession;
@@ -36,6 +37,7 @@ async fn main() -> std::io::Result<()> {
         .data(db_pool.clone())
         .configure(api::account::endpoints)
         .configure(api::ticket::endpoints)
+        // .configure(api::staff::endpoints)
         .service(web::scope("/dev").configure(api::dev::endpoints))
     })
     .bind(api_url)?
