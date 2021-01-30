@@ -13,10 +13,15 @@ const routes = [
     children: [{
       path: '',
       component: Search
-    }, {
+    },
+    {
       path: 'tokens',
       component: Tokens
-    }]
+    }, 
+    {
+      path: 'tokens/:uid',
+      component: Tokens
+    },]
   },
   {
     path: '/staff',

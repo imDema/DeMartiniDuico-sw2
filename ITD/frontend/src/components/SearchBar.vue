@@ -52,9 +52,9 @@ export default {
         // .catch(console.log);
 
         return [
-          {id: 1, value: "Unes Milano", maps_url: "https://www.openstreetmap.org/#map=6/42.088/12.564"}, 
-          {id: 2, value: "Unes Monza", maps_url: "https://www.openstreetmap.org/#map=6/42.088/12.564"}, 
-          {id: 3, value: "Unes Sesto San Giovanni", maps_url: "https://www.openstreetmap.org/#map=6/42.088/12.564"}
+          {id: "dc73e9ce", value: "Unes Milano", maps_url: "https://www.openstreetmap.org/#map=6/42.088/12.564",}, 
+          {id: "f02465ad", value: "Unes Monza", maps_url: "https://www.openstreetmap.org/#map=6/42.088/12.564"}, 
+          {id: "a6692a21", value: "Unes Sesto San Giovanni", maps_url: "https://www.openstreetmap.org/#map=6/42.088/12.564", }
         ];
     },
     getResultValue(result){

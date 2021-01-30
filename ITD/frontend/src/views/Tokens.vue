@@ -4,7 +4,7 @@
     <h3>No tokens available.</h3>
   </div>
   <b-list-group v-if="!isTicketSelected">
-  <b-list-group-item  v-for="t in tickets" :key="t.id" href="#" :active="t==selectedTicket" class="flex-column align-items-start" 
+  <b-list-group-item  v-for="t in tickets" :key="t.uid" href="#" :active="t==selectedTicket" class="flex-column align-items-start" 
     @click="onTicketClick(t)"
   >
     <div class="d-flex w-100 justify-content-between">
@@ -48,6 +48,12 @@ export default {
       return Object.keys(this.selectedTicket).length !== 0
     }
   },
+  watch:{
+    $route(to, from){
+      //update selectedTicket
+      to, from
+    }
+  },
   methods: {
       timeDifference(time){
         var now = Date.now();
@@ -78,14 +84,20 @@ export default {
         }
       },
       deselectTicket(){
+        this.$router.push("/tokens")
         this.selectedTicket = {}
       },
       selectTicket(ticket){
+          if(!ticket){
+            alert("Invalid ticket id")
+            return
+          }
+          this.$router.push("/tokens/"+ticket.uid)
           this.selectedTicket = ticket
       },
       loadTokens(){
         this.busy = true;
-        this.$api.get("/tokens", { })
+        return this.$api.get("/tokens", { })
         .then(res => {
           if(res.status == '200'){
             this.tickets = res.data.tickets;
@@ -97,9 +109,14 @@ export default {
         })
       }
   },
-  async mounted(){
-    this.loadTokens()
-  }
+  created(){
+    this.loadTokens().then( () => {
+      if(this.$route.params.uid){
+        let selectedTickedUID = this.$route.params.uid
+        this.selectTicket(this.tickets.find( t => t.uid === selectedTickedUID))
+      }
+    });
+  },
 }
 
 function prettyDateDiff(millisecs) {

@@ -26,12 +26,12 @@ export default {
             return "openstreetmap.org"
         },
         creation(){
-            let d = new Date(this.ticket.creation);
+            let d = new Date(this.ticket.creation+"Z");
             return d.toLocaleDateString() + " at " + d.toLocaleTimeString();
 
         },
         expiration(){
-            let d = new Date(this.ticket.expiration);
+            let d = new Date(this.ticket.expiration+"Z");
             return d.toLocaleDateString() + " at " + d.toLocaleTimeString();
         }
     },
