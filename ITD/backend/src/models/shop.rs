@@ -2,6 +2,8 @@ use serde::{Serialize, Deserialize};
 
 use chrono::prelude::*;
 
+use futures::StreamExt;
+
 use sqlx::{FromRow, PgPool};
 use sqlx::query_as;
 
@@ -88,7 +90,7 @@ impl<'a> PersistentShop<'a> {
             location: self.inner.location,
             departments: deps
                 .into_iter()
-                .map(|dep| DepartmentResponse::from(dep))
+                .map(DepartmentResponse::from)
                 .collect(),
             weekly_schedule: sched,
         })
@@ -111,6 +113,31 @@ impl<'a> PersistentShop<'a> {
             self.inner.id
         ).fetch_all(self.conn)
         .await?)
+    }
+
+    pub async fn search(conn: &'a PgPool, query: Option<String>) -> sqlx::Result<Vec<ShopResponse>> {
+        let stream = if let Some(q) = query {
+            query_as!(Shop,
+                r"SELECT id, name, description, image, location FROM shop
+                WHERE name ILIKE '%' || $1 || '%'
+                ORDER BY name",
+                q
+            ).fetch(conn)
+        } else {
+            query_as!(Shop,
+                r"SELECT id, name, description, image, location FROM shop
+                ORDER BY name"
+            ).fetch(conn)
+        };
+        let res = stream
+            .fold(Ok(Vec::new()), |acc, s| async {
+                let mut acc = acc?;
+                let ps = Self {conn, inner: s?};
+                acc.push(ps.to_response().await?);
+                Ok(acc)
+            }).await;
+
+        res
     }
 
     pub fn into_inner(self) -> Shop {self.inner}

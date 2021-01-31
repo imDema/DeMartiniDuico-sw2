@@ -6,9 +6,11 @@ use crate::utils::session;
 use actix_web::{web, get, HttpResponse};
 use actix_session::Session;
 use sqlx::PgPool;
+use serde::Deserialize;
 
 pub fn endpoints(cfg: &mut web::ServiceConfig) {
     cfg.service(shop_info);
+    cfg.service(search);
 }
 
 #[get("/shop/{shop_id}")]
@@ -29,4 +31,26 @@ async fn shop_info(conn: web::Data<PgPool>, shop_id: web::Path<String>, session:
         }
     }
     HttpResponse::BadRequest().finish()
+}
+
+#[derive(Deserialize)]
+struct SearchQuery {
+    q: Option<String>,
+}
+#[get("/search")]
+async fn search(conn: web::Data<PgPool>, query: web::Query<SearchQuery>, session: Session) -> HttpResponse {
+    let conn = conn.into_inner();
+    let q = query.into_inner().q;
+    if let None = session::get_account(&session) {
+        return HttpResponse::Forbidden().finish();
+    }
+
+    match PersistentShop::search(&conn, q).await {
+        Ok(shops) => 
+            HttpResponse::Ok().json(shops),
+        Err(e) => {
+            log::error!("Error in search: {}", e);
+            HttpResponse::InternalServerError().finish()
+        },
+    }
 }
