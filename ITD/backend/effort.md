@@ -15,3 +15,7 @@
 | 2021-01-25 | 3h   | Ticket                  |
 | 2021-01-26 | 1h   | Ticket & Testing        |
 | 2021-01-27 | 2h   | Testing                 |
+| 2021-01-28 | 3h   | Ticket Queue            |
+| 2021-01-29 | 2h   | Testing                 |
+| 2021-01-30 | 3h   | Shop                    |
+| 2021-01-31 | 3h   | Staff Login             |
