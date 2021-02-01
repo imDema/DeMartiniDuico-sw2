@@ -63,19 +63,35 @@ async fn setup_env(conn: web::Data<PgPool>) -> HttpResponse {
     let shops = query!(r"INSERT INTO shop (id, name, description, image, location) VALUES
         (1234111, 'Unes Milano', 'Unes via unes numero unes','test1.jpg','49.1234N,12.3456E'),
         (1234222, 'Lidl Torino', 'Lidl via lidl numero lidl','test2.jpg','123.1234N,45.3456E'),
-        (1234333, 'Fruttivendolo da Attilio', 'Frutta e verdura','test3.jpg','2.1234S,23.3456W');")
+        (1234333, 'Fruttivendolo da Attilio', 'Frutta e verdura','test3.jpg','2.1234S,23.3456W'),
+        (1234444, 'Casa dolce casa', 'Tutto per la casa','test4.jpg','46.1234S,23.3456W'),
+        (1234555, 'Green market sas', 'Frutta e verdura per tutti i gusti','test5.jpg','23.1234S,23.3456W'),
+        (1234666, 'ParmaTop Salumeria', 'La miglior mortadella di Parma','test6.jpg','5.1234S,123.3456E');")
         .execute(conn.as_ref())
         .await;
         
-    let departments = query!(r"INSERT INTO department (id, shop_id, description, capacity) VALUES
-        (4444111, 1234111, 'Frutta', 20),
-        (4444222, 1234111, 'Pane', 15),
+    let departments = query!(r"INSERT INTO department (shop_id, description, capacity) VALUES
+        (1234111, 'Frutta', 20),
+        (1234111, 'Pane', 15),
     
-        (4444333, 1234222, 'Surgelati', 12),
-        (4444444, 1234222, 'Carne', 20),
-        (4444555, 1234222, 'Pane', 8),
-    
-        (4444666, 1234333, 'all', 4);")
+        (1234222, 'Surgelati', 12),
+        (1234222, 'Carne', 20),
+        (1234222, 'Pane', 2),
+        
+        (1234333, 'all', 4),
+        
+        (1234444, 'Prodotti per il bagno', 12),
+        (1234444, 'Prodotti per la cucina', 20),
+        (1234444, 'Giardinaggio', 2),
+            
+        (1234555, 'Frutta', 12),
+        (1234555, 'Verdura', 20),
+        (1234555, 'Pane', 8),
+        (1234555, 'Latticini', 8),
+
+        (1234666, 'Insaccati', 12),
+        (1234666, 'Carne', 20),
+        (1234666, 'Formaggi', 14);")    
         .execute(conn.as_ref())
         .await;
 

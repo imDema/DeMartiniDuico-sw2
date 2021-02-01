@@ -189,16 +189,6 @@
       ]
     }
   },
-  "2b9da17755798ac60ea1da170d7d159f006ae96b3646fc347e404df17ce03a6d": {
-    "query": "INSERT INTO shop (id, name, description, image, location) VALUES\n        (1234111, 'Unes Milano', 'Unes via unes numero unes','test1.jpg','49.1234N,12.3456E'),\n        (1234222, 'Lidl Torino', 'Lidl via lidl numero lidl','test2.jpg','123.1234N,45.3456E'),\n        (1234333, 'Fruttivendolo da Attilio', 'Frutta e verdura','test3.jpg','2.1234S,23.3456W');",
-    "describe": {
-      "columns": [],
-      "parameters": {
-        "Left": []
-      },
-      "nullable": []
-    }
-  },
   "2de403104534f99a2abe89fbb5f5ed7edf5a8d891007d099dac3f0c9ed30dc95": {
     "query": "SELECT shop_id, dow, open, close FROM schedule\n            WHERE shop_id = $1\n            ORDER BY dow, open",
     "describe": {
@@ -275,16 +265,6 @@
       ]
     }
   },
-  "444122aa16bd08058a3fa56be425e4113210a5bbf309be251ea81ab9e0f93e98": {
-    "query": "INSERT INTO department (id, shop_id, description, capacity) VALUES\n        (4444111, 1234111, 'Frutta', 20),\n        (4444222, 1234111, 'Pane', 15),\n    \n        (4444333, 1234222, 'Surgelati', 12),\n        (4444444, 1234222, 'Carne', 20),\n        (4444555, 1234222, 'Pane', 8),\n    \n        (4444666, 1234333, 'all', 4);",
-    "describe": {
-      "columns": [],
-      "parameters": {
-        "Left": []
-      },
-      "nullable": []
-    }
-  },
   "4ea44ed57b388fe64856e71d86261700fa1269c6ec47980a0510209d8cba2bb4": {
     "query": "INSERT INTO ticket (customer_id, shop_id, creation, expiration, est_minutes, valid, active) VALUES\n            ($1, $2, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, $3, TRUE, TRUE)\n            RETURNING id",
     "describe": {
@@ -329,6 +309,16 @@
         false,
         false
       ]
+    }
+  },
+  "81fe618d2bf0878dfc1bc7e3b90175ff522c5039ad3badb6667227b160a9529f": {
+    "query": "INSERT INTO department (shop_id, description, capacity) VALUES\n        (1234111, 'Frutta', 20),\n        (1234111, 'Pane', 15),\n    \n        (1234222, 'Surgelati', 12),\n        (1234222, 'Carne', 20),\n        (1234222, 'Pane', 2),\n        \n        (1234333, 'all', 4),\n        \n        (1234444, 'Prodotti per il bagno', 12),\n        (1234444, 'Prodotti per la cucina', 20),\n        (1234444, 'Giardinaggio', 2),\n            \n        (1234555, 'Frutta', 12),\n        (1234555, 'Verdura', 20),\n        (1234555, 'Pane', 8),\n        (1234555, 'Latticini', 8),\n\n        (1234666, 'Insaccati', 12),\n        (1234666, 'Carne', 20),\n        (1234666, 'Formaggi', 14);",
+    "describe": {
+      "columns": [],
+      "parameters": {
+        "Left": []
+      },
+      "nullable": []
     }
   },
   "85033be72c9ba421351009670c386b66a9a9c9105f476f2af057be31f839cd9b": {
@@ -1001,6 +991,16 @@
       "nullable": [
         false
       ]
+    }
+  },
+  "e80d3a1b19def66963eaceacc8594c1e9c0b126bff206b689efc52508594d463": {
+    "query": "INSERT INTO shop (id, name, description, image, location) VALUES\n        (1234111, 'Unes Milano', 'Unes via unes numero unes','test1.jpg','49.1234N,12.3456E'),\n        (1234222, 'Lidl Torino', 'Lidl via lidl numero lidl','test2.jpg','123.1234N,45.3456E'),\n        (1234333, 'Fruttivendolo da Attilio', 'Frutta e verdura','test3.jpg','2.1234S,23.3456W'),\n        (1234444, 'Casa dolce casa', 'Tutto per la casa','test4.jpg','46.1234S,23.3456W'),\n        (1234555, 'Green market sas', 'Frutta e verdura per tutti i gusti','test5.jpg','23.1234S,23.3456W'),\n        (1234666, 'ParmaTop Salumeria', 'La miglior mortadella di Parma','test6.jpg','5.1234S,123.3456E');",
+    "describe": {
+      "columns": [],
+      "parameters": {
+        "Left": []
+      },
+      "nullable": []
     }
   },
   "ed2c0b97690a8ad498acc51290de285de46618c729b6c51a49eb8dd674cf4d6a": {

@@ -97,7 +97,7 @@ impl<'a> PersistentTicket<'a> {
         let mut tx = conn.begin().await?;
 
         let row = query!(r"INSERT INTO ticket (customer_id, shop_id, creation, expiration, est_minutes, valid, active) VALUES
-            ($1, $2, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, $3, TRUE, TRUE)
+            ($1, $2, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP + interval '6 hour', $3, TRUE, TRUE)
             RETURNING id",
             customer_id, shop_id, est_minutes)
             .fetch_one(&mut tx).await?;
