@@ -52,6 +52,14 @@ impl From<Ticket> for TicketResponse {
     }
 }
 
+pub enum EnterResult {
+    Entered,
+    Full(i32),
+    NotFirst(i64),
+    Expired,
+    Invalid,
+}
+
 #[allow(dead_code)]
 pub struct PersistentTicket<'a> {
     conn: &'a PgPool,
@@ -143,6 +151,76 @@ impl<'a> PersistentTicket<'a> {
                 acc.push(x?.into());
                 Ok(acc)
             }).await
+    }
+
+    pub async fn enter(&self) -> sqlx::Result<EnterResult> {
+        let mut tx = self.conn.begin().await?;
+
+        let position = query!(r"SELECT count(*) as count FROM ticket
+            WHERE
+                valid = TRUE AND active = TRUE AND
+                entry IS NULL AND exit IS NULL AND
+                id <> $1 AND creation < $2", self.inner.id, self.inner.creation)
+            .fetch_one(&mut tx)
+            .await?
+            .count.unwrap();
+
+        if position > 0 {
+            return Ok(EnterResult::NotFirst(position));
+        }
+
+        let rows = query!(r"SELECT department.id as id, (count(ticket.id) >= department.capacity) as full FROM ticket, ticket_department, department
+                        WHERE
+                            ticket_department.ticket_id = ticket.id AND
+                            ticket_department.department_id = department.id AND
+                            ticket.shop_id = $1 AND
+                            department.shop_id = $1 AND
+                            ticket.entry IS NOT NULL AND
+                            ticket.exit IS NULL
+                        GROUP BY
+                            department.id, department.capacity", self.inner.shop_id)
+            .fetch_all(&mut tx)
+            .await?;
+
+        let full = rows.iter().find(|&row| row.full.unwrap_or(true));
+        if let Some(dep) = full {
+            return Ok(EnterResult::Full(dep.id));
+        }
+
+        query!(r"UPDATE ticket
+            SET
+                entry = CURRENT_TIMESTAMP,
+                active = FALSE
+            WHERE id = $1", self.inner.id)
+            .execute(&mut tx)
+            .await?;
+
+        tx.commit().await?;
+        Ok(EnterResult::Entered)
+    }
+
+    pub async fn exit(&self) -> sqlx::Result<bool> {
+        let mut tx = self.conn.begin().await?;
+
+        let state = query!(r"SELECT entry IS NOT NULL as entered, exit IS NOT NULL as exited FROM ticket
+            WHERE id = $1", self.inner.id)
+            .fetch_one(&mut tx)
+            .await?;
+
+        if state.entered.unwrap() && !state.exited.unwrap() {
+            query!(r"UPDATE ticket
+                SET
+                    exit = CURRENT_TIMESTAMP,
+                    valid = FALSE
+                WHERE id = $1", self.inner.id)
+                .execute(&mut tx)
+                .await?;
+
+            tx.commit().await?;
+            Ok(true)
+        } else {
+            Ok(false)
+        }
     }
 
     pub fn into_inner(self) -> Ticket {self.inner}

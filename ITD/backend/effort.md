@@ -19,3 +19,4 @@
 | 2021-01-29 | 2h   | Testing                 |
 | 2021-01-30 | 3h   | Shop                    |
 | 2021-01-31 | 3h   | Staff Login             |
+| 2021-02-01 | 3h   | Ticket checking         |

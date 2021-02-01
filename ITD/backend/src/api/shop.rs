@@ -41,7 +41,7 @@ struct SearchQuery {
 async fn search(conn: web::Data<PgPool>, query: web::Query<SearchQuery>, session: Session) -> HttpResponse {
     let conn = conn.into_inner();
     let q = query.into_inner().q;
-    if let None = session::get_account(&session) {
+    if let (None, None) = (session::get_account(&session), session::get_staff_account(&session)) {
         return HttpResponse::Forbidden().finish();
     }
 
