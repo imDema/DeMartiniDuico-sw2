@@ -1,6 +1,6 @@
 use std::error::Error;
 
-use crate::models::account::PersistentCustomer;
+use crate::models::customer::PersistentCustomer;
 use crate::models::shop::PersistentShop;
 use crate::models::ticket::{PersistentTicket, TicketResponse};
 use crate::utils::encoding::{decode_serial, decode_serial_vec};

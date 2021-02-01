@@ -1,4 +1,4 @@
-use crate::models::account::PersistentCustomer;
+use crate::models::customer::PersistentCustomer;
 use crate::utils::session;
 
 use actix_web::{web, get, post, Responder, HttpResponse};

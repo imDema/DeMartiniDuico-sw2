@@ -1,7 +1,7 @@
 use sqlx::PgPool;
 use rand::{RngCore, thread_rng};
 
-use crate::models::account::PersistentCustomer;
+use crate::models::customer::PersistentCustomer;
 
 pub async fn db() -> PgPool {
     dotenv::dotenv().ok();

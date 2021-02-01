@@ -2,8 +2,12 @@ use serde::{Serialize, Deserialize};
 
 use chrono::prelude::*;
 
+use futures::StreamExt;
+
 use sqlx::{FromRow, PgPool};
 use sqlx::query_as;
+
+use crate::utils::encoding::encode_serial;
 
 #[allow(dead_code)]
 #[derive(FromRow, Serialize)]
@@ -22,6 +26,22 @@ pub struct Department {
     description: String,
     capacity: i32
 }
+#[derive(Debug, Serialize, Deserialize, PartialEq)]
+pub struct DepartmentResponse {
+    uid: String,
+    description: String,
+    capacity: i32,
+}
+
+impl From<Department> for DepartmentResponse {
+    fn from(d: Department) -> Self {
+        Self {
+            uid: encode_serial(d.uid),
+            description: d.description,
+            capacity: d.capacity,
+        }
+    }
+}
 
 #[allow(dead_code)]
 #[derive(FromRow, Deserialize, Serialize, Debug)]
@@ -39,10 +59,9 @@ pub struct ShopResponse {
     pub description: String,
     pub image: Option<String>,
     pub location: String,
-    pub departments: Vec<Department>,
+    pub departments: Vec<DepartmentResponse>,
     pub weekly_schedule: Vec<Schedule>,
 }
-
 pub struct PersistentShop<'a> {
     conn: &'a PgPool,
     inner: Shop,
@@ -69,7 +88,10 @@ impl<'a> PersistentShop<'a> {
             description: self.inner.description,
             image: self.inner.image,
             location: self.inner.location,
-            departments: deps,
+            departments: deps
+                .into_iter()
+                .map(DepartmentResponse::from)
+                .collect(),
             weekly_schedule: sched,
         })
     }
@@ -91,6 +113,31 @@ impl<'a> PersistentShop<'a> {
             self.inner.id
         ).fetch_all(self.conn)
         .await?)
+    }
+
+    pub async fn search(conn: &'a PgPool, query: Option<String>) -> sqlx::Result<Vec<ShopResponse>> {
+        let stream = if let Some(q) = query {
+            query_as!(Shop,
+                r"SELECT id, name, description, image, location FROM shop
+                WHERE name ILIKE '%' || $1 || '%'
+                ORDER BY name",
+                q
+            ).fetch(conn)
+        } else {
+            query_as!(Shop,
+                r"SELECT id, name, description, image, location FROM shop
+                ORDER BY name"
+            ).fetch(conn)
+        };
+        let res = stream
+            .fold(Ok(Vec::new()), |acc, s| async {
+                let mut acc = acc?;
+                let ps = Self {conn, inner: s?};
+                acc.push(ps.to_response().await?);
+                Ok(acc)
+            }).await;
+
+        res
     }
 
     pub fn into_inner(self) -> Shop {self.inner}
