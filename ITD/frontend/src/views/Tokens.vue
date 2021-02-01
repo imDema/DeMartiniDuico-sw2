@@ -8,11 +8,11 @@
     @click="onTicketClick(t)"
   >
     <div class="d-flex w-100 justify-content-between">
-      <h5 class="mb-1">Shop name</h5>
+      <h5 class="mb-1">{{t.shop_name}}</h5>
       <small>{{timeDifference(t.creation)}}</small>
     </div>
     <p class="mb-1">
-      Department names
+      {{getDepartmentNames(t).map( d => d.description)}}
     </p>
 
     <small>Details</small>
@@ -41,6 +41,7 @@ export default {
           busy: false,
           selectedTicket: {},
           tickets: [],
+          departmentNames: {},
       }
   },
   computed:{
@@ -52,6 +53,18 @@ export default {
     $route(to, from){
       //update selectedTicket
       to, from
+    },
+    tickets(newTickets){
+      newTickets.forEach( (t) => {
+        this.$api.get("/shop/"+t.shop_id)
+        .then((res)=>{
+          console.log(res.data)
+          this.departmentNames[t] = res.data.departments.filter( d => { return t.department_ids.indexOf(d.uid)!==-1} )
+        })
+        .catch( (err) => {
+          console.log(err)
+        });
+      });
     }
   },
   methods: {
@@ -107,7 +120,13 @@ export default {
         }).finally( () => {
           setTimeout( () => {this.busy = false}, 250)
         })
-      }
+      },
+      getDepartmentNames(t){
+        if(t in this.departmentNames)
+          return this.departmentNames[t]
+        else
+          return []
+      },
   },
   created(){
     this.loadTokens().then( () => {

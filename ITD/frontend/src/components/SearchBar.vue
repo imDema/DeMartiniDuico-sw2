@@ -44,25 +44,20 @@ export default {
     //   })
     // },
     search(input) {
-        input;
-        // this.$api.get("/search", {q: input})
-        // .then( (res) => {
-        //   return res.data....search-results;
-        // })
-        // .catch(console.log);
-
-        return [
-          {id: "dc73e9ce", value: "Unes Milano", maps_url: "https://www.openstreetmap.org/#map=6/42.088/12.564",}, 
-          {id: "f02465ad", value: "Unes Monza", maps_url: "https://www.openstreetmap.org/#map=6/42.088/12.564"}, 
-          {id: "a6692a21", value: "Unes Sesto San Giovanni", maps_url: "https://www.openstreetmap.org/#map=6/42.088/12.564", }
-        ];
+      if(input === "") return []
+      else{
+        return this.$api.get("/search?q="+input)
+        .then( (res) => {
+          return res.data;
+        })
+      }
     },
     getResultValue(result){
-        return result.value;
+        return result.name;
     },
     onSubmit(result){
         this.$emit('submit', result);
-        console.log("emit selected: " + result.value);
+        console.log("emit selected: " + result.name);
     },
     reset(){
         this.$refs.autocomplete.value = ''

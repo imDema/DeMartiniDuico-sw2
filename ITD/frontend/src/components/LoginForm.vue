@@ -182,12 +182,12 @@
               this.$emit('successful-registration');
           }else{
             //login
-            if(res.status == '200'){
+            //if(res.status == '200'){
               this.$store.commit('logged_in')
               this.$store.state.email = email
               this.showSuccessfulLoginAlert()
               this.$emit('successful-login')
-            }
+            //}
           }
         }).catch( (err) => {
           if(err.response){
@@ -197,6 +197,8 @@
             }else if(err.response.status == '400'){
               if(err.response.data == 'Account already exists'){
                 this.showAccountAlreadyExistsAlert();
+              }else{
+                this.showWrongCredentialsAlert()
               }
             }else{
               this.$emit('connection-failure')

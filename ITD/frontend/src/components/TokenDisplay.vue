@@ -1,8 +1,14 @@
 <template>
     <div>
-    <h3 class="my-2">{{ticket.shop_id}}<b-button :href="maps_url" target="_blank" class="mx-2" variant="outline-secondary"><b-icon-map/>Open in Maps </b-button></h3>
+    <h3 class="my-2">{{ticket.shop_name}}<b-button :href="maps_url" target="_blank" class="mx-2" variant="outline-secondary"><b-icon-map/>Open in Maps </b-button></h3>
+    <div class="small">
+    <div>
     Creation: {{creation}}
+    </div>
+    <div>
     Expiration: {{expiration}}
+    </div>
+    </div>
     <queue :shop_id="ticket.shop_id" :ticket_id="ticket.uid" />
     </div>
 </template>
