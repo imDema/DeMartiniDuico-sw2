@@ -41,7 +41,7 @@ pub fn clear_staff_account(session: &Session) {
 pub fn check_staff_auth(session: &Session, shop_id: &str) -> Option<StaffSession> {
     let shop_id = decode_serial(shop_id).ok()?;
     let staff = get_staff_account(&session)?;
-    if shop_id != staff.shop_id {
+    if shop_id == staff.shop_id {
         Some(staff)
     } else {
         None

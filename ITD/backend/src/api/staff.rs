@@ -5,7 +5,6 @@ use crate::utils::session;
 
 use actix_web::{web, get, post, HttpResponse};
 use actix_session::Session;
-use session::StaffSession;
 use sqlx::PgPool;
 use serde::{Serialize, Deserialize};
 
@@ -87,20 +86,19 @@ async fn token_info(conn: web::Data<PgPool>, shop_id: web::Path<String>, query: 
 pub struct LogTicketRequest {
     pub uid: String,
 }
-#[get("/staff/shop/{shop_id}/token/log-entry")]
+#[post("/shop/{shop_id}/token/log-entry")]
 async fn log_entry(conn: web::Data<PgPool>, shop_id: web::Path<String>, query: web::Json<LogTicketRequest>, session: Session) -> HttpResponse {
     let conn = conn.into_inner();
     let q = query.into_inner();
-    let staff = match session::check_staff_auth(&session, &shop_id.into_inner()) {
-        Some(s) => s,
-        None => return HttpResponse::Forbidden().finish(),
-    };
+    if let None = session::check_staff_auth(&session, &shop_id.into_inner()) {
+        return HttpResponse::Forbidden().finish();
+    }
     let ticket_id = match decode_serial(&q.uid) {
         Ok(id) => id,
         _ => return HttpResponse::BadRequest().body("Invalid token id format"),
     };
     
-    match log_entry_inner(&conn, staff, ticket_id).await {
+    match log_entry_inner(&conn, ticket_id).await {
         Ok(resp) => resp,
         Err(e) => {
             log::error!("Error logging entry: {}", e);
@@ -108,7 +106,7 @@ async fn log_entry(conn: web::Data<PgPool>, shop_id: web::Path<String>, query: w
         }
     }
 }
-async fn log_entry_inner(conn: &PgPool, staff: StaffSession, ticket_id: i32) -> sqlx::Result<HttpResponse> {
+async fn log_entry_inner(conn: &PgPool, ticket_id: i32) -> sqlx::Result<HttpResponse> {
     if let Some(ticket) = PersistentTicket::get(conn, ticket_id).await? {
         let result = ticket.enter().await?;
         match result {
@@ -123,20 +121,19 @@ async fn log_entry_inner(conn: &PgPool, staff: StaffSession, ticket_id: i32) -> 
     }
 }
 
-#[get("/staff/shop/{shop_id}/token/log-exit")]
+#[post("/shop/{shop_id}/token/log-exit")]
 async fn log_exit(conn: web::Data<PgPool>, shop_id: web::Path<String>, query: web::Json<LogTicketRequest>, session: Session) -> HttpResponse {
     let conn = conn.into_inner();
     let q = query.into_inner();
-    let staff = match session::check_staff_auth(&session, &shop_id.into_inner()) {
-        Some(s) => s,
-        None => return HttpResponse::Forbidden().finish(),
-    };
+    if let None = session::check_staff_auth(&session, &shop_id.into_inner()) {
+        return HttpResponse::Forbidden().finish();
+    }
     let ticket_id = match decode_serial(&q.uid) {
         Ok(id) => id,
         _ => return HttpResponse::BadRequest().body("Invalid token id format"),
     };
     
-    match log_exit_inner(&conn, staff, ticket_id).await {
+    match log_exit_inner(&conn, ticket_id).await {
         Ok(resp) => resp,
         Err(e) => {
             log::error!("Error logging exit: {}", e);
@@ -144,7 +141,7 @@ async fn log_exit(conn: web::Data<PgPool>, shop_id: web::Path<String>, query: we
         }
     }
 }
-async fn log_exit_inner(conn: &PgPool, staff: StaffSession, ticket_id: i32) -> sqlx::Result<HttpResponse> {
+async fn log_exit_inner(conn: &PgPool, ticket_id: i32) -> sqlx::Result<HttpResponse> {
     if let Some(ticket) = PersistentTicket::get(conn, ticket_id).await? {
         let success = ticket.exit().await?;
         if success {

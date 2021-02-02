@@ -51,13 +51,28 @@ impl From<Ticket> for TicketResponse {
         }
     }
 }
-
+#[derive(Debug, PartialEq)]
 pub enum EnterResult {
     Entered,
     Full(i32),
     NotFirst(i64),
     Expired,
     Invalid,
+}
+
+pub enum NewTicketResult<'a> {
+    Created(PersistentTicket<'a>),
+    AlreadyExists,
+    Closed,
+}
+impl<'a> NewTicketResult<'a> {
+    pub fn unwrap(self) -> PersistentTicket<'a> {
+        match self {
+            NewTicketResult::Created(t) => t,
+            NewTicketResult::AlreadyExists => panic!("Unwrap called on AlreadyExists result"),
+            NewTicketResult::Closed => panic!("Unwrap called on Closed result"),
+        }
+    }
 }
 
 #[allow(dead_code)]
@@ -101,8 +116,19 @@ impl<'a> PersistentTicket<'a> {
             }).await
     }
 
-    pub async fn new(conn: &'a PgPool, customer_id: i32, shop_id: i32, department_ids: Vec<i32>, est_minutes: i32) -> sqlx::Result<PersistentTicket<'a>> {
+    pub async fn new(conn: &'a PgPool, customer_id: i32, shop_id: i32, department_ids: Vec<i32>, est_minutes: i32) -> sqlx::Result<NewTicketResult<'a>> {
         let mut tx = conn.begin().await?;
+
+        let already_have = query!(r"SELECT id FROM ticket
+            WHERE
+                customer_id = $1 AND shop_id = $2 AND
+                exit IS NULL AND expiration > CURRENT_TIMESTAMP",
+                customer_id, shop_id)
+            .fetch_optional(&mut tx).await?;
+
+        if let Some(_) = already_have {
+            return Ok(NewTicketResult::AlreadyExists);
+        }
 
         let row = query!(r"INSERT INTO ticket (customer_id, shop_id, creation, expiration, est_minutes, valid, active) VALUES
             ($1, $2, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP + interval '6 hour', $3, TRUE, TRUE)
@@ -130,7 +156,7 @@ impl<'a> PersistentTicket<'a> {
             .await?;
 
         tx.commit().await?;
-        Ok(Self{conn, inner:ticket_row.into()})
+        Ok(NewTicketResult::Created(Self{conn, inner:ticket_row.into()}))
     }
 
     pub async fn queue(conn: &PgPool, shop_id: i32, valid: bool, active: bool) -> sqlx::Result<Vec<Ticket>> {
@@ -156,11 +182,25 @@ impl<'a> PersistentTicket<'a> {
     pub async fn enter(&self) -> sqlx::Result<EnterResult> {
         let mut tx = self.conn.begin().await?;
 
+        let state = query!(r"SELECT entry IS NOT NULL as entered, exit IS NOT NULL as exited FROM ticket
+            WHERE id = $1", self.inner.id)
+            .fetch_one(&mut tx)
+            .await?;
+
+        // TODO: Clearer distinction of validity and expiration
+        if state.exited.unwrap() {
+            return Ok(EnterResult::Expired);
+        }
+        if state.entered.unwrap() {
+            return Ok(EnterResult::Invalid);
+        }
+
         let position = query!(r"SELECT count(*) as count FROM ticket
             WHERE
+                shop_id = $1 AND
                 valid = TRUE AND active = TRUE AND
                 entry IS NULL AND exit IS NULL AND
-                id <> $1 AND creation < $2", self.inner.id, self.inner.creation)
+                id <> $2 AND creation < $3", self.inner.shop_id, self.inner.id, self.inner.creation)
             .fetch_one(&mut tx)
             .await?
             .count.unwrap();
@@ -189,8 +229,7 @@ impl<'a> PersistentTicket<'a> {
 
         query!(r"UPDATE ticket
             SET
-                entry = CURRENT_TIMESTAMP,
-                active = FALSE
+                entry = CURRENT_TIMESTAMP
             WHERE id = $1", self.inner.id)
             .execute(&mut tx)
             .await?;
@@ -210,8 +249,7 @@ impl<'a> PersistentTicket<'a> {
         if state.entered.unwrap() && !state.exited.unwrap() {
             query!(r"UPDATE ticket
                 SET
-                    exit = CURRENT_TIMESTAMP,
-                    valid = FALSE
+                    exit = CURRENT_TIMESTAMP
                 WHERE id = $1", self.inner.id)
                 .execute(&mut tx)
                 .await?;
@@ -263,10 +301,10 @@ impl From<TicketRow> for Ticket {
 mod tests {
     use super::*;
     use std::error::Error;
-    use std::time::Duration;
-    use crate::utils::tests::{db, test_customer};
+    use crate::utils::tests::*;
     use crate::with_test_shop;
 
+    
     #[actix_rt::test]
     async fn new_ticket_test() -> Result<(), Box<dyn Error>> {
         let conn = db().await;
@@ -275,11 +313,30 @@ mod tests {
             let customer_id = test_customer(&conn).await?;
 
             let inserted = PersistentTicket::new(&conn, customer_id, shopid, vec![d1, d2], 25)
-                .await?.into_inner();
+                .await?.unwrap().into_inner();
     
             let loaded = PersistentTicket::get(&conn, inserted.id).await?.map(PersistentTicket::into_inner);
             let loaded = loaded.unwrap();
             assert_eq!(&inserted, &loaded);
+        });
+        Ok(())
+    }
+
+    #[actix_rt::test]
+    async fn duplicate_ticket_test() -> Result<(), Box<dyn Error>> {
+        let conn = db().await;
+
+        with_test_shop!(&conn, s0 [d0, d1], s1 [d2] {
+            let customer_id = test_customer(&conn).await?;
+
+            let t0 = PersistentTicket::new(&conn, customer_id, s0, vec![d0], 25).await?.unwrap();
+
+            match PersistentTicket::new(&conn, customer_id, s0, vec![d1], 25).await? {
+                NewTicketResult::AlreadyExists => {},
+                _ => panic!("Expected AlreadyExists"),
+            }
+            let t1 = PersistentTicket::new(&conn, customer_id, s1, vec![d2], 25).await?.unwrap();
+    
         });
         Ok(())
     }
@@ -293,11 +350,10 @@ mod tests {
 
         with_test_shop!(&conn, shopid [d0, d1, d2, d3] {
             let t1 = PersistentTicket::new(&conn, id_c1, shopid, vec![d0, d3], 25)
-                .await?.into_inner();
+                .await?.unwrap().into_inner();
 
-            std::thread::sleep(Duration::from_millis(10));
             let t2 = PersistentTicket::new(&conn, id_c2, shopid, vec![d1,d2,d3], 25)
-                .await?.into_inner();
+                .await?.unwrap().into_inner();
 
             let queue = PersistentTicket::queue(&conn, shopid, true, true).await?;
 
@@ -312,6 +368,49 @@ mod tests {
 
             query!("DELETE FROM ticket WHERE id = $1 OR id = $2", t1.id, t2.id)
                 .execute(&conn).await?;
+
+        });
+        Ok(())
+    }
+
+    #[actix_rt::test]
+    async fn entry_exit_test() -> Result<(), Box<dyn Error>>{
+        let conn = db().await;
+
+        let id_c1 = test_customer(&conn).await?;
+        let id_c2 = test_customer(&conn).await?;
+        let id_c3 = test_customer(&conn).await?;
+
+        with_test_shop!(&conn, shopid [d0, d1] {
+            let d_small = test_department(&conn, shopid, 2).await?;
+
+            let t1 = PersistentTicket::new(&conn, id_c1, shopid, vec![d_small], 25).await?.unwrap();
+            let t2 = PersistentTicket::new(&conn, id_c2, shopid, vec![d_small, d0], 25).await?.unwrap();
+            let t3 = PersistentTicket::new(&conn, id_c3, shopid, vec![d_small, d1], 25).await?.unwrap();
+
+            assert_eq!(t1.exit().await.unwrap(), false);
+
+            assert_eq!(t2.enter().await.unwrap(), EnterResult::NotFirst(1));
+            assert_eq!(t3.enter().await.unwrap(), EnterResult::NotFirst(2));
+
+            assert_eq!(t1.enter().await.unwrap(), EnterResult::Entered);
+            assert_eq!(t3.enter().await.unwrap(), EnterResult::NotFirst(1));
+
+            assert_eq!(t2.enter().await.unwrap(), EnterResult::Entered);
+            assert_eq!(t3.enter().await.unwrap(), EnterResult::Full(d_small));
+
+            assert_eq!(t2.exit().await.unwrap(), true);
+            assert_eq!(t3.enter().await.unwrap(), EnterResult::Entered);
+
+            assert_eq!(t1.enter().await.unwrap(), EnterResult::Invalid);
+
+            assert_eq!(t1.exit().await.unwrap(), true);
+            assert_eq!(t3.exit().await.unwrap(), true);
+            assert_eq!(t3.exit().await.unwrap(), false);
+
+            assert_eq!(t1.enter().await.unwrap(), EnterResult::Expired);
+            assert_eq!(t2.enter().await.unwrap(), EnterResult::Expired);
+            assert_eq!(t3.enter().await.unwrap(), EnterResult::Expired);
 
         });
         Ok(())
