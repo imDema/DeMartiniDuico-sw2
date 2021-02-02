@@ -2,11 +2,16 @@ use sqlx::PgPool;
 use rand::{RngCore, thread_rng};
 
 use crate::models::customer::PersistentCustomer;
+use crate::models::staff::PersistentStaff;
 
 pub async fn db() -> PgPool {
     dotenv::dotenv().ok();
     let conn_url = std::env::var("DATABASE_URL").unwrap();
     crate::setup_db(&conn_url).await
+}
+
+pub fn wait_a_bit() {
+    std::thread::sleep(std::time::Duration::from_millis(10));
 }
 
 pub async fn test_customer(conn: &PgPool) -> sqlx::Result<i32> {
@@ -41,14 +46,20 @@ pub async fn del_shop(conn: &PgPool, id: i32) -> sqlx::Result<()> {
     Ok(())
 }
 
-pub async fn test_department(conn: &PgPool, shopid: i32) -> sqlx::Result<i32> {
+pub async fn test_department(conn: &PgPool, shopid: i32, cap: i32) -> sqlx::Result<i32> {
     Ok(sqlx::query!(
         r"INSERT INTO department ( shop_id, description, capacity)
-        VALUES ($1, 'Frutta', 20) RETURNING id",
-        shopid)
+        VALUES ($1, 'Frutta', $2) RETURNING id",
+        shopid, cap)
         .fetch_one(conn)
         .await?
         .id)
+}
+
+pub async fn test_staff(conn: &PgPool, email: &str, password: &str, shop_id: i32) -> sqlx::Result<i32> {
+    let staff = PersistentStaff::create(conn, &email, &password, shop_id).await?.unwrap();
+
+    Ok(staff.inner().account().id())
 }
 
 #[macro_export]
@@ -57,7 +68,7 @@ macro_rules! with_test_shop {
         $(
             let $s = crate::utils::tests::test_shop($conn).await?;
             $(
-                let $di = crate::utils::tests::test_department($conn, $s).await?;
+                let $di = crate::utils::tests::test_department($conn, $s, 10).await?;
             )*
         )+
         $block;

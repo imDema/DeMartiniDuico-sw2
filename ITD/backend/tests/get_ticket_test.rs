@@ -14,23 +14,19 @@ use actix_web::test;
 async fn get_ticket_test() -> sqlx::Result<()> {
     let mut app = setup_app!();
 
-    let (email, _, session) = quick_create_customer!(&mut app);
-
-    let r = req!(whoami(), &session, &mut app);
-    let r_body = read_utf8_body(r).await;
-    assert!(r_body.contains(&email));
+    let (_, _, session) = quick_create_customer!(&mut app);
 
     let (s0, d00, d01, s1, d10) = async {
         let conn = setup_db(&std::env::var("DATABASE_URL").unwrap()).await;
         let sid = test_shop(&conn).await.unwrap();
         let s0 = encode_serial(sid);
-        let did0 = test_department(&conn, sid).await.unwrap();
-        let did1 = test_department(&conn, sid).await.unwrap();
+        let did0 = test_department(&conn, sid, 5).await.unwrap();
+        let did1 = test_department(&conn, sid, 5).await.unwrap();
         let d00 = encode_serial(did0);
         let d01 = encode_serial(did1);
         let sid = test_shop(&conn).await.unwrap();
         let s1 = encode_serial(sid);
-        let did = test_department(&conn, sid).await.unwrap();
+        let did = test_department(&conn, sid, 5).await.unwrap();
         let d10 = encode_serial(did);
         (s0, d00, d01, s1, d10)
     }.await;
@@ -54,25 +50,6 @@ async fn get_ticket_test() -> sqlx::Result<()> {
     check_tokens!([&ticket, &ticket_2], &session, &mut app);
 
     Ok(())
-}
-
-#[macro_export]
-macro_rules! ticket {
-    ($shop:expr, [$($did:expr),+], $est:expr, $cookies:expr, $app:expr) => {{
-        let dids = vec![$($did.as_str(), )+];
-        let r = req!(ticket_new($shop, &dids[..], $est), $cookies, $app);
-        assert_eq!(r.status(), StatusCode::OK);
-
-        let t: TicketResponse = test::read_body_json(r).await;
-        assert_eq!($shop, &t.shop_id);
-        assert_eq!(t.department_ids.len(), dids.len());
-        $(
-        assert!(t.department_ids.contains($did));
-        )+
-        assert!(t.valid);
-        assert!(t.active);
-        t
-    }}
 }
 
 #[macro_export]

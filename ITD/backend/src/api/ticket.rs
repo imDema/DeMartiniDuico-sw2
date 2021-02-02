@@ -2,7 +2,7 @@ use std::error::Error;
 
 use crate::models::customer::PersistentCustomer;
 use crate::models::shop::PersistentShop;
-use crate::models::ticket::{PersistentTicket, TicketResponse};
+use crate::models::ticket::{NewTicketResult, PersistentTicket, TicketResponse};
 use crate::utils::encoding::{decode_serial, decode_serial_vec};
 use crate::utils::session;
 
@@ -59,9 +59,16 @@ async fn ticket_new_inner<'a>(conn: &'a PgPool, customer_id: i32, shop_id: &str,
     let ids = decode_serial_vec(req.department_ids)?;
 
     let tick = PersistentTicket::new(&conn, customer_id, shop.inner().id, ids, req.est_minutes)
-        .await?
-        .into_inner();
-    Ok(HttpResponse::Ok().json(TicketResponse::from(tick)))
+        .await?;
+
+    match tick {
+        NewTicketResult::Created(t) =>
+            Ok(HttpResponse::Ok().json(TicketResponse::from(t.into_inner()))),
+        NewTicketResult::AlreadyExists =>
+            Ok(HttpResponse::BadRequest().body("Customer already has an active ticket for that shop")),
+        NewTicketResult::Closed =>
+            Ok(HttpResponse::BadRequest().body("Ticket creation for this shop is closed"))
+    }
 }
 
 #[get("/shop/{shop_id}/ticket/queue")]

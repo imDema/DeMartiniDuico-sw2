@@ -22,7 +22,8 @@ macro_rules! setup_app {
             .configure(api::account::endpoints)
             .configure(api::ticket::endpoints)
             .configure(api::shop::endpoints)
-            .configure(api::dev::endpoints)
+            .service(actix_web::web::scope("/staff").configure(api::staff::endpoints))
+            .service(actix_web::web::scope("/dev").configure(api::dev::endpoints))
         ).await
     }}
 }
@@ -40,9 +41,54 @@ macro_rules! quick_create_customer {
         assert_eq!(r.status(), actix_web::http::StatusCode::OK);
         let cookies = r.headers().get("Set-Cookie").unwrap();
         let session = common::extract_session_cookie(cookies.to_str().unwrap()).unwrap().to_owned();
+
+        let r = req!(whoami(), &session, $app);
+        let r_body = read_utf8_body(r).await;
+        assert!(r_body.contains(&email));
+
         (email, password, session)
     }};
 }
+
+#[macro_export]
+macro_rules! quick_create_staff {
+    ($app:expr, $shop_id:expr) => {{
+        use rand::{RngCore, thread_rng};
+        let (email, password) = (format!("{:x}@test.com", thread_rng().next_u64()), format!("{:x}", thread_rng().next_u64()));
+        let r = req!(create_staff(&email, &password, $shop_id), $app);
+        assert_eq!(r.status(), actix_web::http::StatusCode::OK);
+        let r = req!(staff_login(&email, &password, None), $app);
+        assert_eq!(r.status(), actix_web::http::StatusCode::OK);
+        let cookies = r.headers().get("Set-Cookie").unwrap();
+        let session = common::extract_session_cookie(cookies.to_str().unwrap()).unwrap().to_owned();
+
+        let r = req!(whoami(), &session, $app);
+        let r_body = read_utf8_body(r).await;
+        assert!(r_body.contains(&email));
+
+        (email, password, session)
+    }};
+}
+
+#[macro_export]
+macro_rules! ticket {
+    ($shop:expr, [$($did:expr),+], $est:expr, $cookies:expr, $app:expr) => {{
+        let dids = vec![$($did.as_str(), )+];
+        let r = req!(ticket_new($shop, &dids[..], $est), $cookies, $app);
+        assert_eq!(r.status(), StatusCode::OK);
+
+        let t: TicketResponse = test::read_body_json(r).await;
+        assert_eq!($shop, &t.shop_id);
+        assert_eq!(t.department_ids.len(), dids.len());
+        $(
+        assert!(t.department_ids.contains($did));
+        )+
+        assert!(t.valid);
+        assert!(t.active);
+        t
+    }}
+}
+
 
 pub fn extract_session_cookie(cookies: &str) -> Option<&str> {
     lazy_static::lazy_static!(

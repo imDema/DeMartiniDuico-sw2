@@ -54,7 +54,7 @@ pub struct Schedule {
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct ShopResponse {
-    pub uid: i32,
+    pub uid: String,
     pub name: String,
     pub description: String,
     pub image: Option<String>,
@@ -83,7 +83,7 @@ impl<'a> PersistentShop<'a> {
         let deps = self.departments().await?;
 
         Ok(ShopResponse {
-            uid: self.inner.id,
+            uid: encode_serial(self.inner.id),
             name: self.inner.name,
             description: self.inner.description,
             image: self.inner.image,
