@@ -94,7 +94,7 @@ async fn ticket_queue(conn: web::Data<PgPool>, shop_id: web::Path<String>, sessi
     }
 }
 async fn ticket_queue_inner(conn: &PgPool, shop_id: i32) -> sqlx::Result<HttpResponse> {
-    let queue = PersistentTicket::queue(conn, shop_id, true, true).await?;
+    let queue = PersistentTicket::queue(conn, shop_id).await?;
 
     let (delta_t, people) = queue.into_iter()
         .fold((Duration::zero(), 0), |(dt, p), ti| {
@@ -188,7 +188,7 @@ async fn ticket_est_inner(conn: &PgPool, cid: i32, tid: i32) -> sqlx::Result<Htt
             log::debug!("Invalid ticket:\n{:?}", ticket);
             return Ok(HttpResponse::BadRequest().body("Expired or invalid ticket"));
         }
-        let queue = PersistentTicket::queue(conn, ticket.shop_id, true, true).await?;
+        let queue = PersistentTicket::queue(conn, ticket.shop_id).await?;
 
         let mut delta_t = Duration::minutes(0);
         let mut contained = false;

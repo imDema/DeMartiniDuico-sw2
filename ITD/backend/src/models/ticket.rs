@@ -89,7 +89,8 @@ impl<'a> PersistentTicket<'a> {
             WHERE ticket_department.ticket_id = ticket.id AND
                 ticket.shop_id = shop.id AND
                 ticket_department.department_id = department.id AND
-                ticket.id = $1
+                ticket.id = $1 AND
+                COALESCE(expiration > CURRENT_TIMESTAMP, TRUE)
             GROUP BY ticket.id, customer_id, ticket.shop_id, shop.name, creation, expiration, valid, active",
             id)
             .fetch_optional(conn)
@@ -105,7 +106,8 @@ impl<'a> PersistentTicket<'a> {
             WHERE ticket_department.ticket_id = ticket.id AND
                 ticket.shop_id = shop.id AND
                 ticket_department.department_id = department.id AND
-                ticket.customer_id = $1
+                ticket.customer_id = $1 AND
+                COALESCE(expiration > CURRENT_TIMESTAMP, TRUE)
             GROUP BY ticket.id, customer_id, ticket.shop_id, shop.name, creation, expiration, valid, active
             ORDER BY creation",
             customer_id)
@@ -166,7 +168,7 @@ impl<'a> PersistentTicket<'a> {
             .await
     }
 
-    pub async fn queue(conn: &PgPool, shop_id: i32, valid: bool, active: bool) -> sqlx::Result<Vec<Ticket>> {
+    pub async fn queue(conn: &PgPool, shop_id: i32) -> sqlx::Result<Vec<Ticket>> {
         query_as!(TicketRow, r"SELECT ticket.id AS id, customer_id, ticket.shop_id AS shop_id, shop.name as shop_name, array_agg(department.id) AS department_ids, creation, expiration, entry, exit, est_minutes, valid, active
                 FROM ticket, ticket_department, department, shop
                 WHERE
@@ -174,10 +176,10 @@ impl<'a> PersistentTicket<'a> {
                     ticket.shop_id = shop.id AND
                     ticket_department.ticket_id = ticket.id AND
                     ticket_department.department_id = department.id AND
-                    valid = $2 AND active = $3
+                    entry IS NULL AND exit IS NULL AND COALESCE(expiration > CURRENT_TIMESTAMP, TRUE)
                 GROUP BY ticket.id, customer_id, ticket.shop_id, shop.name, creation, expiration, valid, active
                 ORDER BY creation",
-                shop_id, valid, active)
+                shop_id)
             .fetch(conn)
             .fold(Ok(Vec::new()), |acc: sqlx::Result<Vec<Ticket>>, x| async {
                 let mut acc = acc?;
@@ -189,13 +191,13 @@ impl<'a> PersistentTicket<'a> {
     pub async fn enter(&self) -> sqlx::Result<EnterResult> {
         let mut tx = self.conn.begin().await?;
 
-        let state = query!(r"SELECT entry IS NOT NULL as entered, exit IS NOT NULL as exited FROM ticket
+        let state = query!(r"SELECT entry IS NOT NULL as entered, exit IS NOT NULL as exited, COALESCE(expiration < CURRENT_TIMESTAMP, TRUE) AS expired FROM ticket
             WHERE id = $1", self.inner.id)
             .fetch_one(&mut tx)
             .await?;
 
         // TODO: Clearer distinction of validity and expiration
-        if state.exited.unwrap() {
+        if state.exited.unwrap() || state.expired.unwrap() {
             return Ok(EnterResult::Expired);
         }
         if state.entered.unwrap() {
@@ -205,7 +207,6 @@ impl<'a> PersistentTicket<'a> {
         let position = query!(r"SELECT count(*) as count FROM ticket
             WHERE
                 shop_id = $1 AND
-                valid = TRUE AND active = TRUE AND
                 entry IS NULL AND exit IS NULL AND
                 id <> $2 AND creation < $3", self.inner.shop_id, self.inner.id, self.inner.creation)
             .fetch_one(&mut tx)
@@ -363,7 +364,7 @@ mod tests {
             let t2 = PersistentTicket::new(&conn, id_c2, shopid, vec![d1,d2,d3], 25)
                 .await?.unwrap().into_inner();
 
-            let queue = PersistentTicket::queue(&conn, shopid, true, true).await?;
+            let queue = PersistentTicket::queue(&conn, shopid).await?;
 
             for t in queue.iter() {
                 println!("{:?}", t);

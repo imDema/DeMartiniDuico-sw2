@@ -38,15 +38,14 @@ async fn get_ticket_test() -> sqlx::Result<()> {
         assert_eq!(r.status(), StatusCode::FORBIDDEN);
 
     // First ticket
-
     let ticket = ticket!(&s0, [&d00, &d01], 15, &session, &mut app);
-
     check_tokens!([&ticket], &session, &mut app);
 
+    let r = req!(ticket_new(&s1, &[&d00, &d10], 15), &session, &mut app); // Dep from another shop should fail
+    assert_eq!(r.status(), StatusCode::BAD_REQUEST);
+
     // Second ticket
-
     let ticket_2 = ticket!(&s1, [&d10], 20, &session, &mut app);
-
     check_tokens!([&ticket, &ticket_2], &session, &mut app);
 
     Ok(())
