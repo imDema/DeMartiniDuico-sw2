@@ -1,14 +1,20 @@
 <template>
     <div>
     <h3 class="my-2">{{ticket.shop_name}}<b-button :href="maps_url" target="_blank" class="mx-2" variant="outline-secondary"><b-icon-map/>Open in Maps </b-button></h3>
-    <div class="small">
-    <div>
-    Creation: {{creation}}
+    <div class="my-2">
+        {{shopDescription}}
     </div>
-    <div>
-    Expiration: {{expiration}}
-    </div>
-    </div>
+    <b-card bg-variant="white">   
+        <div>
+        Creation: {{creation}}
+        </div>
+        <div>
+        Expiration: {{expiration}}
+        </div>
+    </b-card>
+    <b-card bg-variant="secondary" text-variant="light">   
+        Departments for this ticket: {{departments}}
+    </b-card>
     <queue :shop_id="ticket.shop_id" :ticket_id="ticket.uid" />
     </div>
 </template>
@@ -20,6 +26,8 @@ export default {
     },
     props: {
         ticket: Object,
+        shopDescription: String,
+        departments: String,
     },
     data(){
         return {

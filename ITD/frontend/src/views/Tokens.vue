@@ -12,13 +12,12 @@
       <small>{{timeDifference(t.creation)}}</small>
     </div>
     <p class="mb-1">
-      {{getDepartmentNames(t).map( d => d.description)}}
+      {{ shopDescription[t.shop_id] }}
     </p>
-
-    <small>Details</small>
+  <small>Departments: {{ departmentNames[t.shop_id] }}</small>
   </b-list-group-item>
   </b-list-group>
-  <token-display v-if="isTicketSelected" :ticket="selectedTicket"/>
+  <token-display v-if="isTicketSelected" :ticket="selectedTicket" :shop-description="shopDescription[selectedTicket.shop_id]" :departments="departmentNames[selectedTicket.shop_id]"/>
   <b-row class="my-4">
     <b-col cols="6"><b-button @click="back" block><b-icon-arrow-left/>Back</b-button> </b-col>
     <b-col cols="6" v-if="isTicketSelected"><b-button @click="showQR" variant="primary" block>Show</b-button></b-col>
@@ -41,30 +40,23 @@ export default {
           busy: false,
           selectedTicket: {},
           tickets: [],
+          shopInfo: {},
           departmentNames: {},
+          shopDescription: {},
       }
   },
   computed:{
     isTicketSelected(){
       return Object.keys(this.selectedTicket).length !== 0
-    }
+    },        
   },
   watch:{
     $route(to, from){
       //update selectedTicket
       to, from
     },
-    tickets(newTickets){
-      newTickets.forEach( (t) => {
-        this.$api.get("/shop/"+t.shop_id)
-        .then((res)=>{
-          console.log(res.data)
-          this.departmentNames[t] = res.data.departments.filter( d => { return t.department_ids.indexOf(d.uid)!==-1} )
-        })
-        .catch( (err) => {
-          console.log(err)
-        });
-      });
+    async tickets(newTickets){
+      this.loadShopInfo(newTickets);
     }
   },
   methods: {
@@ -114,6 +106,7 @@ export default {
         .then(res => {
           if(res.status == '200'){
             this.tickets = res.data.tickets;
+            return this.tickets
           }
         }).catch( () => {
             this.$emit('connection-failure')
@@ -121,19 +114,56 @@ export default {
           setTimeout( () => {this.busy = false}, 250)
         })
       },
-      getDepartmentNames(t){
-        if(t in this.departmentNames)
-          return this.departmentNames[t]
-        else
-          return []
+      loadShopInfo(tickets){
+          let fetchPromises = []
+          tickets.map(t => t.shop_id).filter((v, i, a) => a.indexOf(v) === i)
+          .forEach( (sid) => {
+            fetchPromises.push(
+              this.$api.get("/shop/"+sid)
+              .then((res)=>{
+                this.shopInfo[sid] = res.data;
+              })
+              .catch( (err) => {
+                console.log(err)
+              })   
+            )
+          });
+          Promise.all(fetchPromises).then( () => {
+            console.log(this.shopInfo)
+            this.updateShopDescription()
+            this.updateDepartmentNames()
+          });
+      },
+      updateShopDescription(){
+        this.tickets.forEach( (t) => {
+            if(t.shop_id  in this.shopInfo)
+              this.$set(this.shopDescription, t.shop_id, this.shopInfo[t.shop_id].description)
+            else
+              this.$set(this.shopDescription, t.shop_id, "")
+        })
+      },
+      updateDepartmentNames(){
+        this.tickets.forEach( (t) => {
+            if(t.shop_id  in this.shopInfo)
+              this.$set(this.departmentNames, t.shop_id, this.shopInfo[t.shop_id].departments
+                .filter(d => t.department_ids.indexOf(d.uid)!==-1).map(d => d.description).join(", ")
+              )
+            else
+              this.$set(this.departmentNames, t.shop_id, "")
+        })
       },
   },
   created(){
-    this.loadTokens().then( () => {
+    if(this.$route.params.uid === ''){
+      this.$delete(this, 'selectedTicket')
+      console.log(this.selectedTicket)
+    }
+    this.loadTokens().then( (newTickets) => {
       if(this.$route.params.uid){
         let selectedTickedUID = this.$route.params.uid
         this.selectTicket(this.tickets.find( t => t.uid === selectedTickedUID))
       }
+      this.loadShopInfo(newTickets)
     });
   },
 }
