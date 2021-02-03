@@ -1,5 +1,6 @@
 
 use serde::{Serialize, Deserialize};
+use sqlx::postgres::PgDone;
 use sqlx::{FromRow, PgPool, query_as, query};
 use chrono::prelude::*;
 
@@ -27,8 +28,8 @@ pub struct TicketResponse {
     pub shop_id: String,
     pub shop_name: String,
     pub department_ids: Vec<String>,
-    pub creation: NaiveDateTime,
-    pub expiration: NaiveDateTime,
+    pub creation: DateTime<Utc>,
+    pub expiration: DateTime<Utc>,
     pub valid: bool,
     pub active: bool,
 }
@@ -44,8 +45,8 @@ impl From<Ticket> for TicketResponse {
             shop_id: encode_serial(t.shop_id),
             shop_name: t.shop_name,
             department_ids: dids,
-            creation: t.creation,
-            expiration: t.expiration,
+            creation: Utc.from_utc_datetime(&t.creation),
+            expiration: Utc.from_utc_datetime(&t.expiration),
             valid: t.valid,
             active: t.active,
         }
@@ -159,6 +160,12 @@ impl<'a> PersistentTicket<'a> {
         Ok(NewTicketResult::Created(Self{conn, inner:ticket_row.into()}))
     }
 
+    pub async fn cancel(self) -> sqlx::Result<PgDone> {
+        query!("DELETE FROM ticket WHERE id = $1", self.inner.id)
+            .execute(self.conn)
+            .await
+    }
+
     pub async fn queue(conn: &PgPool, shop_id: i32, valid: bool, active: bool) -> sqlx::Result<Vec<Ticket>> {
         query_as!(TicketRow, r"SELECT ticket.id AS id, customer_id, ticket.shop_id AS shop_id, shop.name as shop_name, array_agg(department.id) AS department_ids, creation, expiration, entry, exit, est_minutes, valid, active
                 FROM ticket, ticket_department, department, shop
@@ -260,7 +267,8 @@ impl<'a> PersistentTicket<'a> {
             Ok(false)
         }
     }
-
+    
+    pub fn inner(&self) -> &Ticket {&self.inner}
     pub fn into_inner(self) -> Ticket {self.inner}
 }
 
@@ -329,13 +337,13 @@ mod tests {
         with_test_shop!(&conn, s0 [d0, d1], s1 [d2] {
             let customer_id = test_customer(&conn).await?;
 
-            let t0 = PersistentTicket::new(&conn, customer_id, s0, vec![d0], 25).await?.unwrap();
+            let _ = PersistentTicket::new(&conn, customer_id, s0, vec![d0], 25).await?.unwrap();
 
             match PersistentTicket::new(&conn, customer_id, s0, vec![d1], 25).await? {
                 NewTicketResult::AlreadyExists => {},
                 _ => panic!("Expected AlreadyExists"),
             }
-            let t1 = PersistentTicket::new(&conn, customer_id, s1, vec![d2], 25).await?.unwrap();
+            let _ = PersistentTicket::new(&conn, customer_id, s1, vec![d2], 25).await?.unwrap();
     
         });
         Ok(())
