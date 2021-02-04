@@ -13,7 +13,6 @@ import store from './store'
 Vue.use(Autocomplete)
 Vue.use(BootstrapVue)
 Vue.use(BootstrapVueIcons)
-console.log(process.env)
 Vue.use({
   install (Vue) {
   Vue.prototype.$api = axios.create({

@@ -37,6 +37,24 @@ export default {
         this.failedToConnectAlertCountdown = 3
       }
   },
+  created: function () {
+  this.$api.get("/whoami")
+    .then(res => {
+        let isAuthenticated = res.data.authenticated == true;
+        this.$store.state.customer.email = res.data.email;
+        if(isAuthenticated){
+          console.log('true')
+          this.$store.commit('logged_in')
+        }else{
+          this.$store.commit('logged_out')
+          this.$bvModal.show('login-modal')
+        }
+    }).catch( (err) => {
+        this.$bvModal.show('login-modal')
+        console.log(err)
+        console.log('error with /checkauth')
+    });
+  },
 }
 
 </script>

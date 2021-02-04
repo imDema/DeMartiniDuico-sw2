@@ -1,6 +1,8 @@
 $enable-shadows: true;
 $enable-gradients: true;
 $primary: #1761a0;
+$danger: #ce1212;
+$info: #ac0b33;
 
 @import 'node_modules/bootstrap/scss/bootstrap.scss';
 @import 'node_modules/bootstrap-vue/src/index.scss';

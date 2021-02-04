@@ -1,6 +1,6 @@
 <template>
     <b-modal id="login-modal" no-close-on-esc no-close-on-backdrop hide-header hide-footer busy>
-    <LoginForm id="login-form" :prop-registration="isRegistration" @switch-action="isRegistration=$event" @successful-login="slowClose" @successful-registration="isRegistration=false" @connection-failure="$emit('connection-failure')"/>  
+    <LoginForm id="login-form" :staff="staff" :prop-registration="isRegistration" @switch-action="isRegistration=$event" @successful-login="slowClose" @successful-registration="isRegistration=false" @connection-failure="$emit('connection-failure')"/>  
     <template #modal-header>
         <div class="modal_header">{{modal_header}}</div>
     </template>
@@ -18,6 +18,10 @@ export default {
         }
     },
     props:{
+        staff: {
+            type: Boolean,
+            default: false,
+        }
     },
     computed:{
         modal_header() {
