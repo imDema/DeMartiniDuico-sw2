@@ -14,6 +14,8 @@ pub fn endpoints(cfg: &mut web::ServiceConfig) {
     cfg.service(token_info);
     cfg.service(log_entry);
     cfg.service(log_exit);
+    cfg.service(ticket_queue);
+    cfg.service(ticket_skip);
     cfg.service(whoami);
 }
 #[allow(dead_code)]
@@ -55,12 +57,35 @@ async fn logout(_conn: web::Data<PgPool>, session: Session) -> HttpResponse {
     HttpResponse::Ok().finish()
 }
 
+#[get("/shop/{shop_id}/ticket/queue")]
+async fn token_info(conn: web::Data<PgPool>, shop_id: web::Path<String>, session: Session) -> HttpResponse {
+    let conn = conn.into_inner();
+    let shop_id = if let Some(sess) = session::check_staff_auth(&session, &shop_id.into_inner()) {
+        sess.shop_id
+    } else {
+        return HttpResponse::Forbidden().finish();
+    };
+    
+    match PersistentTicket::queue(&conn, shop_id).await {
+        Ok(v) => {
+            let body: Vec<TicketResponse> = v.into_iter()
+                .map(TicketResponse::from)
+                .collect();
+            HttpResponse::Ok().json(body)
+        }
+        Err(e) => {
+            log::error!("Error retrieving ticket queue {}", e);
+            HttpResponse::InternalServerError().finish()
+        }
+    }
+}
+
 #[derive(Deserialize)]
 struct TokenInfoQuery {
     pub uid: String,
 }
 #[get("/shop/{shop_id}/token/info")]
-async fn token_info(conn: web::Data<PgPool>, shop_id: web::Path<String>, query: web::Query<TokenInfoQuery>, session: Session) -> HttpResponse {
+async fn ticket_queue(conn: web::Data<PgPool>, shop_id: web::Path<String>, query: web::Query<TokenInfoQuery>, session: Session) -> HttpResponse {
     let conn = conn.into_inner();
     let q = query.into_inner();
     if let None = session::check_staff_auth(&session, &shop_id.into_inner()) {
@@ -154,6 +179,44 @@ async fn log_exit_inner(conn: &PgPool, ticket_id: i32) -> sqlx::Result<HttpRespo
         Ok(HttpResponse::BadRequest().body("Ticket does not exist"))
     }
 }
+
+#[derive(Deserialize)]
+struct TicketCancelRequest {
+    pub uid: String
+}
+
+#[post("/shop/{shop_id}/token/skip")]
+async fn ticket_skip(conn: web::Data<PgPool>, body: web::Json<TicketCancelRequest>, session: Session) -> HttpResponse {
+    let conn = conn.into_inner();
+    let req = body.into_inner();
+    let sess = if let Some(sess) = session::get_staff_account(&session) {
+        sess
+    } else {
+        return HttpResponse::Forbidden().finish();
+    };
+    let tid = if let Ok(tid) = decode_serial(&req.uid) {
+        tid
+    } else {
+        return HttpResponse::BadRequest().body("Invalid uid in query");
+    };
+
+    let t = PersistentTicket::get(&conn, tid).await;
+
+    if let Ok(Some(ticket)) = t {
+        if ticket.inner().shop_id == sess.shop_id {
+            if let Ok(_) = ticket.cancel().await {
+                HttpResponse::Ok().finish()
+            } else {
+                HttpResponse::InternalServerError().finish()
+            }
+        } else {
+            HttpResponse::Forbidden().finish()
+        }
+    } else {
+        HttpResponse::BadRequest().body("Ticket does not exist")
+    }
+}
+
 #[derive(Serialize)]
 struct WhoamiResponse {
     authenticated: bool,

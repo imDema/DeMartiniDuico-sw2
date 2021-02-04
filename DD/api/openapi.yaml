@@ -510,6 +510,30 @@ paths:
       security:
         - staffAuth: []
 
+  /staff/shop/{shop_id}/token/skip:
+    post:
+      tags:
+        - "staff"
+      summary: Skip and cancel a ticket
+      parameters:
+        - in: path
+          name: "shop_id"
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TokenCode"
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Error
+      security:
+        - staffAuth: []
+
   /staff/manage/create-account/{shop_id}:
     post:
       summary: Generate a temporary staff account for activation
