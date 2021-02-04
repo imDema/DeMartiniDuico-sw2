@@ -208,7 +208,8 @@ impl<'a> PersistentTicket<'a> {
             WHERE
                 shop_id = $1 AND
                 entry IS NULL AND exit IS NULL AND
-                id <> $2 AND creation < $3", self.inner.shop_id, self.inner.id, self.inner.creation)
+                id <> $2 AND creation < $3 AND
+                COALESCE(expiration > CURRENT_TIMESTAMP, TRUE)", self.inner.shop_id, self.inner.id, self.inner.creation)
             .fetch_one(&mut tx)
             .await?
             .count.unwrap();

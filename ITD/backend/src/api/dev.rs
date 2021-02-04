@@ -31,7 +31,7 @@ async fn ids(conn: web::Data<PgPool>) -> HttpResponse {
         .fetch_all(&*conn)
         .await.unwrap();
 
-    let tickets = query!(r"SELECT id, customer_id FROM ticket")
+    let tickets = query!(r"SELECT id, customer_id, shop_id FROM ticket")
         .fetch_all(&*conn)
         .await.unwrap();
 
@@ -49,7 +49,7 @@ async fn ids(conn: web::Data<PgPool>) -> HttpResponse {
     }
     body.push_str("\nTickets:\n");
     for row in tickets {
-        body.push_str(&format!("id: {}, customer_id: {}\n", encode_serial(row.id), encode_serial(row.customer_id)));
+        body.push_str(&format!("id: {}, shop_id: {}, customer_id: {}\n", encode_serial(row.id), encode_serial(row.shop_id), encode_serial(row.customer_id)));
     }
 
     HttpResponse::Ok().body(body)

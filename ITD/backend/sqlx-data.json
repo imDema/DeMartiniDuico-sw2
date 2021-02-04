@@ -384,30 +384,6 @@
       ]
     }
   },
-  "528337ba48a2252b3bb60c5ad79e8dc96df8f8cd76561dc1f431c8381adb5ae3": {
-    "query": "SELECT id, customer_id FROM ticket",
-    "describe": {
-      "columns": [
-        {
-          "ordinal": 0,
-          "name": "id",
-          "type_info": "Int4"
-        },
-        {
-          "ordinal": 1,
-          "name": "customer_id",
-          "type_info": "Int4"
-        }
-      ],
-      "parameters": {
-        "Left": []
-      },
-      "nullable": [
-        false,
-        false
-      ]
-    }
-  },
   "5ea385f61e9806cf6c4e31a0478ea1c92b4008bb097190a4e68efbc3b5d91226": {
     "query": "DELETE FROM ticket WHERE id = $1",
     "describe": {
@@ -418,6 +394,28 @@
         ]
       },
       "nullable": []
+    }
+  },
+  "81875885b57336507e2a7fd707504f6c1df06f16d4c7cb622639d5c8d714db80": {
+    "query": "SELECT count(*) as count FROM ticket\n            WHERE\n                shop_id = $1 AND\n                entry IS NULL AND exit IS NULL AND\n                id <> $2 AND creation < $3 AND\n                COALESCE(expiration > CURRENT_TIMESTAMP, TRUE)",
+    "describe": {
+      "columns": [
+        {
+          "ordinal": 0,
+          "name": "count",
+          "type_info": "Int8"
+        }
+      ],
+      "parameters": {
+        "Left": [
+          "Int4",
+          "Int4",
+          "Timestamp"
+        ]
+      },
+      "nullable": [
+        null
+      ]
     }
   },
   "81fe618d2bf0878dfc1bc7e3b90175ff522c5039ad3badb6667227b160a9529f": {
@@ -781,28 +779,6 @@
       ]
     }
   },
-  "acb2e1a98cd29b1972ff3f845bd7ca0c51f815c4fdb0ece58c0c4cd58826466f": {
-    "query": "SELECT count(*) as count FROM ticket\n            WHERE\n                shop_id = $1 AND\n                entry IS NULL AND exit IS NULL AND\n                id <> $2 AND creation < $3",
-    "describe": {
-      "columns": [
-        {
-          "ordinal": 0,
-          "name": "count",
-          "type_info": "Int8"
-        }
-      ],
-      "parameters": {
-        "Left": [
-          "Int4",
-          "Int4",
-          "Timestamp"
-        ]
-      },
-      "nullable": [
-        null
-      ]
-    }
-  },
   "ad8f0803506417958db559952955db55f81d2b804c3d68fce9929bc7ac52c81f": {
     "query": "SELECT id as uid, shop_id, description, capacity FROM department\n            WHERE shop_id = $1",
     "describe": {
@@ -1065,6 +1041,36 @@
         ]
       },
       "nullable": [
+        false
+      ]
+    }
+  },
+  "c633b9ab69e83646f8ba88b3a6f3398088cd2cbf5bb81b7ba3a7240ea9cc2374": {
+    "query": "SELECT id, customer_id, shop_id FROM ticket",
+    "describe": {
+      "columns": [
+        {
+          "ordinal": 0,
+          "name": "id",
+          "type_info": "Int4"
+        },
+        {
+          "ordinal": 1,
+          "name": "customer_id",
+          "type_info": "Int4"
+        },
+        {
+          "ordinal": 2,
+          "name": "shop_id",
+          "type_info": "Int4"
+        }
+      ],
+      "parameters": {
+        "Left": []
+      },
+      "nullable": [
+        false,
+        false,
         false
       ]
     }
