@@ -41,8 +41,82 @@
       ]
     }
   },
-  "084c060b0242e50d7b74e2675e751d1b281ef4e1d351f91e8da164f3e8a73ed8": {
-    "query": "SELECT ticket.id AS id, customer_id, ticket.shop_id AS shop_id, shop.name as shop_name, array_agg(department.id) AS department_ids, creation, expiration, entry, exit, est_minutes, valid, active\n            FROM ticket, ticket_department, department, shop\n            WHERE ticket_department.ticket_id = ticket.id AND\n                ticket.shop_id = shop.id AND\n                ticket_department.department_id = department.id AND\n                ticket.id = $1\n            GROUP BY ticket.id, customer_id, ticket.shop_id, shop.name, creation, expiration, valid, active",
+  "0f429d2dc88c38ca9ac1626adb70f023e610bd02c66ba43874931bde34c34343": {
+    "query": "UPDATE ticket\n                SET\n                    exit = CURRENT_TIMESTAMP\n                WHERE id = $1",
+    "describe": {
+      "columns": [],
+      "parameters": {
+        "Left": [
+          "Int4"
+        ]
+      },
+      "nullable": []
+    }
+  },
+  "192bbea17da9300e27f0e91881ecab1e12822fb0bd323ee435da970a6286be32": {
+    "query": "SELECT email FROM customer WHERE email = $1",
+    "describe": {
+      "columns": [
+        {
+          "ordinal": 0,
+          "name": "email",
+          "type_info": "Varchar"
+        }
+      ],
+      "parameters": {
+        "Left": [
+          "Text"
+        ]
+      },
+      "nullable": [
+        false
+      ]
+    }
+  },
+  "1c93990fa0a0b548c269ae6bb22fba7f03fe8e7dcbfb688b1c6951ed10ce6fa6": {
+    "query": "SELECT id FROM customer",
+    "describe": {
+      "columns": [
+        {
+          "ordinal": 0,
+          "name": "id",
+          "type_info": "Int4"
+        }
+      ],
+      "parameters": {
+        "Left": []
+      },
+      "nullable": [
+        false
+      ]
+    }
+  },
+  "1f8bc20899162658e52de6d82859c422f6e50adf96094e7ed8c7109d4e8f8a53": {
+    "query": "SELECT id, shop_id FROM department",
+    "describe": {
+      "columns": [
+        {
+          "ordinal": 0,
+          "name": "id",
+          "type_info": "Int4"
+        },
+        {
+          "ordinal": 1,
+          "name": "shop_id",
+          "type_info": "Int4"
+        }
+      ],
+      "parameters": {
+        "Left": []
+      },
+      "nullable": [
+        false,
+        false
+      ]
+    }
+  },
+  "289a3f4a60e108cb16f78c1142a47f2fdf5bc84796be051ecd9480b0400fa6e1": {
+    "query": "SELECT ticket.id AS id, customer_id, ticket.shop_id AS shop_id, shop.name as shop_name, array_agg(department.id) AS department_ids, creation, expiration, entry, exit, est_minutes, valid, active\n            FROM ticket, ticket_department, department, shop\n            WHERE ticket_department.ticket_id = ticket.id AND\n                ticket.shop_id = shop.id AND\n                ticket_department.department_id = department.id AND\n                ticket.id = $1 AND\n                COALESCE(expiration > CURRENT_TIMESTAMP, TRUE)\n            GROUP BY ticket.id, customer_id, ticket.shop_id, shop.name, creation, expiration, valid, active",
     "describe": {
       "columns": [
         {
@@ -127,68 +201,6 @@
       ]
     }
   },
-  "192bbea17da9300e27f0e91881ecab1e12822fb0bd323ee435da970a6286be32": {
-    "query": "SELECT email FROM customer WHERE email = $1",
-    "describe": {
-      "columns": [
-        {
-          "ordinal": 0,
-          "name": "email",
-          "type_info": "Varchar"
-        }
-      ],
-      "parameters": {
-        "Left": [
-          "Text"
-        ]
-      },
-      "nullable": [
-        false
-      ]
-    }
-  },
-  "1c93990fa0a0b548c269ae6bb22fba7f03fe8e7dcbfb688b1c6951ed10ce6fa6": {
-    "query": "SELECT id FROM customer",
-    "describe": {
-      "columns": [
-        {
-          "ordinal": 0,
-          "name": "id",
-          "type_info": "Int4"
-        }
-      ],
-      "parameters": {
-        "Left": []
-      },
-      "nullable": [
-        false
-      ]
-    }
-  },
-  "1f8bc20899162658e52de6d82859c422f6e50adf96094e7ed8c7109d4e8f8a53": {
-    "query": "SELECT id, shop_id FROM department",
-    "describe": {
-      "columns": [
-        {
-          "ordinal": 0,
-          "name": "id",
-          "type_info": "Int4"
-        },
-        {
-          "ordinal": 1,
-          "name": "shop_id",
-          "type_info": "Int4"
-        }
-      ],
-      "parameters": {
-        "Left": []
-      },
-      "nullable": [
-        false,
-        false
-      ]
-    }
-  },
   "2de403104534f99a2abe89fbb5f5ed7edf5a8d891007d099dac3f0c9ed30dc95": {
     "query": "SELECT shop_id, dow, open, close FROM schedule\n            WHERE shop_id = $1\n            ORDER BY dow, open",
     "describe": {
@@ -265,8 +277,94 @@
       ]
     }
   },
-  "4ea44ed57b388fe64856e71d86261700fa1269c6ec47980a0510209d8cba2bb4": {
-    "query": "INSERT INTO ticket (customer_id, shop_id, creation, expiration, est_minutes, valid, active) VALUES\n            ($1, $2, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, $3, TRUE, TRUE)\n            RETURNING id",
+  "3c7b57725eea2be7ae64e53cde495ba33a6dc5afba41f001f3613d8e70670c77": {
+    "query": "SELECT ticket.id AS id, customer_id, ticket.shop_id AS shop_id, shop.name as shop_name, array_agg(department.id) AS department_ids, creation, expiration, entry, exit, est_minutes, valid, active\n            FROM ticket, ticket_department, department, shop\n            WHERE ticket_department.ticket_id = ticket.id AND\n                ticket.shop_id = shop.id AND\n                ticket_department.department_id = department.id AND\n                ticket.customer_id = $1 AND\n                COALESCE(expiration > CURRENT_TIMESTAMP, TRUE)\n            GROUP BY ticket.id, customer_id, ticket.shop_id, shop.name, creation, expiration, valid, active\n            ORDER BY creation",
+    "describe": {
+      "columns": [
+        {
+          "ordinal": 0,
+          "name": "id",
+          "type_info": "Int4"
+        },
+        {
+          "ordinal": 1,
+          "name": "customer_id",
+          "type_info": "Int4"
+        },
+        {
+          "ordinal": 2,
+          "name": "shop_id",
+          "type_info": "Int4"
+        },
+        {
+          "ordinal": 3,
+          "name": "shop_name",
+          "type_info": "Varchar"
+        },
+        {
+          "ordinal": 4,
+          "name": "department_ids",
+          "type_info": "Int4Array"
+        },
+        {
+          "ordinal": 5,
+          "name": "creation",
+          "type_info": "Timestamp"
+        },
+        {
+          "ordinal": 6,
+          "name": "expiration",
+          "type_info": "Timestamp"
+        },
+        {
+          "ordinal": 7,
+          "name": "entry",
+          "type_info": "Timestamp"
+        },
+        {
+          "ordinal": 8,
+          "name": "exit",
+          "type_info": "Timestamp"
+        },
+        {
+          "ordinal": 9,
+          "name": "est_minutes",
+          "type_info": "Int4"
+        },
+        {
+          "ordinal": 10,
+          "name": "valid",
+          "type_info": "Bool"
+        },
+        {
+          "ordinal": 11,
+          "name": "active",
+          "type_info": "Bool"
+        }
+      ],
+      "parameters": {
+        "Left": [
+          "Int4"
+        ]
+      },
+      "nullable": [
+        false,
+        false,
+        false,
+        false,
+        null,
+        false,
+        false,
+        true,
+        true,
+        false,
+        false,
+        false
+      ]
+    }
+  },
+  "3d6d9e0ba5d87908da94a1bfc229e89509cbbf4ef2f38796e32ffb6a3e870f60": {
+    "query": "INSERT INTO department ( shop_id, description, capacity)\n        VALUES ($1, 'Frutta', $2) RETURNING id",
     "describe": {
       "columns": [
         {
@@ -277,7 +375,6 @@
       ],
       "parameters": {
         "Left": [
-          "Int4",
           "Int4",
           "Int4"
         ]
@@ -309,6 +406,18 @@
         false,
         false
       ]
+    }
+  },
+  "5ea385f61e9806cf6c4e31a0478ea1c92b4008bb097190a4e68efbc3b5d91226": {
+    "query": "DELETE FROM ticket WHERE id = $1",
+    "describe": {
+      "columns": [],
+      "parameters": {
+        "Left": [
+          "Int4"
+        ]
+      },
+      "nullable": []
     }
   },
   "81fe618d2bf0878dfc1bc7e3b90175ff522c5039ad3badb6667227b160a9529f": {
@@ -359,6 +468,16 @@
         false,
         false
       ]
+    }
+  },
+  "881343bcdcb542bdbe5727892f435c52e0c061697481652f41422a76be479ec8": {
+    "query": "INSERT INTO schedule (shop_id, dow, open, close) VALUES\n        (1234111, 1, '09:00', '17:00'),\n        (1234111, 2, '09:00', '17:00'),\n        (1234111, 3, '09:00', '17:00'),\n        (1234111, 4, '09:00', '17:00'),\n        (1234111, 5, '09:00', '17:00'),\n\n        (1234222, 1, '09:00', '17:00'),\n        (1234222, 2, '09:00', '17:00'),\n        (1234222, 3, '09:00', '17:00'),\n        (1234222, 4, '09:00', '17:00'),\n        (1234222, 5, '09:00', '17:00'),\n\n        (1234333, 1, '09:00', '17:00'),\n        (1234333, 2, '09:00', '17:00'),\n        (1234333, 3, '09:00', '17:00'),\n        (1234333, 4, '09:00', '17:00'),\n        (1234333, 5, '09:00', '17:00'),\n\n        (1234444, 1, '09:00', '17:00'),\n        (1234444, 2, '09:00', '17:00'),\n        (1234444, 3, '09:00', '17:00'),\n        (1234444, 4, '09:00', '17:00'),\n        (1234444, 5, '09:00', '17:00'),\n\n        (1234555, 1, '09:00', '17:00'),\n        (1234555, 2, '09:00', '17:00'),\n        (1234555, 3, '09:00', '17:00'),\n        (1234555, 4, '09:00', '17:00'),\n        (1234555, 5, '09:00', '17:00'),\n\n        (1234666, 1, '09:00', '17:00'),\n        (1234666, 2, '09:00', '17:00'),\n        (1234666, 3, '09:00', '17:00'),\n        (1234666, 4, '09:00', '17:00'),\n        (1234666, 5, '09:00', '17:00');",
+    "describe": {
+      "columns": [],
+      "parameters": {
+        "Left": []
+      },
+      "nullable": []
     }
   },
   "8b027014459e111e54b722f2b794664721cf7eeb50b08365cf2cc53c436e5a56": {
@@ -514,6 +633,92 @@
       "nullable": []
     }
   },
+  "9e5f05727004c7a70661e620138343933b8f4d6a8af802ed6ac49ea39954dfc7": {
+    "query": "SELECT ticket.id AS id, customer_id, ticket.shop_id AS shop_id, shop.name as shop_name, array_agg(department.id) AS department_ids, creation, expiration, entry, exit, est_minutes, valid, active\n                FROM ticket, ticket_department, department, shop\n                WHERE\n                    ticket.shop_id = $1 AND\n                    ticket.shop_id = shop.id AND\n                    ticket_department.ticket_id = ticket.id AND\n                    ticket_department.department_id = department.id AND\n                    entry IS NULL AND exit IS NULL AND COALESCE(expiration > CURRENT_TIMESTAMP, TRUE)\n                GROUP BY ticket.id, customer_id, ticket.shop_id, shop.name, creation, expiration, valid, active\n                ORDER BY creation",
+    "describe": {
+      "columns": [
+        {
+          "ordinal": 0,
+          "name": "id",
+          "type_info": "Int4"
+        },
+        {
+          "ordinal": 1,
+          "name": "customer_id",
+          "type_info": "Int4"
+        },
+        {
+          "ordinal": 2,
+          "name": "shop_id",
+          "type_info": "Int4"
+        },
+        {
+          "ordinal": 3,
+          "name": "shop_name",
+          "type_info": "Varchar"
+        },
+        {
+          "ordinal": 4,
+          "name": "department_ids",
+          "type_info": "Int4Array"
+        },
+        {
+          "ordinal": 5,
+          "name": "creation",
+          "type_info": "Timestamp"
+        },
+        {
+          "ordinal": 6,
+          "name": "expiration",
+          "type_info": "Timestamp"
+        },
+        {
+          "ordinal": 7,
+          "name": "entry",
+          "type_info": "Timestamp"
+        },
+        {
+          "ordinal": 8,
+          "name": "exit",
+          "type_info": "Timestamp"
+        },
+        {
+          "ordinal": 9,
+          "name": "est_minutes",
+          "type_info": "Int4"
+        },
+        {
+          "ordinal": 10,
+          "name": "valid",
+          "type_info": "Bool"
+        },
+        {
+          "ordinal": 11,
+          "name": "active",
+          "type_info": "Bool"
+        }
+      ],
+      "parameters": {
+        "Left": [
+          "Int4"
+        ]
+      },
+      "nullable": [
+        false,
+        false,
+        false,
+        false,
+        null,
+        false,
+        false,
+        true,
+        true,
+        false,
+        false,
+        false
+      ]
+    }
+  },
   "a5ceaad0060269ab121a35aed882b41cefcd90f0ead11cc36ace48e64ae7bbdc": {
     "query": "INSERT INTO shop (name, description, location)\n        VALUES ('TEST', 'TEST', 'TEST') RETURNING id",
     "describe": {
@@ -573,6 +778,28 @@
         false,
         false,
         false
+      ]
+    }
+  },
+  "acb2e1a98cd29b1972ff3f845bd7ca0c51f815c4fdb0ece58c0c4cd58826466f": {
+    "query": "SELECT count(*) as count FROM ticket\n            WHERE\n                shop_id = $1 AND\n                entry IS NULL AND exit IS NULL AND\n                id <> $2 AND creation < $3",
+    "describe": {
+      "columns": [
+        {
+          "ordinal": 0,
+          "name": "count",
+          "type_info": "Int8"
+        }
+      ],
+      "parameters": {
+        "Left": [
+          "Int4",
+          "Int4",
+          "Timestamp"
+        ]
+      },
+      "nullable": [
+        null
       ]
     }
   },
@@ -700,6 +927,64 @@
       ]
     }
   },
+  "b3ad4dba31c593057859899d20a85b07c87c304a1cfe7a8896ec7f999fd36437": {
+    "query": "SELECT entry IS NOT NULL as entered, exit IS NOT NULL as exited, COALESCE(expiration < CURRENT_TIMESTAMP, TRUE) AS expired FROM ticket\n            WHERE id = $1",
+    "describe": {
+      "columns": [
+        {
+          "ordinal": 0,
+          "name": "entered",
+          "type_info": "Bool"
+        },
+        {
+          "ordinal": 1,
+          "name": "exited",
+          "type_info": "Bool"
+        },
+        {
+          "ordinal": 2,
+          "name": "expired",
+          "type_info": "Bool"
+        }
+      ],
+      "parameters": {
+        "Left": [
+          "Int4"
+        ]
+      },
+      "nullable": [
+        null,
+        null,
+        null
+      ]
+    }
+  },
+  "be17c1830e88b6f4a34f162d3e93420d5b1ccefed65abdc32dd0c32f75130480": {
+    "query": "SELECT department.id as id, (count(ticket.id) >= department.capacity) as full FROM ticket, ticket_department, department\n                        WHERE\n                            ticket_department.ticket_id = ticket.id AND\n                            ticket_department.department_id = department.id AND\n                            ticket.shop_id = $1 AND\n                            department.shop_id = $1 AND\n                            ticket.entry IS NOT NULL AND\n                            ticket.exit IS NULL\n                        GROUP BY\n                            department.id, department.capacity",
+    "describe": {
+      "columns": [
+        {
+          "ordinal": 0,
+          "name": "id",
+          "type_info": "Int4"
+        },
+        {
+          "ordinal": 1,
+          "name": "full",
+          "type_info": "Bool"
+        }
+      ],
+      "parameters": {
+        "Left": [
+          "Int4"
+        ]
+      },
+      "nullable": [
+        false,
+        null
+      ]
+    }
+  },
   "be4b600a4bc6b3314305e99f22fdb3b01829fb527e09e1fd37e00c854626f6dd": {
     "query": "SELECT id, email, salt, digest, shop_id FROM staff WHERE id = $1",
     "describe": {
@@ -756,6 +1041,28 @@
       ],
       "parameters": {
         "Left": []
+      },
+      "nullable": [
+        false
+      ]
+    }
+  },
+  "c4dbe00cfaed2879c85f8d450ff4925b5ed1444866526f1ed2c646a607051bcc": {
+    "query": "INSERT INTO ticket (customer_id, shop_id, creation, expiration, est_minutes, valid, active) VALUES\n            ($1, $2, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP + interval '6 hour', $3, TRUE, TRUE)\n            RETURNING id",
+    "describe": {
+      "columns": [
+        {
+          "ordinal": 0,
+          "name": "id",
+          "type_info": "Int4"
+        }
+      ],
+      "parameters": {
+        "Left": [
+          "Int4",
+          "Int4",
+          "Int4"
+        ]
       },
       "nullable": [
         false
@@ -847,94 +1154,6 @@
       ]
     }
   },
-  "d84426d7e616af65d16a0da524be7cb589b6e862d54d114f32bc3e6aff6f867c": {
-    "query": "SELECT ticket.id AS id, customer_id, ticket.shop_id AS shop_id, shop.name as shop_name, array_agg(department.id) AS department_ids, creation, expiration, entry, exit, est_minutes, valid, active\n                FROM ticket, ticket_department, department, shop\n                WHERE\n                    ticket.shop_id = $1 AND\n                    ticket.shop_id = shop.id AND\n                    ticket_department.ticket_id = ticket.id AND\n                    ticket_department.department_id = department.id AND\n                    valid = $2 AND active = $3\n                GROUP BY ticket.id, customer_id, ticket.shop_id, shop.name, creation, expiration, valid, active\n                ORDER BY creation",
-    "describe": {
-      "columns": [
-        {
-          "ordinal": 0,
-          "name": "id",
-          "type_info": "Int4"
-        },
-        {
-          "ordinal": 1,
-          "name": "customer_id",
-          "type_info": "Int4"
-        },
-        {
-          "ordinal": 2,
-          "name": "shop_id",
-          "type_info": "Int4"
-        },
-        {
-          "ordinal": 3,
-          "name": "shop_name",
-          "type_info": "Varchar"
-        },
-        {
-          "ordinal": 4,
-          "name": "department_ids",
-          "type_info": "Int4Array"
-        },
-        {
-          "ordinal": 5,
-          "name": "creation",
-          "type_info": "Timestamp"
-        },
-        {
-          "ordinal": 6,
-          "name": "expiration",
-          "type_info": "Timestamp"
-        },
-        {
-          "ordinal": 7,
-          "name": "entry",
-          "type_info": "Timestamp"
-        },
-        {
-          "ordinal": 8,
-          "name": "exit",
-          "type_info": "Timestamp"
-        },
-        {
-          "ordinal": 9,
-          "name": "est_minutes",
-          "type_info": "Int4"
-        },
-        {
-          "ordinal": 10,
-          "name": "valid",
-          "type_info": "Bool"
-        },
-        {
-          "ordinal": 11,
-          "name": "active",
-          "type_info": "Bool"
-        }
-      ],
-      "parameters": {
-        "Left": [
-          "Int4",
-          "Bool",
-          "Bool"
-        ]
-      },
-      "nullable": [
-        false,
-        false,
-        false,
-        false,
-        null,
-        false,
-        false,
-        true,
-        true,
-        false,
-        false,
-        false
-      ]
-    }
-  },
   "dbbbc72cf10924b67b2167fcb998a87b5854022f68b84ab259353e254adb57b7": {
     "query": "SELECT code, email, salt, digest FROM temp_customer WHERE code = $1",
     "describe": {
@@ -973,8 +1192,8 @@
       ]
     }
   },
-  "e3dbe4ff24f837b2c678f6c4aa82f9223744b671dace88b7be1c064d343ceca0": {
-    "query": "INSERT INTO department ( shop_id, description, capacity)\n        VALUES ($1, 'Frutta', 20) RETURNING id",
+  "de094b395e3cd3ce72bdf820f2f24712b57be456c40ff73cfd8c9145b6a2e50e": {
+    "query": "SELECT id FROM ticket\n            WHERE\n                customer_id = $1 AND shop_id = $2 AND\n                exit IS NULL AND expiration > CURRENT_TIMESTAMP",
     "describe": {
       "columns": [
         {
@@ -985,6 +1204,7 @@
       ],
       "parameters": {
         "Left": [
+          "Int4",
           "Int4"
         ]
       },
@@ -1003,90 +1223,16 @@
       "nullable": []
     }
   },
-  "ed2c0b97690a8ad498acc51290de285de46618c729b6c51a49eb8dd674cf4d6a": {
-    "query": "SELECT ticket.id AS id, customer_id, ticket.shop_id AS shop_id, shop.name as shop_name, array_agg(department.id) AS department_ids, creation, expiration, entry, exit, est_minutes, valid, active\n            FROM ticket, ticket_department, department, shop\n            WHERE ticket_department.ticket_id = ticket.id AND\n                ticket.shop_id = shop.id AND\n                ticket_department.department_id = department.id AND\n                ticket.customer_id = $1\n            GROUP BY ticket.id, customer_id, ticket.shop_id, shop.name, creation, expiration, valid, active\n            ORDER BY creation",
+  "ed7432630f8b37ba50ed01fb9ff4cfccd269b6a747637a3c345fba0282c3bf37": {
+    "query": "UPDATE ticket\n            SET\n                entry = CURRENT_TIMESTAMP\n            WHERE id = $1",
     "describe": {
-      "columns": [
-        {
-          "ordinal": 0,
-          "name": "id",
-          "type_info": "Int4"
-        },
-        {
-          "ordinal": 1,
-          "name": "customer_id",
-          "type_info": "Int4"
-        },
-        {
-          "ordinal": 2,
-          "name": "shop_id",
-          "type_info": "Int4"
-        },
-        {
-          "ordinal": 3,
-          "name": "shop_name",
-          "type_info": "Varchar"
-        },
-        {
-          "ordinal": 4,
-          "name": "department_ids",
-          "type_info": "Int4Array"
-        },
-        {
-          "ordinal": 5,
-          "name": "creation",
-          "type_info": "Timestamp"
-        },
-        {
-          "ordinal": 6,
-          "name": "expiration",
-          "type_info": "Timestamp"
-        },
-        {
-          "ordinal": 7,
-          "name": "entry",
-          "type_info": "Timestamp"
-        },
-        {
-          "ordinal": 8,
-          "name": "exit",
-          "type_info": "Timestamp"
-        },
-        {
-          "ordinal": 9,
-          "name": "est_minutes",
-          "type_info": "Int4"
-        },
-        {
-          "ordinal": 10,
-          "name": "valid",
-          "type_info": "Bool"
-        },
-        {
-          "ordinal": 11,
-          "name": "active",
-          "type_info": "Bool"
-        }
-      ],
+      "columns": [],
       "parameters": {
         "Left": [
           "Int4"
         ]
       },
-      "nullable": [
-        false,
-        false,
-        false,
-        false,
-        null,
-        false,
-        false,
-        true,
-        true,
-        false,
-        false,
-        false
-      ]
+      "nullable": []
     }
   },
   "efb8d7f7c066a8ef8b0d51041c191eb10c7d4a28864c200be495111c2e52f2a2": {
@@ -1130,6 +1276,32 @@
         false,
         true,
         false
+      ]
+    }
+  },
+  "f37101ecc412f35e02e37c99189d5ebca392b46478956efc77963a37511811f2": {
+    "query": "SELECT entry IS NOT NULL as entered, exit IS NOT NULL as exited FROM ticket\n            WHERE id = $1",
+    "describe": {
+      "columns": [
+        {
+          "ordinal": 0,
+          "name": "entered",
+          "type_info": "Bool"
+        },
+        {
+          "ordinal": 1,
+          "name": "exited",
+          "type_info": "Bool"
+        }
+      ],
+      "parameters": {
+        "Left": [
+          "Int4"
+        ]
+      },
+      "nullable": [
+        null,
+        null
       ]
     }
   },

@@ -8,7 +8,7 @@ use crate::utils::session;
 
 use actix_web::{web, get, post, HttpResponse};
 use actix_session::Session;
-use chrono::{NaiveDateTime, Duration, Utc};
+use chrono::{DateTime, Duration, Utc};
 use sqlx::PgPool;
 use serde::{Serialize, Deserialize};
 
@@ -103,7 +103,7 @@ async fn ticket_queue_inner(conn: &PgPool, shop_id: i32) -> sqlx::Result<HttpRes
 
     Ok(HttpResponse::Ok().json(TicketEstResponse {
         people,
-        est: Utc::now().naive_utc() + delta_t
+        est: Utc::now() + delta_t
     }))
 }
 
@@ -155,7 +155,7 @@ struct TicketEstQuery {
 #[derive(Serialize, Debug)]
 struct TicketEstResponse {
     pub people: u32,
-    pub est: NaiveDateTime,
+    pub est: DateTime<Utc>,
 }
 #[get("/ticket/est")]
 async fn ticket_est(conn: web::Data<PgPool>, query: web::Query<TicketEstQuery>, session: Session) -> HttpResponse {
@@ -205,7 +205,7 @@ async fn ticket_est_inner(conn: &PgPool, cid: i32, tid: i32) -> sqlx::Result<Htt
         if contained {
             Ok(HttpResponse::Ok().json(TicketEstResponse {
                 people,
-                est: Utc::now().naive_utc() + delta_t
+                est: Utc::now() + delta_t
             }))
         } else {
             Ok(HttpResponse::BadRequest().body("Not the owner of the ticket"))
