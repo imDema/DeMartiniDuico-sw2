@@ -4,8 +4,11 @@
 \begin{tabularx}{\textwidth}{|p{0.08\textwidth}|l|X|} \hline
 \textbf{Class} & \textbf{HTTP request} & \textbf{Description} \\\hline\endhead
 account & \makecell{\textbf{POST} \\ \texttt{/login}}  & Logs in and returns the authentication  cookie \\\hline
+account & \makecell{\textbf{GET} \\ \texttt{/logout}}  & Log out and terminate session \\\hline
 account & \makecell{\textbf{POST} \\ \texttt{/register}}  & Request creation of a new account \\\hline
 account & \makecell{\textbf{GET} \\ \texttt{/register/confirm}}  & Submit email confirmation \\\hline
+account & \makecell{\textbf{GET} \\ \texttt{/whoami}}  & Get customer authentication status \\\hline
+account & \makecell{\textbf{GET} \\ \texttt{/staff/whoami}}  & Get customer authentication status \\\hline
 booking & \makecell{\textbf{POST} \\ \texttt{/shop/\{shop\_id\}/booking/new}}  & Request a booking for a shop \\\hline
 booking & \makecell{\textbf{GET} \\ \texttt{/shop/\{shop\_id\}/booking/availability}}  & Get information about the time slot availability for bookings \\\hline
 manage & \makecell{\textbf{POST} \\ \texttt{/staff/manage/create-account/\{shop\_id\}}}  & Generate a temporary staff account for activation \\\hline
@@ -48,6 +51,18 @@ Responses     & \everyrow{}\begin{tabu}{X[0.5]|X[3]|X[2]}
 \begin{table}[H]
 \tabulinesep=4pt\everyrow{\tabucline[0.5pt]-}
 \begin{tabu} to \textwidth {@{}|X|X[5]|} \hline
+\textbf{GET}  & \texttt{/logout} \\
+Description   & Log out and terminate session  \\
+Responses     & \everyrow{}\begin{tabu}{X[0.5]|X[3]|X[2]} 
+\textbf{Code} & \textbf{Description} & \textbf{Body} \\
+\hline \textbf{200} & OK &\\
+\hline \textbf{400} & Not Logged in &\\
+\end{tabu}\everyrow{\tabucline[0.5pt]-} \\
+\end{tabu}
+\end{table}
+\begin{table}[H]
+\tabulinesep=4pt\everyrow{\tabucline[0.5pt]-}
+\begin{tabu} to \textwidth {@{}|X|X[5]|} \hline
 \textbf{POST}  & \texttt{/register} \\
 Description   & Request creation of a new account  \\
 Body & \texttt{RequestRegistration} \\
@@ -69,8 +84,30 @@ Parameters    & \everyrow{}\begin{tabu}{X|X}
 \end{tabu}\everyrow{\tabucline[0.5pt]-}\\
 Responses     & \everyrow{}\begin{tabu}{X[0.5]|X[3]|X[2]} 
 \textbf{Code} & \textbf{Description} & \textbf{Body} \\
-\hline \textbf{201} & successful operation &\\
+\hline \textbf{200} & successful operation &\\
 \hline \textbf{400} & Invalid code &\\
+\end{tabu}\everyrow{\tabucline[0.5pt]-} \\
+\end{tabu}
+\end{table}
+\begin{table}[H]
+\tabulinesep=4pt\everyrow{\tabucline[0.5pt]-}
+\begin{tabu} to \textwidth {@{}|X|X[5]|} \hline
+\textbf{GET}  & \texttt{/whoami} \\
+Description   & Get customer authentication status  \\
+Responses     & \everyrow{}\begin{tabu}{X[0.5]|X[3]|X[2]} 
+\textbf{Code} & \textbf{Description} & \textbf{Body} \\
+\hline \textbf{200} & Ok &\texttt{\{authenticated: boolean, email: string,\}}\\
+\end{tabu}\everyrow{\tabucline[0.5pt]-} \\
+\end{tabu}
+\end{table}
+\begin{table}[H]
+\tabulinesep=4pt\everyrow{\tabucline[0.5pt]-}
+\begin{tabu} to \textwidth {@{}|X|X[5]|} \hline
+\textbf{GET}  & \texttt{/staff/whoami} \\
+Description   & Get customer authentication status  \\
+Responses     & \everyrow{}\begin{tabu}{X[0.5]|X[3]|X[2]} 
+\textbf{Code} & \textbf{Description} & \textbf{Body} \\
+\hline \textbf{200} & Ok &\texttt{\{authenticated: boolean, email: string,\}}\\
 \end{tabu}\everyrow{\tabucline[0.5pt]-} \\
 \end{tabu}
 \end{table}
@@ -113,6 +150,10 @@ Responses     & \everyrow{}\begin{tabu}{X[0.5]|X[3]|X[2]}
 \begin{tabu} to \textwidth {@{}|X|X[5]|} \hline
 \textbf{POST}  & \texttt{/staff/manage/create-account/\{shop\_id\}} \\
 Description   & Generate a temporary staff account for activation  \\
+Parameters    & \everyrow{}\begin{tabu}{X|X}
+\textbf{Name} & \textbf{Type} \\
+\hline shop\_id & \texttt{string} \\
+\end{tabu}\everyrow{\tabucline[0.5pt]-}\\
 Body & \texttt{string} \\
 Responses     & \everyrow{}\begin{tabu}{X[0.5]|X[3]|X[2]} 
 \textbf{Code} & \textbf{Description} & \textbf{Body} \\
@@ -404,7 +445,7 @@ Responses     & \everyrow{}\begin{tabu}{X[0.5]|X[3]|X[2]}
 \end{table}
 \subsubsection{Models}
 
-\begin{center}\textbf{BookingAvailability}: \texttt{Array<\{dept\_id: string, time: TimeSpan, available: integer,\}>}\end{center}
+\begin{center}\textbf{BookingAvailability}: \texttt{Array<\{dept\_id: string, time: Schedule, available: integer,\}>}\end{center}
 
 \begin{center}\textbf{BookingList}: \texttt{Array<TokenBooking>}\end{center}
 
@@ -486,7 +527,18 @@ department\_ids & \texttt{Array<string>} \\
 \end{tabu}
 \end{table}
 
-\begin{center}\textbf{Schedule}: \texttt{Array<TimeSpan>}\end{center}
+
+    \begin{table}[H]
+    \centering
+    \textbf{Schedule}\\
+    \everyrow{\tabucline[0.5pt]-}
+    \begin{tabu} to 0.55\textwidth {|X|X|} \hline
+    Field & Type \\
+    dow & \texttt{integer} \\
+start & \texttt{string} \\
+end & \texttt{string} \\
+\end{tabu}
+\end{table}
 
 
     \begin{table}[H]
@@ -515,7 +567,7 @@ description & \texttt{string} \\
 image & \texttt{string} \\
 location & \texttt{string} \\
 departments & \texttt{Array<Department>} \\
-weekly-schedule & weekly-schedule \\
+weekly-schedule & \texttt{Array<Schedule>} \\
 \end{tabu}
 \end{table}
 
@@ -541,18 +593,6 @@ password & \texttt{string} \\
     Field & Type \\
     email & \texttt{string} \\
 token & \texttt{string} \\
-\end{tabu}
-\end{table}
-
-
-    \begin{table}[H]
-    \centering
-    \textbf{TimeSpan}\\
-    \everyrow{\tabucline[0.5pt]-}
-    \begin{tabu} to 0.55\textwidth {|X|X|} \hline
-    Field & Type \\
-    start & \texttt{string} \\
-end & \texttt{string} \\
 \end{tabu}
 \end{table}
 
@@ -591,10 +631,11 @@ end\_time & \texttt{string} \\
     Field & Type \\
     uid & \texttt{string} \\
 shop\_id & \texttt{string} \\
+shop\_name & \texttt{string} \\
 department\_ids & \texttt{Array<string>} \\
 creation & \texttt{string} \\
 expiration & \texttt{string} \\
-state & \texttt{string} \\
+valid & \texttt{boolean} \\
 \end{tabu}
 \end{table}
 

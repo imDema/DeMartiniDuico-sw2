@@ -1,4 +1,4 @@
-default:
+default: generate
 	latexmk -synctex=1 -interaction=nonstopmode -file-line-error -pdf -outdir=./ ./main
 
 generate:
