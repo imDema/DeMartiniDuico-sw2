@@ -15,6 +15,7 @@
     auto-select
     @submit="onSubmit"
     ref="autocomplete"
+    :debounce-time="100"
     ></Autocomplete>    
 </div>
 </template>

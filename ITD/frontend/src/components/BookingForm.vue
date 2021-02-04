@@ -5,7 +5,7 @@
   <span class="italic">{{store.description}}</span> 
   </header>
   <b-form class="py-2" novalidate>
-      <b-form-group id="input-group-categories" label="Categories:">         
+      <b-form-group id="input-group-categories" label="Departments:" v-if="'departments' in store && store.departments.length >=2">         
         <b-form-checkbox v-for="cat in store.departments" :key="cat.uid" :value="cat.uid" :checked="form.categories.indexOf(cat.uid)!==-1" v-model="form.categories">
           {{ cat.description }}
         </b-form-checkbox>
@@ -50,7 +50,7 @@ import Queue from "./Queue"
       // TODO add specific keys
       store: {
         type: Object,
-        default() { return {}},
+        default() { return { departments: [] }},
       }
     },
     computed: {
@@ -104,7 +104,7 @@ import Queue from "./Queue"
           alert("Store data missing");
           return
         }
-        if(!this.form.categories){
+        if(!this.form.categories || this.form.categories.length === 0){
           this.form.categories = this.store.departments.map( d => d.uid);
         }
         let endpoint = "/shop/"+this.store.uid+"/ticket/new"
@@ -118,6 +118,13 @@ import Queue from "./Queue"
             this.$emit('success')
             let new_uid = res.data.uid
             this.$router.push('/tokens/'+new_uid)
+            .catch( (err) => {
+              if(err.name === 'NavigationDuplicated'){
+                //ignore
+              }else{
+                console.log(err)
+              }
+            })
           }
         }).catch( () => {}) //TODO
       },

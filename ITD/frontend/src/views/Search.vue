@@ -20,7 +20,7 @@ export default {
   },
   methods: {
     getTicket(searchChoice){
-      if(!searchChoice){
+      if(!('uid' in searchChoice)){
         console.log('get-ticket event without params')
         return
       }

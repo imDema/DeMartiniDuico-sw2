@@ -38,7 +38,7 @@ export default {
     },
     computed:{
         est() {
-            let then = new Date(this.queue.est+"Z")
+            let then = new Date(this.queue.est)
             let now = new Date()
             let secs = (then - now)/1000;
             let min = Math.round(secs/60,3)

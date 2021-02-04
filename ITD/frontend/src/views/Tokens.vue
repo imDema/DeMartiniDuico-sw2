@@ -1,4 +1,8 @@
 <template>
+  <div>
+  <b-jumbotron class="py-1 px-3" bg-variant="secondary" text-variant="white" border-variant="dark">
+    Your tokens
+  </b-jumbotron>
   <div class="container my-4">
   <div v-if="tickets.length===0">
     <h3>No tokens available.</h3>
@@ -11,10 +15,21 @@
       <h5 class="mb-1">{{t.shop_name}}</h5>
       <small>{{timeDifference(t.creation)}}</small>
     </div>
-    <p class="mb-1">
-      {{ shopDescription[t.shop_id] }}
-    </p>
-  <small>Departments: {{ departmentNames[t.shop_id] }}</small>
+    <div class="d-flex w-100 justify-content-between">
+      <div>
+      <p class="mb-1">
+        {{ shopDescription[t.shop_id] }}
+      </p>
+      <small>Departments: {{ departmentNames[t.shop_id] }}</small>
+      </div>
+      <div>
+        <b-button  :id="'popover-delete-event' + t.uid" @click="deleteOnClick"><b-icon icon="trash"/></b-button>
+            <b-popover :target="'popover-delete-event'+ t.uid" triggers="focus" placement="left">
+              <div>Are you sure you want to delete this ticket?</div>
+              <b-button variant="danger" @click="deleteTicket(t.uid)">Delete</b-button>
+            </b-popover>
+      </div>
+    </div>
   </b-list-group-item>
   </b-list-group>
   <token-display v-if="isTicketSelected" :ticket="selectedTicket" :shop-description="shopDescription[selectedTicket.shop_id]" :departments="departmentNames[selectedTicket.shop_id]"/>
@@ -23,6 +38,7 @@
     <b-col cols="6" v-if="isTicketSelected"><b-button @click="showQR" variant="primary" block>Show</b-button></b-col>
   </b-row>
 
+  </div>
   </div>
 </template>
 
@@ -51,15 +67,27 @@ export default {
     },        
   },
   watch:{
-    $route(to, from){
-      //update selectedTicket
-      to, from
+    $route(to){
+      this.onRouteChange(to)
     },
     async tickets(newTickets){
       this.loadShopInfo(newTickets);
     }
   },
   methods: {
+      onRouteChange(to){
+        if(!to.params.uid){
+          //console.log('empty uid')
+          this.$set(this, 'selectedTicket', {})
+        }
+        this.loadTokens().then( (newTickets) => {
+          if(to.params.uid){
+            let selectedTickedUID = to.params.uid
+            this.selectTicket(this.tickets.find( t => t.uid === selectedTickedUID))
+          }
+          this.loadShopInfo(newTickets)
+        });
+      },
       timeDifference(time){
         var now = Date.now();
         var then = new Date(time).getTime();
@@ -98,6 +126,13 @@ export default {
             return
           }
           this.$router.push("/tokens/"+ticket.uid)
+          .catch( (err) => {
+              if(err.name === 'NavigationDuplicated'){
+                //ignore
+              }else{
+                console.log(err)
+              }
+            })
           this.selectedTicket = ticket
       },
       loadTokens(){
@@ -129,7 +164,6 @@ export default {
             )
           });
           Promise.all(fetchPromises).then( () => {
-            console.log(this.shopInfo)
             this.updateShopDescription()
             this.updateDepartmentNames()
           });
@@ -152,19 +186,19 @@ export default {
               this.$set(this.departmentNames, t.shop_id, "")
         })
       },
+      deleteOnClick(e){
+          e.preventDefault()
+          e.stopPropagation()
+      },
+      deleteTicket(uid){
+          this.$api.post("/ticket/cancel", {uid: uid})
+          .then(this.loadTokens)
+          .catch(console.log)
+      },
+      
   },
   created(){
-    if(this.$route.params.uid === ''){
-      this.$delete(this, 'selectedTicket')
-      console.log(this.selectedTicket)
-    }
-    this.loadTokens().then( (newTickets) => {
-      if(this.$route.params.uid){
-        let selectedTickedUID = this.$route.params.uid
-        this.selectTicket(this.tickets.find( t => t.uid === selectedTickedUID))
-      }
-      this.loadShopInfo(newTickets)
-    });
+    this.onRouteChange(this.$route)
   },
 }
 
@@ -174,7 +208,7 @@ function prettyDateDiff(millisecs) {
   if (secs < 3600) return Math.floor(secs / 60) + " min(s)";
   if (secs < 86400) return Math.floor(secs / 3600) + " hour(s)";
   if (secs < 604800) return Math.floor(secs / 86400) + " day(s)";
-  return Date().toDateString();
+  return "Months ";
 }
 </script>
 

@@ -1,7 +1,14 @@
 <template>
-<div>
+<div class="my-2">
+  <div class="border-bottom d-flex justify-content-between  pb-2">
+    <div class="h4">{{modal_header}}</div>
+    <div class="d-flex flex-row justify-content-end align-items-center">
+      <div class="p-2">{{switch_text.text}}</div>
+      <b-button variant="outline-primary" class="switch-action" @click="switchAction">{{switch_text.button}}</b-button>
+    </div>
+  </div>
   <b-overlay :show="showOverlay" rounded="sm">
-  <div class="container">
+  <div class="container my-4">
     <b-form @submit="onSubmit" @reset="onReset">
       <b-form-group
         validated
@@ -98,11 +105,6 @@
     </b-form>
   </div>
   </b-overlay>
-
-  <div class="border-top pt-2 mt-4 d-flex flex-row justify-content-end align-items-center">
-    <div class="p-2">{{switch_text.text}}</div>
-    <b-button variant="outline-primary" class="switch-action" @click="switchAction">{{switch_text.button}}</b-button>
-  </div>
 </div>
 </template>
 
@@ -133,6 +135,9 @@
     computed:{
       password_label() {
           return this.isRegistration?"Your new password:":"Your password:";
+      },
+      modal_header() {
+          return this.isRegistration?"Sign-up":"Log-in"
       },
       switch_text(){
           return this.isRegistration?

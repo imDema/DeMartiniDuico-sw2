@@ -12,7 +12,7 @@
         Expiration: {{expiration}}
         </div>
     </b-card>
-    <b-card bg-variant="secondary" text-variant="light">   
+    <b-card bg-variant="light">   
         Departments for this ticket: {{departments}}
     </b-card>
     <queue :shop_id="ticket.shop_id" :ticket_id="ticket.uid" />
@@ -37,15 +37,16 @@ export default {
     },
     computed:{
         maps_url(){
+            //TODO
             return "openstreetmap.org"
         },
         creation(){
-            let d = new Date(this.ticket.creation+"Z");
+            let d = new Date(this.ticket.creation);
             return d.toLocaleDateString() + " at " + d.toLocaleTimeString();
 
         },
         expiration(){
-            let d = new Date(this.ticket.expiration+"Z");
+            let d = new Date(this.ticket.expiration);
             return d.toLocaleDateString() + " at " + d.toLocaleTimeString();
         }
     },
