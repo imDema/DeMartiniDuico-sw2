@@ -17,6 +17,7 @@ pub fn endpoints(cfg: &mut web::ServiceConfig) {
     cfg.service(ticket_new);
     cfg.service(ticket_est);
     cfg.service(ticket_queue);
+    cfg.service(ticket_cancel);
 }
 
 #[derive(Serialize, Deserialize)]
@@ -93,7 +94,7 @@ async fn ticket_queue(conn: web::Data<PgPool>, shop_id: web::Path<String>, sessi
     }
 }
 async fn ticket_queue_inner(conn: &PgPool, shop_id: i32) -> sqlx::Result<HttpResponse> {
-    let queue = PersistentTicket::queue(conn, shop_id, true, true).await?;
+    let queue = PersistentTicket::queue(conn, shop_id).await?;
 
     let (delta_t, people) = queue.into_iter()
         .fold((Duration::zero(), 0), |(dt, p), ti| {
@@ -187,7 +188,7 @@ async fn ticket_est_inner(conn: &PgPool, cid: i32, tid: i32) -> sqlx::Result<Htt
             log::debug!("Invalid ticket:\n{:?}", ticket);
             return Ok(HttpResponse::BadRequest().body("Expired or invalid ticket"));
         }
-        let queue = PersistentTicket::queue(conn, ticket.shop_id, true, true).await?;
+        let queue = PersistentTicket::queue(conn, ticket.shop_id).await?;
 
         let mut delta_t = Duration::minutes(0);
         let mut contained = false;
@@ -212,4 +213,36 @@ async fn ticket_est_inner(conn: &PgPool, cid: i32, tid: i32) -> sqlx::Result<Htt
     } else {
         Ok(HttpResponse::BadRequest().body("Ticket does not exist"))
     }
+}
+
+#[derive(Deserialize)]
+struct TicketCancelRequest {
+    pub uid: String
+}
+#[post("/ticket/cancel")]
+async fn ticket_cancel(conn: web::Data<PgPool>, body: web::Json<TicketCancelRequest>, session: Session) -> HttpResponse {
+    let conn = conn.into_inner();
+    let req = body.into_inner();
+    let uid = if let Some(uid) = session::get_account(&session) {
+        uid
+    } else {
+        return HttpResponse::Forbidden().finish();
+    };
+    let tid = if let Ok(tid) = decode_serial(&req.uid) {
+        tid
+    } else {
+        return HttpResponse::BadRequest().body("Invalid uid in query");
+    };
+
+    let t = PersistentTicket::get(&conn, tid).await;
+
+    if let Ok(Some(ticket)) = t {
+        if ticket.inner().customer_id == uid {
+            if let Ok(_) = ticket.cancel().await {
+                return HttpResponse::Ok().finish()
+            }
+        }
+        
+    }
+    HttpResponse::BadRequest().finish()
 }

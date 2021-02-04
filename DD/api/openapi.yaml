@@ -211,6 +211,27 @@ paths:
       security:
         - customerAuth: []
 
+  /ticket/cancel:
+    post:
+      summary: Cancel a ticket
+      tags:
+        - "ticket"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                uid:
+                  type: string
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: "Bad Request"
+      security:
+        - customerAuth: []
+
   /shop/{shop_id}/ticket/queue:
     get:
       summary: Get information about the queue status and approximate waiting time
