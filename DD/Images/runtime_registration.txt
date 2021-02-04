@@ -37,7 +37,7 @@ S->DB: activate_credentials()
 activate DB
 DB-->>S:
 deactivate DB
-S-->>C: 201 OK
+S-->>C: 200 OK
 deactivate S
 deactivate C 
 

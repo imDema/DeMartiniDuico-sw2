@@ -50,9 +50,9 @@ S->S: check_waiting_list()
 activate S
 deactivateafter S
 
-alt waiting list is full
+alt Customer already has a Ticket
 S-->>C: 400 Bad Request
-else waiting list is not full
+else Customer does not have a Ticket
 S->DB: insert_ticket()
 activate DB
 DB-->>S:
