@@ -36,6 +36,8 @@ async fn main() -> std::io::Result<()> {
         .data(db_pool.clone())
         .configure(api::account::endpoints)
         .configure(api::ticket::endpoints)
+        .configure(api::shop::endpoints)
+        .service(web::scope("/staff").configure(api::staff::endpoints))
         .service(web::scope("/dev").configure(api::dev::endpoints))
     })
     .bind(api_url)?

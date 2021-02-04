@@ -20,8 +20,8 @@ DROP TABLE IF EXISTS schedule;
 CREATE TABLE schedule (
     shop_id INTEGER NOT NULL REFERENCES shop(id) ON DELETE CASCADE,
     dow SMALLINT NOT NULL,
-    open TIME WITH TIME ZONE NOT NULL,
-    close TIME WITH TIME ZONE NOT NULL,
+    open TIME NOT NULL,
+    close TIME NOT NULL,
     PRIMARY KEY (shop_id, dow, open),
     CHECK (dow > 0 AND dow <= 7)
 );
@@ -31,10 +31,14 @@ CREATE TABLE ticket (
     id SERIAL PRIMARY KEY,
     customer_id INT NOT NULL REFERENCES customer(id) ON DELETE CASCADE,
     shop_id INTEGER NOT NULL REFERENCES shop(id) ON DELETE CASCADE,
-    creation TIMESTAMP WITH TIME ZONE NOT NULL,
-    expiration TIMESTAMP WITH TIME ZONE NOT NULL,
+    creation TIMESTAMP NOT NULL,
+    expiration TIMESTAMP NOT NULL,
+    entry TIMESTAMP,
+    exit TIMESTAMP,
+    est_minutes INTEGER NOT NULL,
     valid BOOLEAN NOT NULL,
-    active BOOLEAN NOT NULL
+    active BOOLEAN NOT NULL,
+    CHECK(est_minutes > 0 AND est_minutes < 1440)
 );
 
 DROP TABLE IF EXISTS ticket_department;
