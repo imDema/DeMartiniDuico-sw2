@@ -17,7 +17,7 @@
             :state="validation"
             ></b-form-input>
       </b-form-group>
-        <b-overlay       
+ <!--       <b-overlay       
         :show="isSubmitBusy"
         rounded
         opacity="0.3"
@@ -26,6 +26,7 @@
         >
         <b-button type="submit" variant="primary" class="btn-block">Submit</b-button>
       </b-overlay>
+-->
     </b-form>
   </b-modal>
 </template>
@@ -38,7 +39,7 @@ export default {
             form: {
                 uid: ''
             },   
-            isSubmitBusy: false,
+            //isSubmitBusy: false,
         }
     },
     props:{
@@ -52,11 +53,10 @@ export default {
     methods: {
         submit(){
             console.log('submit')
-            this.isSubmitBusy = true
-
             let uid = this.form.uid;
             if(!this.validation)
                 return //TODO error message
+            //this.isSubmitBusy = true
             this.$router.push('/staff/tokens/'+uid)
         },
     }
