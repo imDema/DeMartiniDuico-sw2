@@ -51,6 +51,12 @@ pub fn whoami() -> TestRequest {
 }
 
 #[allow(dead_code)]
+pub fn whoami_staff() -> TestRequest {
+    TestRequest::get()
+        .uri("/staff/whoami")
+}
+
+#[allow(dead_code)]
 pub fn ticket_new(shop: &str, departments: &[&str], est_minutes: i32) -> TestRequest {
     TestRequest::post()
         .uri(&format!("/shop/{shop_id}/ticket/new", shop_id=shop))

@@ -30,8 +30,8 @@ async fn ticket_new(conn: web::Data<PgPool>, shop_id: web::Path<String>, body: w
     let conn = conn.into_inner();
     let shop_id = shop_id.into_inner();
     let req = body.into_inner();
-    let uid = if let Some(uid) = session::get_account(&session) {
-        uid
+    let sess = if let Some(sess) = session::get_account(&session) {
+        sess
     } else {
         return HttpResponse::Forbidden().finish();
     };
@@ -40,7 +40,7 @@ async fn ticket_new(conn: web::Data<PgPool>, shop_id: web::Path<String>, body: w
         return HttpResponse::BadRequest().body("Must specify departments");
     }
 
-    match ticket_new_inner(&conn, uid, &shop_id, req).await {
+    match ticket_new_inner(&conn, sess.id, &shop_id, req).await {
         Ok(resp) => resp,
         Err(e) => {
             log::error!("{}", e);
@@ -115,13 +115,13 @@ pub struct TokensResponse {
 #[get("/tokens")]
 async fn tokens(conn: web::Data<PgPool>, session: Session) -> HttpResponse {
     let conn = conn.into_inner();
-    let uid = if let Some(uid) = session::get_account(&session) {
-        uid
+    let sess = if let Some(sess) = session::get_account(&session) {
+        sess
     } else {
         return HttpResponse::Forbidden().finish();
     };
 
-    match tokens_inner(&conn, uid).await {
+    match tokens_inner(&conn, sess.id).await {
         Ok(resp) => resp,
         Err(e) => {
             log::error!("{}", e);
@@ -168,8 +168,8 @@ async fn ticket_est(conn: web::Data<PgPool>, query: web::Query<TicketEstQuery>, 
         return HttpResponse::BadRequest().body("Invalid uid in query");
     };
 
-    if let Some(cid) = session::get_account(&session) {
-        match ticket_est_inner(&conn, cid, tid).await {
+    if let Some(sess) = session::get_account(&session) {
+        match ticket_est_inner(&conn, sess.id, tid).await {
             Ok(h) => h,
             Err(e) => {
                 log::error!("{}", e);
@@ -223,8 +223,8 @@ struct TicketCancelRequest {
 async fn ticket_cancel(conn: web::Data<PgPool>, body: web::Json<TicketCancelRequest>, session: Session) -> HttpResponse {
     let conn = conn.into_inner();
     let req = body.into_inner();
-    let uid = if let Some(uid) = session::get_account(&session) {
-        uid
+    let sess = if let Some(sess) = session::get_account(&session) {
+        sess
     } else {
         return HttpResponse::Forbidden().finish();
     };
@@ -237,7 +237,7 @@ async fn ticket_cancel(conn: web::Data<PgPool>, body: web::Json<TicketCancelRequ
     let t = PersistentTicket::get(&conn, tid).await;
 
     if let Ok(Some(ticket)) = t {
-        if ticket.inner().customer_id == uid {
+        if ticket.inner().customer_id == sess.id {
             if let Ok(_) = ticket.cancel().await {
                 return HttpResponse::Ok().finish()
             }

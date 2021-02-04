@@ -9,16 +9,24 @@ const KEY_STAFF_ACCOUNT: &'static str = "staff_account";
 #[derive(Serialize, Deserialize)]
 pub struct StaffSession {
     pub id: i32,
+    pub email: String,
     pub shop_id: i32,
 }
+#[derive(Serialize, Deserialize)]
+pub struct CustomerSession {
+    pub id: i32,
+    pub email: String,
+}
 
-pub fn get_account(session: &Session) -> Option<i32> {
-    session.get::<Option<i32>>(KEY_CUSTOMER_ACCOUNT).unwrap()
+
+pub fn get_account(session: &Session) -> Option<CustomerSession> {
+    session.get::<Option<CustomerSession>>(KEY_CUSTOMER_ACCOUNT).unwrap()
         .and_then(|o| o)
 }
 
-pub fn set_account(session: &Session, uid: i32) {
-    session.set(KEY_CUSTOMER_ACCOUNT, Some(uid)).unwrap();
+pub fn set_account(session: &Session, id: i32, email: &str) {
+    let sess = CustomerSession{id, email: email.to_owned()};
+    session.set(KEY_CUSTOMER_ACCOUNT, Some(sess)).unwrap();
 }
 
 pub fn clear_account(session: &Session) {
@@ -30,8 +38,8 @@ pub fn get_staff_account(session: &Session) -> Option<StaffSession> {
         .and_then(|o| o)
 }
 
-pub fn set_staff_account(session: &Session, id: i32, shop_id: i32) {
-    session.set(KEY_STAFF_ACCOUNT, Some(StaffSession{id, shop_id})).unwrap();
+pub fn set_staff_account(session: &Session, id: i32, email: &str, shop_id: i32) {
+    session.set(KEY_STAFF_ACCOUNT, Some(StaffSession{id, email: email.to_owned(), shop_id})).unwrap();
 }
 
 pub fn clear_staff_account(session: &Session) {

@@ -1,5 +1,4 @@
 use crate::models::customer::PersistentCustomer;
-use crate::models::staff::PersistentStaff;
 use crate::utils::session;
 
 use actix_web::{web, get, post, Responder, HttpResponse};
@@ -33,7 +32,7 @@ async fn login(conn: web::Data<PgPool>, body: web::Json<RequestLogin>, session: 
     if let Ok(Some(acc)) = acc {
         let acc = acc.into_inner();
         if acc.verify_authentication(req.password.as_bytes()) {
-            session::set_account(&session, acc.id());
+            session::set_account(&session, acc.id(), acc.email());
 
             // session.renew();
             HttpResponse::Ok().finish()
@@ -111,30 +110,14 @@ struct WhoamiResponse {
     email: Option<String>,
 }
 #[get("/whoami")]
-async fn whoami(conn: web::Data<PgPool>, session: Session) -> HttpResponse {
-    let conn = conn.into_inner();
-    if let Some(uid) = session::get_account(&session) {
-        let acc = PersistentCustomer::get(&conn, uid).await;
-        if let Ok(opt) = acc {
-            let body = opt.map_or(
-                WhoamiResponse{authenticated: false, email: None},
-                |acc| WhoamiResponse{
-                    authenticated: true,
-                    email: Some(acc.into_inner().email().to_owned()),
-                });
-            return HttpResponse::Ok().json(body)
-        }
-    } else if let Some(staff) = session::get_staff_account(&session) {
-        let acc = PersistentStaff::get(&conn, staff.id).await;
-        if let Ok(opt) = acc {
-            let body = opt.map_or(
-                WhoamiResponse{authenticated: false, email: None},
-                |acc| WhoamiResponse{
-                    authenticated: true,
-                    email: Some(acc.inner().account().email().to_owned()),
-                });
-            return HttpResponse::Ok().json(body)
-        }
+async fn whoami(session: Session) -> HttpResponse {
+    if let Some(sess) = session::get_account(&session) {
+        let body = WhoamiResponse{
+                authenticated: true,
+                email: Some(sess.email)
+        };
+        return HttpResponse::Ok().json(body)
+    } else {
+        HttpResponse::Ok().json(WhoamiResponse{authenticated: false, email: None})
     }
-    HttpResponse::Ok().json(WhoamiResponse{authenticated: false, email: None})
 }

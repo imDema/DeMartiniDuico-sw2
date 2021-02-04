@@ -14,6 +14,7 @@ pub fn endpoints(cfg: &mut web::ServiceConfig) {
     cfg.service(token_info);
     cfg.service(log_entry);
     cfg.service(log_exit);
+    cfg.service(whoami);
 }
 #[allow(dead_code)]
 #[derive(Deserialize, Serialize, Debug)]
@@ -33,7 +34,7 @@ async fn login(conn: web::Data<PgPool>, body: web::Json<RequestLogin>, session: 
     if let Ok(Some(staff_acc)) = staff_acc {
         let sa = staff_acc.into_inner();
         if sa.account().verify_authentication(req.password.as_bytes()) {
-            session::set_staff_account(&session, sa.account().id(), sa.shop_id());
+            session::set_staff_account(&session, sa.account().id(), sa.account().email(), sa.shop_id());
 
             // session.renew();
             HttpResponse::Ok().finish()
@@ -151,5 +152,24 @@ async fn log_exit_inner(conn: &PgPool, ticket_id: i32) -> sqlx::Result<HttpRespo
         }
     } else {
         Ok(HttpResponse::BadRequest().body("Ticket does not exist"))
+    }
+}
+#[derive(Serialize)]
+struct WhoamiResponse {
+    authenticated: bool,
+    email: Option<String>,
+    shop_id: Option<String>,
+}
+#[get("/whoami")]
+async fn whoami(session: Session) -> HttpResponse {
+    if let Some(sess) = session::get_staff_account(&session) {
+        let body = WhoamiResponse{
+                authenticated: true,
+                email: Some(sess.email),
+                shop_id: Some(encode_serial(sess.shop_id))
+        };
+        return HttpResponse::Ok().json(body)
+    } else {
+        HttpResponse::Ok().json(WhoamiResponse{authenticated: false, email: None, shop_id: None})
     }
 }

@@ -62,7 +62,7 @@ macro_rules! quick_create_staff {
         let cookies = r.headers().get("Set-Cookie").unwrap();
         let session = common::extract_session_cookie(cookies.to_str().unwrap()).unwrap().to_owned();
 
-        let r = req!(whoami(), &session, $app);
+        let r = req!(whoami_staff(), &session, $app);
         let r_body = read_utf8_body(r).await;
         assert!(r_body.contains(&email));
 
