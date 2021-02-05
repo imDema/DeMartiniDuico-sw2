@@ -18,6 +18,8 @@ ITD/backend/target
 ITD/frontend/node_modules
 ITD/frontend/dist
 
+ITD/nginx_ssl
+
 # local env files
 .env.local
 .env.*.local

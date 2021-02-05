@@ -4,8 +4,11 @@ services:
     build: ./frontend
     ports:
       - "8080:80"
+      - "8443:443"
     links:
       - clup-backend
+    volumes:
+      - "./nginx_ssl:/etc/ssl:ro"
   clup-backend:
     build: ./backend
     ports:
