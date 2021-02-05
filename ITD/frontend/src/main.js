@@ -9,6 +9,7 @@ import './custom.scss';
 import './autocompletion-style.css';
 import router from './router'
 import store from './store'
+import './registerServiceWorker'
 
 Vue.use(Autocomplete)
 Vue.use(BootstrapVue)
