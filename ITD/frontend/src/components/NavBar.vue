@@ -62,10 +62,14 @@
         this.$api.get(endpoint)
         .then( res => {
           if(res.status == '200'){
-            this.$store.commit('logged_out')
-            this.$emit('logout')
-            this.$router.replace(this.staff?'/staff':'/')
-            this.displayLogin()
+            if(this.staff){
+              this.$store.commit('staff_logged_out')
+            }else{
+              this.$store.commit('logged_out')
+            }
+              this.$emit('logout')
+              this.$router.replace(this.staff?'/staff':'/')
+              this.displayLogin()
           }
         })
         .catch( err => {

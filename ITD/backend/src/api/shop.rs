@@ -21,7 +21,7 @@ async fn shop_info(conn: web::Data<PgPool>, shop_id: web::Path<String>, session:
     } else {
         return HttpResponse::BadRequest().body("Invalid shop id format")
     };
-    if let None = session::get_account(&session) {
+    if let (None, None) = (session::get_account(&session), session::get_staff_account(&session)) {
         return HttpResponse::Forbidden().finish();
     }
 

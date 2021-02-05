@@ -5,7 +5,7 @@
   </b-jumbotron>
 -->
   <div class="container my-4">
-    <h4>Ticket functions</h4>
+    <h4>Token functions</h4>
     <div>
       <b-row>
         <b-col cols="6"><b-button class="h-100" variant="primary" block @click="scanToken">Scan token</b-button></b-col>
@@ -14,6 +14,11 @@
         </b-col>
       </b-row>
     </div>
+    <staff-queue />
+    <div>
+    <h4>Bookings</h4>
+    <div>No upcoming bookings.</div>
+    </div>
   </div>
   <scan-modal />
 </div>
@@ -21,27 +26,21 @@
 
 <script>
 import ScanModal from '../components/ScanModal.vue'
+import StaffQueue from '../components/StaffQueue.vue'
 export default {
   name: 'App',
   components: {
-    ScanModal
-
+    ScanModal,
+    StaffQueue,
   },
   data() {
-      return defaultData()
+    return {}
   },
   methods: {
     scanToken(){
       this.$bvModal.show('scan-modal')
     }
   },
-}
-
-function defaultData(){
-  return {
-    step: 0,
-    searchChoice: {},
-  }
 }
 </script>
 

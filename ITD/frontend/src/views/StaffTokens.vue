@@ -47,20 +47,19 @@ export default {
             this.loadInfo()
         },
         loadInfo(){
-            let shop_id = this.$store.state.staff.shop_id
-            if(!shop_id){
-                console.log("no shop_id")
-                //TODO use then after /whoami
-                this.loadInfoInterval = setTimeout(this.loadInfo, 250)
-                return
-            }
             if(!this.uid)
                 console.log("No :uid provided")
 
-            return this.$api.get(`/staff/shop/${shop_id}/token/info?uid=`+encodeURIComponent(this.uid))
-            .then( (res) => {
-                this.tokenInfo = res.data
-            }).catch(console.log)
+            return this.$store.dispatch('fetchStaffWhoami')
+            .then( data => {
+                if(!data.shop_id)
+                    return
+                let shop_id = data.shop_id
+                return this.$api.get(`/staff/shop/${shop_id}/token/info?uid=`+encodeURIComponent(this.uid))
+                .then( (res) => {
+                    this.tokenInfo = res.data
+                }).catch(console.log)
+            })
         },
         logEntry(){
             this.logAction('log-entry')

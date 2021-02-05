@@ -38,23 +38,31 @@ export default {
       }
   },
   created: function () {
-    this.$api.get("/staff/whoami")
-      .then(res => {
-          let isAuthenticated = res.data.authenticated == true;
-          if(isAuthenticated){
-            this.$store.state.staff.shop_id = res.data.shop_id;
-            this.$store.state.staff.email = res.data.email;
-            this.$store.commit('staff_logged_in')
-            console.log('Cookie -> authenticated')
-          }else{
-            this.$store.commit('staff_logged_out')
-            this.$bvModal.show('login-modal')
-          }
-      }).catch( (err) => {
+    this.$store.dispatch('fetchStaffWhoami')
+    .then( (data) => {
+        if(!data.authenticated)
           this.$bvModal.show('login-modal')
-          console.log(err)
-          console.log('error with /checkauth')
-      });
+    }).catch( (err) => {
+        this.$bvModal.show('login-modal')
+        console.log(err)
+    });
+    // this.$api.get("/staff/whoami")
+    //   .then(res => {
+    //       let isAuthenticated = res.data.authenticated == true;
+    //       if(isAuthenticated){
+    //         this.$store.state.staff.shop_id = res.data.shop_id;
+    //         this.$store.state.staff.email = res.data.email;
+    //         this.$store.commit('staff_logged_in')
+    //         console.log('Cookie -> authenticated')
+    //       }else{
+    //         this.$store.commit('staff_logged_out')
+    //         this.$bvModal.show('login-modal')
+    //       }
+    //   }).catch( (err) => {
+    //       this.$bvModal.show('login-modal')
+    //       console.log(err)
+    //       console.log('error with /checkauth')
+    //   });
     }
 }
 

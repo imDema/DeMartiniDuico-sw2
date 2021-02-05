@@ -197,8 +197,13 @@
           }else{
             //login
             //if(res.status == '200'){
-              this.$store.commit('logged_in')
-              this.$store.state.customer.email = email
+              if(this.staff){
+                this.$store.commit('staff_logged_in')
+                this.$store.state.staff.email = email
+              }else{
+                this.$store.commit('logged_in')
+                this.$store.state.customer.email = email
+              }
               this.showSuccessfulLoginAlert()
               this.$emit('successful-login')
             //}
