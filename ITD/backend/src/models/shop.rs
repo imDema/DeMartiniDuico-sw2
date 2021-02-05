@@ -21,7 +21,7 @@ pub struct Shop {
 
 #[derive(Serialize, Deserialize, FromRow, Debug)]
 pub struct Department {
-    uid: i32,
+    pub uid: i32,
     shop_id: i32,
     description: String,
     capacity: i32

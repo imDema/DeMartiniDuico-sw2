@@ -1,1 +1,0 @@
-CREATE INDEX IF NOT EXISTS ticket_creation ON ticket(creation);

@@ -13,6 +13,8 @@ CREATE TABLE department (
     shop_id INTEGER NOT NULL REFERENCES shop(id) ON DELETE CASCADE,
     description VARCHAR NOT NULL,
     capacity INTEGER NOT NULL,
+    ma_visit REAL NOT NULL DEFAULT 15,
+    ma_est_visit REAL NOT NULL DEFAULT 15,
     CHECK (capacity >= 0)
 );
 
@@ -40,6 +42,7 @@ CREATE TABLE ticket (
     active BOOLEAN NOT NULL,
     CHECK(est_minutes > 0 AND est_minutes < 1440)
 );
+CREATE INDEX IF NOT EXISTS ticket_creation ON ticket(creation);
 
 DROP TABLE IF EXISTS ticket_department;
 CREATE TABLE ticket_department(
@@ -47,3 +50,19 @@ CREATE TABLE ticket_department(
     department_id INT NOT NULL REFERENCES department(id) ON DELETE CASCADE,
     PRIMARY KEY (ticket_id, department_id)
 );
+
+CREATE OR REPLACE FUNCTION check_ticket_departments_same_shop() RETURNS TRIGGER
+    LANGUAGE PLPGSQL
+    AS
+    $$
+    BEGIN
+        IF (SELECT shop_id FROM ticket WHERE id = NEW.ticket_id) <> (SELECT shop_id FROM department WHERE id = NEW.department_id) THEN
+            RAISE EXCEPTION 'All of the departments of a ticket must be from the same shop';
+        END IF;
+        RETURN NEW;
+    END;
+    $$;
+CREATE TRIGGER ticket_departments_same_shop
+    BEFORE INSERT ON ticket_department
+    FOR EACH ROW
+    EXECUTE FUNCTION check_ticket_departments_same_shop();

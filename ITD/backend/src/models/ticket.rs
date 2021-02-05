@@ -7,6 +7,7 @@ use chrono::prelude::*;
 use futures::StreamExt;
 
 use crate::utils::encoding::encode_serial;
+use crate::utils::time::{combine_expected_measured, minute_diff};
 
 #[derive(Debug, PartialEq, Eq)]
 pub struct Ticket {
@@ -196,7 +197,6 @@ impl<'a> PersistentTicket<'a> {
             .fetch_one(&mut tx)
             .await?;
 
-        // TODO: Clearer distinction of validity and expiration
         if state.exited.unwrap() || state.expired.unwrap() {
             return Ok(EnterResult::Expired);
         }
@@ -218,7 +218,7 @@ impl<'a> PersistentTicket<'a> {
             return Ok(EnterResult::NotFirst(position));
         }
 
-        let rows = query!(r"SELECT department.id as id, (count(ticket.id) >= department.capacity) as full FROM ticket, ticket_department, department
+        let rows = query!(r"SELECT department.id as id, department.capacity as capacity, (count(ticket.id) >= department.capacity) as full FROM ticket, ticket_department, department
                         WHERE
                             ticket_department.ticket_id = ticket.id AND
                             ticket_department.department_id = department.id AND
@@ -243,6 +243,17 @@ impl<'a> PersistentTicket<'a> {
             .execute(&mut tx)
             .await?;
 
+        for r in rows {
+            let w  = 1. / (r.capacity as f32 + 1.);
+            let est_f = self.inner.est_minutes as f32;
+            query!(r"UPDATE department
+            SET
+                ma_est_visit = ma_est_visit * (REAL '1' - $3) + $2 * $3
+            WHERE id = $1", r.id, est_f, w)
+            .execute(&mut tx)
+            .await?;
+        }
+
         tx.commit().await?;
         Ok(EnterResult::Entered)
     }
@@ -250,24 +261,60 @@ impl<'a> PersistentTicket<'a> {
     pub async fn exit(&self) -> sqlx::Result<bool> {
         let mut tx = self.conn.begin().await?;
 
-        let state = query!(r"SELECT entry IS NOT NULL as entered, exit IS NOT NULL as exited FROM ticket
+        let state = query!(r"SELECT entry, exit FROM ticket
             WHERE id = $1", self.inner.id)
             .fetch_one(&mut tx)
             .await?;
 
-        if state.entered.unwrap() && !state.exited.unwrap() {
-            query!(r"UPDATE ticket
-                SET
-                    exit = CURRENT_TIMESTAMP
-                WHERE id = $1", self.inner.id)
-                .execute(&mut tx)
-                .await?;
+        let entry_time = match (&state.entry, &state.exit) {
+            (&Some(t), &None) => t,
+            _ => return Ok(false),
+        };
 
-            tx.commit().await?;
-            Ok(true)
-        } else {
-            Ok(false)
+        query!(r"UPDATE ticket
+            SET
+                exit = CURRENT_TIMESTAMP
+            WHERE id = $1", self.inner.id)
+            .execute(&mut tx)
+            .await?;
+
+        //TODO: can be optimized
+        let rows = query!(r"SELECT department.id as id, department.capacity as capacity FROM ticket_department, department
+                    WHERE
+                        ticket_department.ticket_id = $1", self.inner.id)
+        .fetch_all(&mut tx)
+        .await?;
+
+        let visit_length = minute_diff(entry_time, Utc::now().naive_utc());
+
+        for r in rows {
+            let w  = 1. / (r.capacity as f32 + 1.);
+            query!(r"UPDATE department
+            SET
+                ma_visit = ma_visit * (REAL '1' - $3) + $2 * $3
+            WHERE id = $1", r.id, visit_length, w)
+            .execute(&mut tx)
+            .await?;
         }
+    
+        tx.commit().await?;
+        Ok(true)
+    }
+
+    pub async fn max_est(conn: &PgPool, departments: &[i32]) -> sqlx::Result<f32> {
+        let mut max = 0.0;
+        for &d in departments {
+            let wait_mas = query!(r"SELECT ma_visit, ma_est_visit, capacity FROM department
+                WHERE id = $1", d)
+                .fetch_one(conn)
+                .await?;
+            
+            let combined = combine_expected_measured(wait_mas.ma_est_visit, wait_mas.ma_visit) / wait_mas.capacity as f32;
+            if combined > max {
+                max = combined;
+            }
+        }
+        Ok(max)
     }
     
     pub fn inner(&self) -> &Ticket {&self.inner}
