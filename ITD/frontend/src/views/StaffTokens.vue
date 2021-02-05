@@ -8,7 +8,8 @@
             The ticket is not valid for this Store
         </div>
         <div v-if="validTicket">
-            <b-card bg-variant="white" title="Details">   
+            <b-card bg-variant="white" title="Details">
+                <div>Position in queue: {{position}}</div>
                 <div v-for="(value, key) in tokenInfo" :key="key">
                     {{ key }}: {{ value }}
                 </div>
@@ -34,6 +35,7 @@ export default {
             uid: null,
             loadInfoInterval: {},
             tokenInfo: {},
+            tickets: {},
         }
     },
     watch:{
@@ -46,12 +48,24 @@ export default {
             this.uid = to.params.uid
             this.loadInfo()
         },
+        fetchQueue(shop_id){
+            if(!shop_id)
+              return
+            return this.$api.get(`/staff/shop/${shop_id}/ticket/queue`)
+                .then(res => {
+                    if(res.status == '200'){
+                        this.tickets = res.data;
+                        return this.tickets
+                    }
+                }).catch( console.log )
+        },
         loadInfo(){
             if(!this.uid)
                 console.log("No :uid provided")
 
-            return this.$store.dispatch('fetchStaffWhoami')
-            .then( data => {
+            let whoami = this.$store.dispatch('fetchStaffWhoami')
+            whoami.then( data => this.fetchQueue(data.shop_id))
+            whoami.then( data => {
                 if(!data.shop_id)
                     return
                 let shop_id = data.shop_id
@@ -88,6 +102,16 @@ export default {
         validTicket(){
             return !!this.tokenInfo
         },
+        position(){
+            if(!(this.tickets instanceof Array)){
+              return "Calculating..."
+            }
+            let index = this.tickets.map(t => t.uid).indexOf(this.uid)
+            if(index===-1)
+              return "Not applicable"
+            else  
+              return index+1
+        }
     },
     created(){
         this.onRouteChange(this.$route)

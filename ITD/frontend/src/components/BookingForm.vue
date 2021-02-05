@@ -22,6 +22,17 @@
     </b-row>
     <b-tooltip target="booking-button" triggers="hover" placement="bottom">Booking is not available in this demo</b-tooltip>
   </b-form>
+          <b-alert
+          :show="submitFailedAlert.countdown"
+          dismissible
+          fade
+          class="position-fixed fixed-bottom m-0 rounded-0"
+          style="z-index: 2000;"
+          variant="danger"
+          @dismiss-count-down="submitFailedAlert.countdown=$event"
+        >
+          {{submitFailedAlert.message}}
+        </b-alert>
   </div>
 </template>
 
@@ -36,9 +47,13 @@ import Queue from "./Queue"
         form: {
           step: 0,
           categories: [],
-          datetime: { date: null, time: null}
+          datetime: { date: null, time: null},
         },
         //store_info: {},
+        submitFailedAlert:{
+          countdown: 0,
+          message: "Failed to obtain a ticket.",
+        },
         show: true
       }
     },
@@ -104,14 +119,17 @@ import Queue from "./Queue"
           alert("Store data missing");
           return
         }
+        let categories;
         if(!this.form.categories || this.form.categories.length === 0){
-          this.form.categories = this.store.departments.map( d => d.uid);
+          categories = this.store.departments.map( d => d.uid);
+        }else{
+          categories = this.form.categories
         }
         let endpoint = "/shop/"+this.store.uid+"/ticket/new"
         let est_minutes = 30
         this.$api.post(endpoint, {
           est_minutes: est_minutes,
-          department_ids: this.form.categories
+          department_ids: categories
         })
         .then(res => {
           if(res.status == '200'){
@@ -126,7 +144,12 @@ import Queue from "./Queue"
               }
             })
           }
-        }).catch( () => {}) //TODO
+        }).catch( (err) => {
+            if('response' in err)
+              this.showSubmitFailedAlert(err.response.data)
+            else
+              this.showSubmitFailedAlert("Failed to connect.")
+        }) //TODO
       },
       onSubmit(evt){
         evt.preventDefault()
@@ -134,6 +157,10 @@ import Queue from "./Queue"
       },
       submitBooking() {
         alert(JSON.stringify(this.form))
+      },
+      showSubmitFailedAlert(message){
+        this.submitFailedAlert.message = message
+        this.submitFailedAlert.countdown = 3
       },
       // onReset(evt) {
       //   evt.preventDefault()

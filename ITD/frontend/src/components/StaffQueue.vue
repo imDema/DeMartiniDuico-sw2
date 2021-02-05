@@ -6,19 +6,22 @@
     No tickets in queue.
   </div>
   <b-list-group>
-  <b-list-group-item  v-for="t in tickets" :key="t.uid" href="#" :active="t==selectedTicket" class="flex-column align-items-start" 
+  <b-list-group-item  v-for="(t, index) in tickets" :key="t.uid" href="#" :active="t==selectedTicket" class="flex-column align-items-start" 
     @click="onTicketClick(t)"
   >
     <div class="d-flex w-100 justify-content-between">
-      <h5 class="mb-1">{{t.shop_name}}</h5>
+      <div>
+      <span>{{index+1}}) </span>
+      <span class="h5 mb-1">{{t.uid}}</span>
+      </div>
       <small>Created: {{timeDifference(t.creation)}}</small>
     </div>
     <div class="d-flex w-100 justify-content-between">
       <div>
       <p class="mb-1">
-          Hellohello
+          Expiration: {{prettyDate(t.expiration)}}
       </p>
-      <small>Departments: {{ t.department_ids }}</small>
+      <small>Department_ids: {{ t.department_ids }}</small>
       </div>
       <div>
         <b-button :id="'popover-delete-event' + t.uid" @click="skipOnClick"><b-icon icon="x-square"/></b-button>
@@ -82,9 +85,9 @@ export default {
           }
         }).catch( () => {
             this.$emit('connection-failure')
-        }).finally( () => {
-          setTimeout( () => {this.busy = false}, 250)
         })
+      }).finally( () => {
+          setTimeout( () => {this.busy = false}, 250)
       })
     },
     // loadShopInfo(){
@@ -97,9 +100,10 @@ export default {
     //           })   
     //         )
     // }
-  },
-  getWhoami(){
-
+    prettyDate(date){
+      let d = new Date(date)
+      return d.toLocaleString()
+    },
   },
   created(){
     // this.loadShopInfo()
