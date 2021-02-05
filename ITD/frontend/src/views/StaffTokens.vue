@@ -24,6 +24,28 @@
         <b-col cols="6"><b-button class="h-100" to="/staff" block><b-icon-arrow-left/> Back</b-button>
         </b-col>
     </b-row>
+           <b-alert
+          :show="successfulActionAlert.countdown"
+          dismissible
+          fade
+          class="position-fixed fixed-bottom m-0 rounded-0"
+          style="z-index: 2000;"
+          variant="success"
+          @dismiss-count-down="successfulActionAlert.countdown=$event"
+        >
+          {{successfulActionAlert.message}}
+        </b-alert>
+        <b-alert
+          :show="failedActionAlert.countdown"
+          dismissible
+          fade
+          class="position-fixed fixed-bottom m-0 rounded-0"
+          style="z-index: 2000;"
+          variant="danger"
+          @dismiss-count-down="failedActionAlert.countdown=$event"
+        >
+          {{failedActionAlert.message}}
+        </b-alert>
 </div>
 </template>
 <script>
@@ -36,6 +58,14 @@ export default {
             loadInfoInterval: {},
             tokenInfo: {},
             tickets: {},
+            successfulActionAlert:{
+                countdown: 0,
+                message: "Successful action",
+            },
+            failedActionAlert:{
+                countdown: 0,
+                message: "Failed action",
+            }
         }
     },
     watch:{
@@ -91,8 +121,19 @@ export default {
             }
             this.$api.post(`/staff/shop/${shop_id}/token/${endpoint}`,
                 { uid: this.uid }
-            ).then( console.log('ok') )
-            .catch((err) => alert("Operation failed"+(err.response.data?":\n":"")+err.response.data))
+            ).then( (response) => {
+                response;
+                this.showSuccessfulActionAlert("Successfully executed action: "+endpoint)
+            })
+            .catch((err) => this.showFailedActionAlert("Operation failed"+(err.response.data?":\n":"")+err.response.data))
+        },
+        showSuccessfulActionAlert(message){
+            this.successfulActionAlert.message = message
+            this.successfulActionAlert.countdown = 3
+        },
+        showFailedActionAlert(message){
+            this.failedActionAlert.message = message
+            this.failedActionAlert.countdown = 3
         },
     },
     computed:{
@@ -108,7 +149,7 @@ export default {
             }
             let index = this.tickets.map(t => t.uid).indexOf(this.uid)
             if(index===-1)
-              return "Not applicable"
+              return "Not present"
             else  
               return index+1
         }

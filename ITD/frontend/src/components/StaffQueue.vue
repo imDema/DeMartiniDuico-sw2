@@ -43,6 +43,7 @@ export default {
       tickets:[],
       busy: false,
       selectedTicket: {},
+      loadTokensInterval: {},
     }
   },
   methods:{
@@ -71,10 +72,17 @@ export default {
     },
     loadTokens(){
       this.busy = true;
-      return this.$store.dispatch('fetchStaffWhoami')
+      return new Promise((resolve, reject) => {
+        let shop_id = this.$store.state.staff.shop_id
+        if(!shop_id){
+          return this.$store.dispatch('fetchStaffWhoami').then(resolve).catch(reject)
+        }else{
+          return resolve({shop_id: shop_id})
+        }
+      })
       .then( (data) => {
         data;
-        let shop_id = this.$store.state.staff.shop_id
+        let shop_id = data.shop_id
         if(!shop_id)
           return
         return this.$api.get(`/staff/shop/${shop_id}/ticket/queue`)
@@ -109,6 +117,10 @@ export default {
     // this.loadShopInfo()
     // .then(this.loadTokens);
     setTimeout(this.loadTokens, 100)
+    setTimeout(() => {
+      this.loadTokensInterval = setInterval(this.loadTokens, 4000)
+    },
+    1000)
   },  
 }
 function prettyDateDiff(millisecs) {
