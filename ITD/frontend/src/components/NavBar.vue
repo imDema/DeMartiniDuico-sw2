@@ -1,6 +1,6 @@
 <template>
   <b-navbar type="dark" toggleable="lg" :variant="staff?'info':'primary'">
-  <b-navbar-brand :to="staff?'/staff':'/'">
+  <b-navbar-brand :to="staff?'/staff':'/'" @click="$emit('go-home')">
     <img id="logo" :src="require('../assets/logo-CLup-mini.png')" class="d-inline-block" alt="logo"/>
     CLup
   </b-navbar-brand>

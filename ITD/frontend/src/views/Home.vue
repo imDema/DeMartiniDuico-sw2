@@ -1,6 +1,6 @@
 <template>
   <div>
-  <nav-bar/>
+  <nav-bar @go-home="resetFormStep"/>
   <auth-modal @connection-failure="showFailedToConnectAlert"/>
   <router-view/>
   <b-alert
@@ -35,6 +35,10 @@ export default {
   methods: {
       showFailedToConnectAlert(){
         this.failedToConnectAlertCountdown = 3
+      },
+      resetFormStep(){
+        // if('booking_form' in this.$refs)
+        //   this.$refs.booking_form.
       }
   },
   created: function () {
