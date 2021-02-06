@@ -1,10 +1,11 @@
 
-use actix_web::dev::{MessageBody, ServiceResponse};
+use actix_web::dev::{MessageBody, RequestHead, ServiceResponse};
 use actix_web::test::TestRequest;
 use actix_web::test;
 use clup::api::staff::LogTicketRequest;
 use clup::api::ticket::TicketNewRequest;
 use clup::api::account::{RequestLogin, RequestRegistration};
+use clup::api::dev::{NewStaffRequest};
 
 #[macro_export]
 macro_rules! req {
@@ -86,8 +87,13 @@ pub fn shop_queue(shop_id: &str) -> TestRequest {
 
 #[allow(dead_code)]
 pub fn create_staff(email: &str, password: &str, shop_id: &str) -> TestRequest {
-    TestRequest::get()
-        .uri(&format!("/dev/new_staff?email={email}&password={password}&shop_id={shop_id}", email=email, password=password, shop_id=shop_id))
+    TestRequest::post()
+        .uri("/dev/new_staff")
+        .set_json(&NewStaffRequest{
+            email :email.to_owned(),
+            password: password.to_owned(),
+            shop_id: shop_id.to_owned(),
+        })
 }
 
 #[allow(dead_code)]

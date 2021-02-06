@@ -155,8 +155,8 @@ async fn tokens_inner(conn: &PgPool, uid: i32) -> sqlx::Result<HttpResponse> {
 struct TicketEstQuery {
     pub uid: String,
 }
-#[derive(Serialize, Debug)]
-struct TicketEstResponse {
+#[derive(Serialize, Deserialize, Debug)]
+pub struct TicketEstResponse {
     pub people: u32,
     pub est: DateTime<Utc>,
 }

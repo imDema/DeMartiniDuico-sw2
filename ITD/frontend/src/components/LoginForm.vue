@@ -190,7 +190,7 @@
               let url = this.$api.defaults.baseURL+"/register/confirm?code=" 
               + encodeURIComponent(code);
               console.log(url);
-              window.open(url);
+              alert("Open this url to confirm your registration: \n"+url);
               //END temp
               this.showSuccessfulRegistrationAlert();
               this.$emit('successful-registration');

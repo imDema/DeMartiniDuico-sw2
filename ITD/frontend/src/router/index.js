@@ -6,6 +6,10 @@ import Tokens from '../views/Tokens.vue'
 import Staff from '../views/Staff.vue'
 import StaffHome from '../views/StaffHome.vue'
 import StaffTokens from '../views/StaffTokens.vue'
+// DEV
+import Dev from '../views/dev/Dev.vue'
+import DevIds from '../views/dev/DevIds.vue'
+import DevNewStaff from '../views/dev/DevNewStaff.vue'
 
 Vue.use(VueRouter)
 
@@ -40,7 +44,22 @@ const routes = [
         component: StaffTokens
       },
     ]
-  }
+  },
+  {
+    path: '/dev',
+    // lazy example
+    //component: () => import(/* webpackChunkName: "about" */ '../views/Staff.vue')
+    component: Dev,
+    children: [{
+        path: '',
+        component: DevIds
+      },
+      {
+        path: 'new_staff',
+        component: DevNewStaff
+      },
+    ]
+  },
 ]
 
 const router = new VueRouter({
