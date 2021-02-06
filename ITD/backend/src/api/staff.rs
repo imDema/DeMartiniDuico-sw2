@@ -57,6 +57,7 @@ async fn logout(_conn: web::Data<PgPool>, session: Session) -> HttpResponse {
     HttpResponse::Ok().finish()
 }
 
+/// Show tickets currently in queue for this shop
 #[get("/shop/{shop_id}/ticket/queue")]
 async fn token_info(conn: web::Data<PgPool>, shop_id: web::Path<String>, session: Session) -> HttpResponse {
     let conn = conn.into_inner();
@@ -84,6 +85,7 @@ async fn token_info(conn: web::Data<PgPool>, shop_id: web::Path<String>, session
 struct TokenInfoQuery {
     pub uid: String,
 }
+/// Show available information on a token
 #[get("/shop/{shop_id}/token/info")]
 async fn ticket_queue(conn: web::Data<PgPool>, shop_id: web::Path<String>, query: web::Query<TokenInfoQuery>, session: Session) -> HttpResponse {
     let conn = conn.into_inner();
@@ -112,6 +114,7 @@ async fn ticket_queue(conn: web::Data<PgPool>, shop_id: web::Path<String>, query
 pub struct LogTicketRequest {
     pub uid: String,
 }
+/// Try to log the entry of a token
 #[post("/shop/{shop_id}/token/log-entry")]
 async fn log_entry(conn: web::Data<PgPool>, shop_id: web::Path<String>, query: web::Json<LogTicketRequest>, session: Session) -> HttpResponse {
     let conn = conn.into_inner();
@@ -134,7 +137,7 @@ async fn log_entry(conn: web::Data<PgPool>, shop_id: web::Path<String>, query: w
 }
 async fn log_entry_inner(conn: &PgPool, ticket_id: i32) -> sqlx::Result<HttpResponse> {
     if let Some(ticket) = PersistentTicket::get(conn, ticket_id).await? {
-        let result = ticket.enter().await?;
+        let result = ticket.try_enter().await?;
         match result {
             EnterResult::Entered => Ok(HttpResponse::Ok().finish()),
             EnterResult::Full(did) => Ok(HttpResponse::BadRequest().body(&format!("Department {} is full", encode_serial(did)))),
@@ -184,7 +187,7 @@ async fn log_exit_inner(conn: &PgPool, ticket_id: i32) -> sqlx::Result<HttpRespo
 struct TicketCancelRequest {
     pub uid: String
 }
-
+/// Skip and cancel a token for this shop. Intended use is skipping customers that are late.
 #[post("/shop/{shop_id}/token/skip")]
 async fn ticket_skip(conn: web::Data<PgPool>, body: web::Json<TicketCancelRequest>, session: Session) -> HttpResponse {
     let conn = conn.into_inner();
@@ -223,6 +226,7 @@ struct WhoamiResponse {
     email: Option<String>,
     shop_id: Option<String>,
 }
+/// Check the session and retrieve authentication status and email
 #[get("/whoami")]
 async fn whoami(session: Session) -> HttpResponse {
     if let Some(sess) = session::get_staff_account(&session) {

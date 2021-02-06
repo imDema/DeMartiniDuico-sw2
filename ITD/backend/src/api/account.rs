@@ -11,7 +11,6 @@ pub fn endpoints(cfg: &mut web::ServiceConfig) {
     cfg.service(logout);
     cfg.service(register);
     cfg.service(confirm);
-    cfg.service(checkauth);
     cfg.service(whoami);
 }
 #[allow(dead_code)]
@@ -21,7 +20,6 @@ pub struct RequestLogin {
     pub password: String,
     pub remember: Option<bool>,
 }
-// TODO: remember
 #[post("/login")]
 async fn login(conn: web::Data<PgPool>, body: web::Json<RequestLogin>, session: Session) -> HttpResponse {
     let conn = conn.into_inner();
@@ -95,15 +93,6 @@ async fn confirm(conn: web::Data<PgPool>, query: web::Query<ConfirmQuery>) -> im
     }
 }
 
-#[get("/checkauth")]
-async fn checkauth(session: Session) -> HttpResponse {
-    let uid = session::get_account(&session);
-    if let Some(_) = uid {
-        HttpResponse::Ok().body("true")
-    } else {
-        HttpResponse::Ok().body("false")
-    }
-}
 #[derive(Serialize)]
 struct WhoamiResponse {
     authenticated: bool,

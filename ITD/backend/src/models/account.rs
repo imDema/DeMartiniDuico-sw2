@@ -2,6 +2,7 @@ use serde::{Serialize, Deserialize};
 use sqlx::FromRow;
 use rand::Rng;
 
+/// Internal Account structure, contains login related information and methods for checking authentication
 #[derive(Debug, Serialize, Deserialize, FromRow, PartialEq, Eq)]
 pub struct Account {
     pub(super) id: i32,
@@ -10,6 +11,7 @@ pub struct Account {
     pub(super) digest: Vec<u8>,
 }
 
+/// Salt and digest produced by the password hashing function
 pub struct HashedPass {
     pub salt: Vec<u8>,
     pub digest: Vec<u8>,
@@ -18,12 +20,14 @@ pub struct HashedPass {
 impl Account {
     fn argon_conf<'a>() -> argon2::Config<'a> { argon2::Config::default() }
 
+    /// Check if `password` is correct for this accont
     pub fn verify_authentication(&self, password: &[u8]) -> bool {
         let conf = Self::argon_conf();
         let matches = argon2::verify_raw(password, &self.salt, &self.digest, &conf);
         matches.unwrap_or_else(|err| {log::error!("Argon2 error!: `{:?}`", err); false})
     }
 
+    /// Calculate hash digest for `password`
     pub fn hash_password(password: &[u8]) -> HashedPass {
         let config = Self::argon_conf();
         let mut salt = vec![0u8; 16];

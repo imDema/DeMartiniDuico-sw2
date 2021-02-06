@@ -9,6 +9,7 @@ use futures::StreamExt;
 use crate::utils::encoding::encode_serial;
 use crate::utils::time::{combine_expected_measured, minute_diff};
 
+/// Internal structure for ticket
 #[derive(Debug, PartialEq, Eq)]
 pub struct Ticket {
     pub id: i32,
@@ -23,6 +24,7 @@ pub struct Ticket {
     pub department_ids: Vec<i32>,
 }
 
+/// Response ready structure for ticket
 #[derive(Debug, Serialize, Deserialize, PartialEq)]
 pub struct TicketResponse {
     pub uid: String,
@@ -53,6 +55,13 @@ impl From<Ticket> for TicketResponse {
         }
     }
 }
+
+/// ## Result for log entry operation
+/// + Entered: Successful entry
+/// + Full(i32): Department with returned id is full, not entered
+/// + NotFirst(i32): Not first in queue, returned number people in queue, not entered
+/// + Expired: Ticket is expired, not entered
+/// + Invalid: Ticket is invalid, not entered
 #[derive(Debug, PartialEq)]
 pub enum EnterResult {
     Entered,
@@ -62,12 +71,17 @@ pub enum EnterResult {
     Invalid,
 }
 
+/// ## Result for ticket creation operation
+/// + Created: Ticket created
+/// + AlreadyExists: Ticket not created. The customer already has a ticket for this shop
+/// + Closed: Ticket not created. The shop does not allow creating tickets at the moment
 pub enum NewTicketResult<'a> {
     Created(PersistentTicket<'a>),
     AlreadyExists,
     Closed,
 }
 impl<'a> NewTicketResult<'a> {
+    /// Extract Created value if `Created`, panics otherwise
     pub fn unwrap(self) -> PersistentTicket<'a> {
         match self {
             NewTicketResult::Created(t) => t,
@@ -77,6 +91,7 @@ impl<'a> NewTicketResult<'a> {
     }
 }
 
+/// Data Access Object for ticket
 #[allow(dead_code)]
 pub struct PersistentTicket<'a> {
     conn: &'a PgPool,
@@ -84,6 +99,7 @@ pub struct PersistentTicket<'a> {
 }
 
 impl<'a> PersistentTicket<'a> {
+    /// Retrieve ticket from its primary key
     pub async fn get(conn: &'a PgPool, id: i32) -> sqlx::Result<Option<PersistentTicket<'a>>> {
         let ticket = query_as!(TicketRow, r"SELECT ticket.id AS id, customer_id, ticket.shop_id AS shop_id, shop.name as shop_name, array_agg(department.id) AS department_ids, creation, expiration, entry, exit, est_minutes, valid, active
             FROM ticket, ticket_department, department, shop
@@ -101,6 +117,7 @@ impl<'a> PersistentTicket<'a> {
         Ok(ticket)
     }
 
+    /// Retrieve all active tickets for a customer
     pub async fn get_for_customer(conn: &'a PgPool, customer_id: i32) -> sqlx::Result<Vec<Ticket>> {
         query_as!(TicketRow, r"SELECT ticket.id AS id, customer_id, ticket.shop_id AS shop_id, shop.name as shop_name, array_agg(department.id) AS department_ids, creation, expiration, entry, exit, est_minutes, valid, active
             FROM ticket, ticket_department, department, shop
@@ -120,7 +137,9 @@ impl<'a> PersistentTicket<'a> {
             }).await
     }
 
-    pub async fn new(conn: &'a PgPool, customer_id: i32, shop_id: i32, department_ids: Vec<i32>, est_minutes: i32) -> sqlx::Result<NewTicketResult<'a>> {
+    /// Create a new ticket
+    /// See [`NewTicketResult`] for the result
+    pub async fn try_new(conn: &'a PgPool, customer_id: i32, shop_id: i32, department_ids: Vec<i32>, est_minutes: i32) -> sqlx::Result<NewTicketResult<'a>> {
         let mut tx = conn.begin().await?;
 
         let already_have = query!(r"SELECT id FROM ticket
@@ -163,12 +182,14 @@ impl<'a> PersistentTicket<'a> {
         Ok(NewTicketResult::Created(Self{conn, inner:ticket_row.into()}))
     }
 
+    /// Cancel and delete this ticket
     pub async fn cancel(self) -> sqlx::Result<PgDone> {
         query!("DELETE FROM ticket WHERE id = $1", self.inner.id)
             .execute(self.conn)
             .await
     }
 
+    /// Get the active ticket queue for this shop, ordered by creation
     pub async fn queue(conn: &PgPool, shop_id: i32) -> sqlx::Result<Vec<Ticket>> {
         query_as!(TicketRow, r"SELECT ticket.id AS id, customer_id, ticket.shop_id AS shop_id, shop.name as shop_name, array_agg(department.id) AS department_ids, creation, expiration, entry, exit, est_minutes, valid, active
                 FROM ticket, ticket_department, department, shop
@@ -189,7 +210,9 @@ impl<'a> PersistentTicket<'a> {
             }).await
     }
 
-    pub async fn enter(&self) -> sqlx::Result<EnterResult> {
+    /// Try to log entry for this ticket at this moment.
+    /// See [`EnterResult`] for results
+    pub async fn try_enter(&self) -> sqlx::Result<EnterResult> {
         let mut tx = self.conn.begin().await?;
 
         let state = query!(r"SELECT entry IS NOT NULL as entered, exit IS NOT NULL as exited, COALESCE(expiration < CURRENT_TIMESTAMP, TRUE) AS expired FROM ticket
@@ -258,6 +281,10 @@ impl<'a> PersistentTicket<'a> {
         Ok(EnterResult::Entered)
     }
 
+    /// Try to log exit for this ticket at this moment.
+    /// ### Returns
+    /// + `Ok(true)` if successful
+    /// + `Ok(false)` if exit is not allowed for the current state of the ticket
     pub async fn exit(&self) -> sqlx::Result<bool> {
         let mut tx = self.conn.begin().await?;
 
@@ -301,6 +328,7 @@ impl<'a> PersistentTicket<'a> {
         Ok(true)
     }
 
+    /// Get the an estimate of the time between each allowed entrance for customers waiting to enter some departments
     pub async fn max_est(conn: &PgPool, departments: &[i32]) -> sqlx::Result<f32> {
         let mut max = 0.0;
         for &d in departments {
@@ -321,6 +349,7 @@ impl<'a> PersistentTicket<'a> {
     pub fn into_inner(self) -> Ticket {self.inner}
 }
 
+/// Row structure for ticket
 #[derive(FromRow)]
 pub(super) struct TicketRow {
     pub id: i32,
@@ -369,7 +398,7 @@ mod tests {
         with_test_shop!(&conn, shopid [d1, d2] {
             let customer_id = test_customer(&conn).await?;
 
-            let inserted = PersistentTicket::new(&conn, customer_id, shopid, vec![d1, d2], 25)
+            let inserted = PersistentTicket::try_new(&conn, customer_id, shopid, vec![d1, d2], 25)
                 .await?.unwrap().into_inner();
     
             let loaded = PersistentTicket::get(&conn, inserted.id).await?.map(PersistentTicket::into_inner);
@@ -386,13 +415,13 @@ mod tests {
         with_test_shop!(&conn, s0 [d0, d1], s1 [d2] {
             let customer_id = test_customer(&conn).await?;
 
-            let _ = PersistentTicket::new(&conn, customer_id, s0, vec![d0], 25).await?.unwrap();
+            let _ = PersistentTicket::try_new(&conn, customer_id, s0, vec![d0], 25).await?.unwrap();
 
-            match PersistentTicket::new(&conn, customer_id, s0, vec![d1], 25).await? {
+            match PersistentTicket::try_new(&conn, customer_id, s0, vec![d1], 25).await? {
                 NewTicketResult::AlreadyExists => {},
                 _ => panic!("Expected AlreadyExists"),
             }
-            let _ = PersistentTicket::new(&conn, customer_id, s1, vec![d2], 25).await?.unwrap();
+            let _ = PersistentTicket::try_new(&conn, customer_id, s1, vec![d2], 25).await?.unwrap();
     
         });
         Ok(())
@@ -406,10 +435,10 @@ mod tests {
         let id_c2 = test_customer(&conn).await?;
 
         with_test_shop!(&conn, shopid [d0, d1, d2, d3] {
-            let t1 = PersistentTicket::new(&conn, id_c1, shopid, vec![d0, d3], 25)
+            let t1 = PersistentTicket::try_new(&conn, id_c1, shopid, vec![d0, d3], 25)
                 .await?.unwrap().into_inner();
 
-            let t2 = PersistentTicket::new(&conn, id_c2, shopid, vec![d1,d2,d3], 25)
+            let t2 = PersistentTicket::try_new(&conn, id_c2, shopid, vec![d1,d2,d3], 25)
                 .await?.unwrap().into_inner();
 
             let queue = PersistentTicket::queue(&conn, shopid).await?;
@@ -441,33 +470,33 @@ mod tests {
         with_test_shop!(&conn, shopid [d0, d1] {
             let d_small = test_department(&conn, shopid, 2).await?;
 
-            let t1 = PersistentTicket::new(&conn, id_c1, shopid, vec![d_small], 25).await?.unwrap();
-            let t2 = PersistentTicket::new(&conn, id_c2, shopid, vec![d_small, d0], 25).await?.unwrap();
-            let t3 = PersistentTicket::new(&conn, id_c3, shopid, vec![d_small, d1], 25).await?.unwrap();
+            let t1 = PersistentTicket::try_new(&conn, id_c1, shopid, vec![d_small], 25).await?.unwrap();
+            let t2 = PersistentTicket::try_new(&conn, id_c2, shopid, vec![d_small, d0], 25).await?.unwrap();
+            let t3 = PersistentTicket::try_new(&conn, id_c3, shopid, vec![d_small, d1], 25).await?.unwrap();
 
             assert_eq!(t1.exit().await.unwrap(), false);
 
-            assert_eq!(t2.enter().await.unwrap(), EnterResult::NotFirst(1));
-            assert_eq!(t3.enter().await.unwrap(), EnterResult::NotFirst(2));
+            assert_eq!(t2.try_enter().await.unwrap(), EnterResult::NotFirst(1));
+            assert_eq!(t3.try_enter().await.unwrap(), EnterResult::NotFirst(2));
 
-            assert_eq!(t1.enter().await.unwrap(), EnterResult::Entered);
-            assert_eq!(t3.enter().await.unwrap(), EnterResult::NotFirst(1));
+            assert_eq!(t1.try_enter().await.unwrap(), EnterResult::Entered);
+            assert_eq!(t3.try_enter().await.unwrap(), EnterResult::NotFirst(1));
 
-            assert_eq!(t2.enter().await.unwrap(), EnterResult::Entered);
-            assert_eq!(t3.enter().await.unwrap(), EnterResult::Full(d_small));
+            assert_eq!(t2.try_enter().await.unwrap(), EnterResult::Entered);
+            assert_eq!(t3.try_enter().await.unwrap(), EnterResult::Full(d_small));
 
             assert_eq!(t2.exit().await.unwrap(), true);
-            assert_eq!(t3.enter().await.unwrap(), EnterResult::Entered);
+            assert_eq!(t3.try_enter().await.unwrap(), EnterResult::Entered);
 
-            assert_eq!(t1.enter().await.unwrap(), EnterResult::Invalid);
+            assert_eq!(t1.try_enter().await.unwrap(), EnterResult::Invalid);
 
             assert_eq!(t1.exit().await.unwrap(), true);
             assert_eq!(t3.exit().await.unwrap(), true);
             assert_eq!(t3.exit().await.unwrap(), false);
 
-            assert_eq!(t1.enter().await.unwrap(), EnterResult::Expired);
-            assert_eq!(t2.enter().await.unwrap(), EnterResult::Expired);
-            assert_eq!(t3.enter().await.unwrap(), EnterResult::Expired);
+            assert_eq!(t1.try_enter().await.unwrap(), EnterResult::Expired);
+            assert_eq!(t2.try_enter().await.unwrap(), EnterResult::Expired);
+            assert_eq!(t3.try_enter().await.unwrap(), EnterResult::Expired);
 
         });
         Ok(())

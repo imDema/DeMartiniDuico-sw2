@@ -59,7 +59,7 @@ async fn ticket_new_inner<'a>(conn: &'a PgPool, customer_id: i32, shop_id: &str,
 
     let ids = decode_serial_vec(req.department_ids)?;
 
-    let tick = PersistentTicket::new(&conn, customer_id, shop.inner().id, ids, req.est_minutes)
+    let tick = PersistentTicket::try_new(&conn, customer_id, shop.inner().id, ids, req.est_minutes)
         .await?;
 
     match tick {
@@ -72,6 +72,7 @@ async fn ticket_new_inner<'a>(conn: &'a PgPool, customer_id: i32, shop_id: &str,
     }
 }
 
+/// Retrieve information about the length of the queue for this shop
 #[get("/shop/{shop_id}/ticket/queue")]
 async fn ticket_queue(conn: web::Data<PgPool>, shop_id: web::Path<String>, session: Session) -> HttpResponse {
     let conn = conn.into_inner();
@@ -115,6 +116,7 @@ pub struct TokensResponse {
     pub tickets: Vec<TicketResponse>,
     pub bookings: Vec<()>,
 }
+/// List all owned active tokens
 #[get("/tokens")]
 async fn tokens(conn: web::Data<PgPool>, session: Session) -> HttpResponse {
     let conn = conn.into_inner();
@@ -160,6 +162,7 @@ pub struct TicketEstResponse {
     pub people: u32,
     pub est: DateTime<Utc>,
 }
+/// Get the estimate wait time for this ticket
 #[get("/ticket/est")]
 async fn ticket_est(conn: web::Data<PgPool>, query: web::Query<TicketEstQuery>, session: Session) -> HttpResponse {
     let conn = conn.into_inner();

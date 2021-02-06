@@ -15,6 +15,7 @@ pub fn endpoints(cfg: &mut web::ServiceConfig) {
     cfg.service(list_shops);
 }
 
+/// Lists all ids for shops, departments, customers and tickets
 #[get("/ids")]
 async fn ids(conn: web::Data<PgPool>) -> HttpResponse {
     let conn = conn.into_inner();
@@ -57,7 +58,7 @@ async fn ids(conn: web::Data<PgPool>) -> HttpResponse {
     HttpResponse::Ok().body(body)
 }
 
-
+/// Create shops and departments for testing purposes
 #[get("/setup_env")]
 async fn setup_env(conn: web::Data<PgPool>) -> HttpResponse {
     let conn = conn.into_inner();
