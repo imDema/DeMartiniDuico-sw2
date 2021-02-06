@@ -2,6 +2,7 @@ use sqlx::{FromRow, PgPool, query, query_as};
 
 use super::account::Account;
 
+/// Internal staff structure, wraps [`Account`] adding a shop id
 pub struct Staff {
     account: Account,
     shop_id: i32,
@@ -9,6 +10,7 @@ pub struct Staff {
 
 impl Staff {
     pub fn shop_id(&self) -> i32 { self.shop_id }
+    /// Get inner account structure
     pub fn account(&self) -> &Account { &self.account }
 }
 
@@ -28,6 +30,7 @@ impl From<StaffRow> for Staff {
     }
 }
 
+/// Row structure for staff
 #[derive(FromRow)]
 struct StaffRow {
     id: i32,
@@ -37,6 +40,7 @@ struct StaffRow {
     digest: Vec<u8>,
 }
 
+/// Data Access Object for staff
 #[allow(dead_code)]
 pub struct PersistentStaff<'a> {
     inner: Staff,
@@ -44,6 +48,7 @@ pub struct PersistentStaff<'a> {
 }
 
 impl<'a> PersistentStaff<'a> {
+    /// Retrieve staff from its primary key
     pub async fn get(conn: &'a PgPool, id: i32) -> sqlx::Result<Option<PersistentStaff<'a>>> {
         let acc = query_as!(StaffRow,
             r"SELECT id, email, salt, digest, shop_id FROM staff WHERE id = $1",
@@ -54,6 +59,7 @@ impl<'a> PersistentStaff<'a> {
         Ok(acc.map(|acc|Self{inner: acc.into(), conn}))
     }
 
+    /// Retrieve staff from its email
     pub async fn find(conn: &'a PgPool, email: &str) -> sqlx::Result<Option<PersistentStaff<'a>>> {
         let acc = query_as!(StaffRow,
                 r"SELECT id, email, salt, digest, shop_id FROM staff WHERE email = $1",
@@ -67,6 +73,7 @@ impl<'a> PersistentStaff<'a> {
         }
     }
 
+    /// Create a new staff account (for development purposes there are no confirmation steps)
     pub async fn create(conn: &'a PgPool, email: &str, password: &str, shop_id: i32) -> sqlx::Result<Option<PersistentStaff<'a>>> {
         let mut tx = conn.begin().await?;
 

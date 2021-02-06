@@ -84,6 +84,7 @@ pub fn decode_serial(s: &str) -> Result<i32, ParseIntError> {
     Ok(feistel_decrypt(x, N, K) as i32)
 }
 
+/// Decode a vector of integers that have been encoded with encode_serial
 pub fn decode_serial_vec(v: Vec<String>) -> Result<Vec<i32>, ParseIntError> {
     v.iter()
         .map(|s| &s[..])

@@ -9,6 +9,7 @@ use sqlx::query_as;
 
 use crate::utils::encoding::encode_serial;
 
+/// Row structure for shop
 #[allow(dead_code)]
 #[derive(FromRow, Serialize)]
 pub struct Shop {
@@ -19,6 +20,7 @@ pub struct Shop {
     pub location: String,
 }
 
+/// Row structure for Department
 #[derive(Serialize, Deserialize, FromRow, Debug)]
 pub struct Department {
     pub uid: i32,
@@ -26,6 +28,7 @@ pub struct Department {
     description: String,
     capacity: i32
 }
+/// Response ready structure for department
 #[derive(Debug, Serialize, Deserialize, PartialEq)]
 pub struct DepartmentResponse {
     uid: String,
@@ -43,6 +46,7 @@ impl From<Department> for DepartmentResponse {
     }
 }
 
+/// Opening time slot for a shop
 #[allow(dead_code)]
 #[derive(FromRow, Deserialize, Serialize, Debug)]
 pub struct Schedule {
@@ -52,6 +56,7 @@ pub struct Schedule {
     close: NaiveTime,
 }
 
+///Response ready structure for shop
 #[derive(Serialize, Deserialize, Debug)]
 pub struct ShopResponse {
     pub uid: String,
@@ -62,12 +67,14 @@ pub struct ShopResponse {
     pub departments: Vec<DepartmentResponse>,
     pub weekly_schedule: Vec<Schedule>,
 }
+/// Data Access Object for shop
 pub struct PersistentShop<'a> {
     conn: &'a PgPool,
     inner: Shop,
 }
 
 impl<'a> PersistentShop<'a> {
+    /// Retrieve shop from its primary key
     pub async fn get(conn: &'a PgPool, id: i32) -> sqlx::Result<Option<PersistentShop<'a>>> {
         let q = query_as!(Shop,
             r"SELECT id, name, description, image, location FROM shop
@@ -78,6 +85,7 @@ impl<'a> PersistentShop<'a> {
         Ok(q.map(|q| Self {conn, inner: q}))
     }
 
+    /// Retrieve information about schedule and departments, then transform into a response ready format
     pub async fn to_response(self) -> sqlx::Result<ShopResponse> {
         let sched = self.schedule().await?;
         let deps = self.departments().await?;
@@ -96,6 +104,7 @@ impl<'a> PersistentShop<'a> {
         })
     }
 
+    /// Retrieve schedule for this shop
     pub async fn schedule(&self) -> sqlx::Result<Vec<Schedule>> {
         Ok(query_as!(Schedule,
             r"SELECT shop_id, dow, open, close FROM schedule
@@ -106,6 +115,7 @@ impl<'a> PersistentShop<'a> {
         .await?)
     }
 
+    /// Retrieve departments for this shop
     pub async fn departments(&self) -> sqlx::Result<Vec<Department>> {
         Ok(query_as!(Department,
             r"SELECT id as uid, shop_id, description, capacity FROM department
@@ -115,6 +125,7 @@ impl<'a> PersistentShop<'a> {
         .await?)
     }
 
+    /// Search shops by name, matches case insensitive substrings
     pub async fn search(conn: &'a PgPool, query: Option<String>) -> sqlx::Result<Vec<ShopResponse>> {
         let stream = if let Some(q) = query {
             query_as!(Shop,

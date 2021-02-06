@@ -20,3 +20,7 @@
 | 2021-01-30 | 3h   | Shop                    |
 | 2021-01-31 | 3h   | Staff Login             |
 | 2021-02-01 | 3h   | Ticket checking         |
+| 2021-02-02 | 3h   | Testing                 |
+| 2021-02-03 | 3h   | Ticket expiration       |
+| 2021-02-04 | 4h   | Staff endpoints         |
+| 2021-02-05 | 3h   | Ticket                  |
