@@ -92,17 +92,22 @@ struct TokenInfoQuery {
 async fn ticket_queue(conn: web::Data<PgPool>, shop_id: web::Path<String>, query: web::Query<TokenInfoQuery>, session: Session) -> HttpResponse {
     let conn = conn.into_inner();
     let q = query.into_inner();
-    if let None = session::check_staff_auth(&session, &shop_id.into_inner()) {
+    let s = if let Some(s) = session::check_staff_auth(&session, &shop_id.into_inner()) {
+        s
+    } else {
         return HttpResponse::Forbidden().finish();
-    }
+
+    };
     let ticket_id = match decode_serial(&q.uid) {
         Ok(id) => id,
         _ => return HttpResponse::BadRequest().body("Invalid token id format"),
     };
 
     match PersistentTicket::get(&conn, ticket_id).await {
-        Ok(Some(t)) => 
+        Ok(Some(t)) if t.inner().shop_id == s.shop_id => 
             HttpResponse::Ok().json(TicketResponse::from(t.into_inner())),
+        Ok(Some(_)) =>
+            HttpResponse::Forbidden().finish(),
         Ok(None) => 
             HttpResponse::Ok().json(()),
         Err(e) => {
@@ -116,16 +121,13 @@ async fn ticket_queue(conn: web::Data<PgPool>, shop_id: web::Path<String>, query
 #[get("/shop/{shop_id}/status")]
 async fn status(conn: web::Data<PgPool>, shop_id: web::Path<String>, session: Session) -> HttpResponse {
     let conn = conn.into_inner();
-    let shop_id = if let Ok(s) = decode_serial(&shop_id.into_inner()) {
+    let s = if let Some(s) = session::check_staff_auth(&session, &shop_id.into_inner()) {
         s
     } else {
-        return HttpResponse::BadRequest().body("Invalid shop id format")
-    };
-    if let None = session::get_staff_account(&session) {
         return HttpResponse::Forbidden().finish();
-    }
+    };
 
-    if let Ok(v) = PersistentShop::get_occupancy(&conn, shop_id).await {
+    if let Ok(v) = PersistentShop::get_occupancy(&conn, s.shop_id).await {
         return HttpResponse::Ok().json(v);
     }
     HttpResponse::BadRequest().finish()
