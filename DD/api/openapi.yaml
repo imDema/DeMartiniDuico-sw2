@@ -77,7 +77,7 @@ paths:
             type: "string"
       security: []
       responses:
-        "200":
+        "201":
           description: "successful operation"
         "400":
           description: "Invalid code"
@@ -345,25 +345,6 @@ paths:
         "400":
           description: Invalid credentials
 
-  /staff/whoami:
-    get:
-      tags:
-        - "account"
-      summary: "Get customer authentication status"
-      security: []
-      responses:
-        "200":
-          description: Ok
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  authenticated:
-                    type: boolean
-                  email:
-                    type: string
-
   /staff/shop/{shop_id}/ticket/queue:
     get:
       summary: Get detailed information about the current queue status
@@ -433,6 +414,31 @@ paths:
           description: Ticket does not exist
       security:
         - staffAuth: []
+        
+  /staff/shop/{shop_id}/status:
+    get:
+      summary: Get token information and validity
+      parameters:
+        - in: path
+          name: "shop_id"
+          required: true
+          schema:
+            type: string
+      tags:
+        - "staff"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/DepartmentOccupancy"
+        "400":
+          description: Ticket does not exist
+      security:
+        - staffAuth: []
 
   /staff/shop/{shop_id}/ticket/new-substitute:
     post:
@@ -491,30 +497,6 @@ paths:
       tags:
         - "staff"
       summary: Log exit, update shop occupancy information
-      parameters:
-        - in: path
-          name: "shop_id"
-          required: true
-          schema:
-            type: string
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/TokenCode"
-      responses:
-        "200":
-          description: OK
-        "400":
-          description: Error
-      security:
-        - staffAuth: []
-
-  /staff/shop/{shop_id}/token/skip:
-    post:
-      tags:
-        - "staff"
-      summary: Skip and cancel a ticket
       parameters:
         - in: path
           name: "shop_id"
@@ -805,11 +787,20 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/Schedule"
-    ShopOccupancy:
+    DepartmentOccupancy:
       type: object
-      description: department_uid, occupancy map
-      additionalProperties:
-        type: integer
+      properties:
+        department:
+          type: object
+          properties:
+            uid:
+              type: string
+            description:
+              type: string
+            capacity:
+              type: integer
+        occupancy:
+          type: integer
     Schedule:
       type: object
       properties:

@@ -9,11 +9,14 @@ import './custom.scss';
 import './autocompletion-style.css';
 import router from './router'
 import store from './store'
+import VueQriously from 'vue-qriously'
 import './registerServiceWorker'
+
 
 Vue.use(Autocomplete)
 Vue.use(BootstrapVue)
 Vue.use(BootstrapVueIcons)
+Vue.use(VueQriously)
 Vue.use({
   install (Vue) {
   Vue.prototype.$api = axios.create({

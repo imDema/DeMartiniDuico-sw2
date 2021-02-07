@@ -1,6 +1,6 @@
 <template>
   <b-navbar type="dark" toggleable="lg" :variant="staff?'info':'primary'">
-  <b-navbar-brand :to="staff?'/staff':'/'">
+  <b-navbar-brand :to="staff?'/staff':'/'" @click="$emit('go-home')">
     <img id="logo" :src="require('../assets/logo-CLup-mini.png')" class="d-inline-block" alt="logo"/>
     CLup
   </b-navbar-brand>
@@ -8,7 +8,10 @@
     <b-nav-item v-show="!staff" to="/tokens">
      <b-icon icon="upc-scan"/> My tokens
     </b-nav-item>
-    <b-nav-text v-show="staff" class="text-light">Staff services</b-nav-text>
+<!--    <b-nav-text v-show="staff" class="text-light">STAFF</b-nav-text> -->
+     <b-nav-item v-show="staff" to="/staff/occupancy">
+     <b-icon icon="person"/> Occupancy
+    </b-nav-item>
   </b-navbar-nav>
   <b-navbar-toggle target="nav-collapse">
       <template #default="{ expanded }">

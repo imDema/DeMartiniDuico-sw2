@@ -3,6 +3,7 @@ name = "clup"
 version = "0.1.0"
 authors = ["imDema <luca.de.martini@protonmail.com>"]
 edition = "2018"
+default-run = "clup"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
@@ -34,9 +35,9 @@ actix-rt = "1.1"
 regex = "1.4"
 
 [profile.release]
-# lto = "thin"
-opt-level = 2
+lto = "thin"
+opt-level = 3
 
-# [[bin]]
-# name = "clup"
-# path = "src/bin/main.rs"
+[[bin]]
+name = "clup"
+path = "src/bin/main.rs"

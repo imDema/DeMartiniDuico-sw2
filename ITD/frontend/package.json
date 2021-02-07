@@ -21,6 +21,8 @@
     "sass-loader": "^10.1.0",
     "vue": "^2.6.12",
     "vue-cookies": "^1.7.4",
+    "vue-qrcode-reader": "^2.3.16",
+    "vue-qriously": "^1.1.1",
     "vue-router": "^3.2.0",
     "vuex": "^3.4.0",
     "webpack": "^4.0.0"

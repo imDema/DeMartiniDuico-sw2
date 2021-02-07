@@ -37,6 +37,7 @@ async fn shop_info(conn: web::Data<PgPool>, shop_id: web::Path<String>, session:
 struct SearchQuery {
     q: Option<String>,
 }
+
 #[get("/search")]
 async fn search(conn: web::Data<PgPool>, query: web::Query<SearchQuery>, session: Session) -> HttpResponse {
     let conn = conn.into_inner();

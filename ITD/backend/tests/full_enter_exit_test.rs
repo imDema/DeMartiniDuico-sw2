@@ -1,5 +1,6 @@
 
 mod common;
+use clup::api::ticket::TicketEstResponse;
 use clup::models::ticket::TicketResponse;
 use clup::setup_db;
 use clup::utils::encoding::encode_serial;
@@ -37,37 +38,51 @@ async fn full_enter_exit_test() -> sqlx::Result<()> {
 
     let (t0, t1, t2) = (t0.uid, t1.uid, t2.uid);
 
-    let r = req!(log_entry(&s0, &t0), &staff, &mut app);
-    assert_eq!(r.status(), StatusCode::OK);
-
-    let r = req!(log_entry(&s0, &t0), &staff, &mut app);
+    let r = req!(ticket_est(&t0), &customer_1, &mut app); // C1 tries to use another C0's ticket
     assert_eq!(r.status(), StatusCode::BAD_REQUEST);
 
-    let r = req!(log_entry(&s0, &t2), &staff, &mut app);
+    let r = req!(ticket_est(&t0), &customer_0, &mut app); // C0 checks queue
+    assert_eq!(r.status(), StatusCode::OK);
+    let resp: TicketEstResponse = test::read_body_json(r).await;
+    assert_eq!(resp.people, 0);
+
+    let r = req!(log_entry(&s0, &t0), &staff, &mut app); // C0 enters
+    assert_eq!(r.status(), StatusCode::OK);
+
+    let r = req!(log_entry(&s0, &t0), &staff, &mut app); // C0 cannot enter twice
     assert_eq!(r.status(), StatusCode::BAD_REQUEST);
 
-    let r = req!(log_entry(&s0, &t1), &staff, &mut app);
-    assert_eq!(r.status(), StatusCode::OK);
-
-    let r = req!(log_entry(&s0, &t2), &staff, &mut app);
+    let r = req!(log_entry(&s0, &t2), &staff, &mut app); // C2 can't enter, not first in line
     assert_eq!(r.status(), StatusCode::BAD_REQUEST);
 
-    let r = req!(log_exit(&s0, &t0), &staff, &mut app);
+    let r = req!(ticket_est(&t2), &customer_2, &mut app); // C2 checks queue
+    assert_eq!(r.status(), StatusCode::OK);
+    let resp: TicketEstResponse = test::read_body_json(r).await;
+    assert_eq!(resp.people, 1);
+    eprintln!("{:?}", resp);
+
+    let r = req!(log_entry(&s0, &t1), &staff, &mut app); // C1 enters
     assert_eq!(r.status(), StatusCode::OK);
 
-    let r = req!(log_entry(&s0, &t2), &staff, &mut app);
-    assert_eq!(r.status(), StatusCode::OK);
-
-    let r = req!(log_exit(&s0, &t1), &staff, &mut app);
-    assert_eq!(r.status(), StatusCode::OK);
-
-    let r = req!(log_exit(&s0, &t2), &staff, &mut app);
-    assert_eq!(r.status(), StatusCode::OK);
-
-    let r = req!(log_exit(&s0, &t2), &staff, &mut app);
+    let r = req!(log_entry(&s0, &t2), &staff, &mut app); // C2 can't enter, department is full
     assert_eq!(r.status(), StatusCode::BAD_REQUEST);
 
-    let r = req!(log_entry(&s0, &t0), &staff, &mut app);
+    let r = req!(log_exit(&s0, &t0), &staff, &mut app); // C0 exits
+    assert_eq!(r.status(), StatusCode::OK);
+
+    let r = req!(log_entry(&s0, &t2), &staff, &mut app); // C2 can now enter
+    assert_eq!(r.status(), StatusCode::OK);
+
+    let r = req!(log_exit(&s0, &t1), &staff, &mut app); // C1 exits
+    assert_eq!(r.status(), StatusCode::OK);
+
+    let r = req!(log_exit(&s0, &t2), &staff, &mut app); // C2 exits
+    assert_eq!(r.status(), StatusCode::OK);
+
+    let r = req!(log_exit(&s0, &t2), &staff, &mut app); // C2 cannot exit twice
+    assert_eq!(r.status(), StatusCode::BAD_REQUEST);
+
+    let r = req!(log_entry(&s0, &t0), &staff, &mut app); // C1 cannot exit twice
     assert_eq!(r.status(), StatusCode::BAD_REQUEST);
 
     Ok(())

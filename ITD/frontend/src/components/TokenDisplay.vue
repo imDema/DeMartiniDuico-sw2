@@ -27,6 +27,7 @@ export default {
     props: {
         ticket: Object,
         shopDescription: String,
+        shopMaps_url: String,
         departments: String,
     },
     data(){
@@ -36,10 +37,28 @@ export default {
         }
     },
     computed:{
-        maps_url(){
-            //TODO
-            return "openstreetmap.org"
-        },
+      maps_url(){
+        if(!this.shopMaps_url)
+          return "#"
+        let coord = this.shopMaps_url;
+        let matches = /^(\d+\.\d+)([NS]),(\d+\.\d+)+([EW])$/g.exec(coord)
+        if(!matches)
+          return "#"
+        let lat  = ((matches[2]==='N')?'':'-') + matches[1]
+        let long = ((matches[4]==='E')?'':'-') + matches[3]
+        return "https://bing.com/maps/default.aspx?rtp=~pos."+lat+"_"+long
+      },
+      osm_maps_url(){
+        if(!this.shopMaps_url)
+          return "#"
+        let coord = this.shopMaps_url;
+        let matches = /^(\d+\.\d+)([NS]),(\d+\.\d+)+([EW])$/g.exec(coord)
+        if(!matches)
+          return "#"
+        let lat  = ((matches[2]==='N')?'':'-') + matches[1]
+        let long = ((matches[4]==='E')?'':'-') + matches[3]
+        return "https://www.openstreetmap.org/directions#map=11/"+lat+"/"+long
+      },
         creation(){
             let d = new Date(this.ticket.creation);
             return d.toLocaleDateString() + " at " + d.toLocaleTimeString();

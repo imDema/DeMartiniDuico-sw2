@@ -1,7 +1,8 @@
-use actix_web::{HttpResponse, web, get};
+use actix_web::{HttpResponse, web, get, post};
 use sqlx::{PgPool, query};
 use serde::{Serialize, Deserialize};
 
+use crate::models::shop::PersistentShop;
 use crate::models::staff::PersistentStaff;
 use crate::utils::encoding::{decode_serial, encode_serial};
 
@@ -11,8 +12,10 @@ pub fn endpoints(cfg: &mut web::ServiceConfig) {
     cfg.service(ids);
     cfg.service(new_staff);
     cfg.service(setup_env);
+    cfg.service(list_shops);
 }
 
+/// Lists all ids for shops, departments, customers and tickets
 #[get("/ids")]
 async fn ids(conn: web::Data<PgPool>) -> HttpResponse {
     let conn = conn.into_inner();
@@ -55,7 +58,7 @@ async fn ids(conn: web::Data<PgPool>) -> HttpResponse {
     HttpResponse::Ok().body(body)
 }
 
-
+/// Create shops and departments for testing purposes
 #[get("/setup_env")]
 async fn setup_env(conn: web::Data<PgPool>) -> HttpResponse {
     let conn = conn.into_inner();
@@ -141,17 +144,15 @@ async fn setup_env(conn: web::Data<PgPool>) -> HttpResponse {
 }
 
 #[derive(Serialize, Deserialize)]
-struct NewStaffQuery {
+pub struct NewStaffRequest {
     pub email: String,
     pub password: String,
     pub shop_id: String,
 }
 
 /// ### Create a new staff account
-/// GET method is easier to use in tests and the endpoint **should not be active** in production anyway
-/// so security isn't a concern 
-#[get("/new_staff")]
-async fn new_staff(conn: web::Data<PgPool>, query: web::Query<NewStaffQuery>) -> HttpResponse {
+#[post("/new_staff")]
+async fn new_staff(conn: web::Data<PgPool>, query: web::Json<NewStaffRequest>) -> HttpResponse {
     let conn = conn.into_inner();
     let q = query.into_inner();
     let shop_id = match decode_serial(&q.shop_id) {
@@ -168,5 +169,18 @@ async fn new_staff(conn: web::Data<PgPool>, query: web::Query<NewStaffQuery>) ->
             log::error!("Error in staff creation {}", e);
             HttpResponse::InternalServerError().finish()
         }
+    }
+}
+
+#[get("/shops")]
+async fn list_shops(conn: web::Data<PgPool>) -> HttpResponse {
+    let conn = conn.into_inner();
+    match PersistentShop::search(&conn, None).await {
+        Ok(shops) => 
+            HttpResponse::Ok().json(shops),
+        Err(e) => {
+            log::error!("Error in search: {}", e);
+            HttpResponse::InternalServerError().finish()
+        },
     }
 }

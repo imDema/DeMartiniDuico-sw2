@@ -32,23 +32,28 @@
     </div>
   </b-list-group-item>
   </b-list-group>
-  <token-display v-if="isTicketSelected" :ticket="selectedTicket" :shop-description="shopDescription[selectedTicket.shop_id]" :departments="departmentNames[selectedTicket.shop_id]"/>
+  <token-display v-if="isTicketSelected" :ticket="selectedTicket" :shop-description="shopDescription[selectedTicket.shop_id]"
+    :shop-maps_url="shopMapsUrl[selectedTicket.shop_id]"
+    :departments="departmentNames[selectedTicket.shop_id]"/>
   <b-row class="my-4">
     <b-col cols="6"><b-button @click="back" block><b-icon-arrow-left/>Back</b-button> </b-col>
     <b-col cols="6" v-if="isTicketSelected"><b-button @click="showQR" variant="primary" block>Show</b-button></b-col>
   </b-row>
 
   </div>
+  <q-r-modal ref="qrmodal" :value="this.selectedTicket.uid"/>
   </div>
 </template>
 
 <script>
 import TokenDisplay from '../components/TokenDisplay.vue'
+import QRModal from '../components/QRModal.vue'
 
 export default {
   name: 'App',
   components: {
-    TokenDisplay
+    TokenDisplay,
+    QRModal,
   },
   data() {
       return {
@@ -59,6 +64,7 @@ export default {
           shopInfo: {},
           departmentNames: {},
           shopDescription: {},
+          shopMapsUrl: {},
       }
   },
   computed:{
@@ -107,7 +113,7 @@ export default {
         //reset data
       },
       showQR(){
-        alert(this.selectedTicket.uid)
+        this.$refs.qrmodal.show()
       },
       onTicketClick(ticket){
         if(this.selectedTicket === ticket){
@@ -166,6 +172,7 @@ export default {
           Promise.all(fetchPromises).then( () => {
             this.updateShopDescription()
             this.updateDepartmentNames()
+            this.updateShopMapsUrl()
           });
       },
       updateShopDescription(){
@@ -174,6 +181,14 @@ export default {
               this.$set(this.shopDescription, t.shop_id, this.shopInfo[t.shop_id].description)
             else
               this.$set(this.shopDescription, t.shop_id, "")
+        })
+      },
+      updateShopMapsUrl(){
+        this.tickets.forEach( (t) => {
+            if(t.shop_id  in this.shopInfo)
+              this.$set(this.shopMapsUrl, t.shop_id, this.shopInfo[t.shop_id].location)
+            else
+              this.$set(this.shopMapsUrl, t.shop_id, "")
         })
       },
       updateDepartmentNames(){
