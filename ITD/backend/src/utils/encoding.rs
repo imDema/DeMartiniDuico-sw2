@@ -1,6 +1,19 @@
 use std::num::ParseIntError;
 
-const K: u32 = 0xdeadbeef; // TODO: Use environment variable instead of constant
+use lazy_static::lazy_static;
+
+lazy_static!(
+    static ref K: u32 = {
+        match std::env::var("ENCODING_KEY") {
+            Ok(a) if a.len() > 0 => u32::from_str_radix(&a, 16).expect("Invalid ENCODING_KEY format, expected 4 hexadecimal bytes"),
+            _ => {
+                println!("WARNING USING DEFAULT ENCODING KEY, THIS IS ENABLED ONLY FOR TESTING PURPOSES, DO NOT USE IN PRODUCTION");
+                0xdeadbeef
+            }
+        }
+    };
+);
+
 const N: usize = 32;
 
 #[inline]
@@ -75,13 +88,13 @@ fn feistel_decrypt(x: u32, n: usize, k: u32) -> u32 {
 /// assert_eq!(Ok(x), dec);
 ///```
 pub fn encode_serial(id: i32) -> String {
-    format!("{:x}", feistel_encrypt(id as u32, N, K))
+    format!("{:x}", feistel_encrypt(id as u32, N, *K))
 }
 
 /// Decode integers encoded with encode_serial
 pub fn decode_serial(s: &str) -> Result<i32, ParseIntError> {
     let x = u32::from_str_radix(s, 16)?;
-    Ok(feistel_decrypt(x, N, K) as i32)
+    Ok(feistel_decrypt(x, N, *K) as i32)
 }
 
 /// Decode a vector of integers that have been encoded with encode_serial

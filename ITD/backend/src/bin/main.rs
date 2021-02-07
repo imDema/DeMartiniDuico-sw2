@@ -19,7 +19,7 @@ async fn main() -> std::io::Result<()> {
 
     let api_url = env::var("API_URL").unwrap_or("0.0.0.0:5000".into());
     HttpServer::new(move || {
-        let cors = Cors::default() // Dev purposes TODO: check
+        let cors = Cors::default() // Dev purposes
             .allow_any_origin()
             .allow_any_method()
             .allow_any_header()

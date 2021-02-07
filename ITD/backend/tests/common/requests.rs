@@ -1,5 +1,5 @@
 
-use actix_web::dev::{MessageBody, RequestHead, ServiceResponse};
+use actix_web::dev::{MessageBody, ServiceResponse};
 use actix_web::test::TestRequest;
 use actix_web::test;
 use clup::api::staff::LogTicketRequest;

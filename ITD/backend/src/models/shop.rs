@@ -4,7 +4,7 @@ use chrono::prelude::*;
 
 use futures::StreamExt;
 
-use sqlx::{FromRow, PgPool};
+use sqlx::{FromRow, PgPool, query};
 use sqlx::query_as;
 
 use crate::utils::encoding::encode_serial;
@@ -46,6 +46,12 @@ impl From<Department> for DepartmentResponse {
     }
 }
 
+#[derive(Serialize, Deserialize)]
+pub struct DepartmentOccupancyResponse {
+    department: DepartmentResponse,
+    occupancy: i32,
+}
+
 /// Opening time slot for a shop
 #[allow(dead_code)]
 #[derive(FromRow, Deserialize, Serialize, Debug)]
@@ -83,6 +89,40 @@ impl<'a> PersistentShop<'a> {
         ).fetch_optional(conn)
         .await?;
         Ok(q.map(|q| Self {conn, inner: q}))
+    }
+
+    /// Retieve information about current department occupancy
+    pub async fn get_occupancy(conn: &'a PgPool, shop_id: i32) -> sqlx::Result<Vec<DepartmentOccupancyResponse>> {
+        query!(r"SELECT
+            department.id as id,
+            description,
+            capacity,
+            count(ticket.id) as occupancy
+        FROM ticket, ticket_department, department
+        WHERE
+            ticket_department.ticket_id = ticket.id AND
+            ticket_department.department_id = department.id AND
+            ticket.shop_id = $1 AND
+            department.shop_id = $1 AND
+            ticket.exit IS NULL AND
+            ticket.entry IS NOT NULL
+        GROUP BY
+            department.id, description, capacity", shop_id)
+            .fetch(conn)
+            .fold(Ok(Vec::new()), |acc, r| async {
+                let mut acc = acc?;
+                let r = r?;
+                acc.push(DepartmentOccupancyResponse {
+                    department: Department {
+                        uid: r.id,
+                        shop_id: shop_id,
+                        description: r.description,
+                        capacity: r.capacity
+                    }.into(),
+                    occupancy: r.occupancy.unwrap() as i32
+                });
+                Ok(acc)
+            }).await
     }
 
     /// Retrieve information about schedule and departments, then transform into a response ready format

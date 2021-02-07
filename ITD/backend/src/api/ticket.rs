@@ -95,15 +95,9 @@ async fn ticket_queue(conn: web::Data<PgPool>, shop_id: web::Path<String>, sessi
     }
 }
 async fn ticket_queue_inner(conn: &PgPool, shop_id: i32) -> sqlx::Result<HttpResponse> {
-    let deps: Vec<i32> = if let Some(s) = PersistentShop::get(conn, shop_id).await? {
-        s.departments().await?.into_iter().map(|d| d.uid).collect()
-    } else {
-        return Ok(HttpResponse::BadRequest().finish());
-    };
-
     let people = PersistentTicket::queue(conn, shop_id).await?.len() as u32;
 
-    PersistentTicket::max_est(conn, &deps[..]).await.map(|w|
+    PersistentTicket::est(conn, shop_id, None).await.map(|w|
         HttpResponse::Ok().json(TicketEstResponse {
             people,
             est: Utc::now() + Duration::minutes((w * people as f32) as i64),
@@ -196,26 +190,16 @@ async fn ticket_est_inner(conn: &PgPool, cid: i32, tid: i32) -> sqlx::Result<Htt
         }
         let queue = PersistentTicket::queue(conn, ticket.shop_id).await?;
 
-        let mut contained = false;
-        let mut people = 0;
-        for ti in queue.into_iter() {
-            if ti.id == tid {
-                contained = true;
-                break;
-            }
-            people += 1;
-        }
+        let people = queue.into_iter()
+            .filter(|tick| tick.creation < ticket.creation)
+            .count() as u32;
 
-        if contained {
-            PersistentTicket::max_est(conn, &ticket.department_ids[..]).await.map(|w|
-                HttpResponse::Ok().json(TicketEstResponse {
-                    people,
-                    est: Utc::now() + Duration::minutes((w * people as f32) as i64),
-                })
-            )
-        } else {
-            Ok(HttpResponse::BadRequest().body("Not the owner of the ticket"))
-        }
+        PersistentTicket::est(conn, ticket.shop_id, Some(ticket)).await.map(|w|
+            HttpResponse::Ok().json(TicketEstResponse {
+                people,
+                est: Utc::now() + Duration::minutes((w * people as f32) as i64),
+            })
+        )
     } else {
         Ok(HttpResponse::BadRequest().body("Ticket does not exist"))
     }

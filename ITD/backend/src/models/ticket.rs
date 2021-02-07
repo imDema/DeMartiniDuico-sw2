@@ -327,22 +327,50 @@ impl<'a> PersistentTicket<'a> {
         tx.commit().await?;
         Ok(true)
     }
+    
+    pub async fn est(conn: &PgPool, shop_id: i32, ticket: Option<Ticket> ) -> sqlx::Result<f32> {
+        let (creation, deps) = match ticket.map(|t| (t.creation, t.department_ids)) {
+            Some((a,b)) => (Some(a), Some(b)),
+            None => (None, None)
+        };
 
-    /// Get the an estimate of the time between each allowed entrance for customers waiting to enter some departments
-    pub async fn max_est(conn: &PgPool, departments: &[i32]) -> sqlx::Result<f32> {
-        let mut max = 0.0;
-        for &d in departments {
-            let wait_mas = query!(r"SELECT ma_visit, ma_est_visit, capacity FROM department
-                WHERE id = $1", d)
-                .fetch_one(conn)
-                .await?;
-            
-            let combined = combine_expected_measured(wait_mas.ma_est_visit, wait_mas.ma_visit) / wait_mas.capacity as f32;
-            if combined > max {
-                max = combined;
-            }
-        }
-        Ok(max)
+        let rows = query_as!(EstJoinRow, r"SELECT
+            department.id as id,
+            capacity as capacity,
+            count(ticket.id) as queue_extended,
+            ma_est_visit,
+            ma_visit
+        FROM ticket, ticket_department, department
+        WHERE
+            ticket_department.ticket_id = ticket.id AND
+            ticket_department.department_id = department.id AND
+            ticket.shop_id = $1 AND
+            department.shop_id = $1 AND
+            ticket.exit IS NULL AND
+            COALESCE(ticket.creation < $2, TRUE)
+        GROUP BY
+            department.id, capacity, ma_est_visit, ma_visit", shop_id, creation)
+            .fetch_all(conn)
+            .await?;
+
+        let fold_est = |wait, r: EstJoinRow| {
+            let dt = combine_expected_measured(r.ma_est_visit, r.ma_visit);
+            let dp = r.queue_extended.unwrap() as i32 - r.capacity;
+            let w = dp as f32 * dt;
+            w.max(wait)
+        };
+
+        let est = if let Some(mut deps) = deps {
+            deps.sort();
+            rows.into_iter()
+                .filter(|r| deps.binary_search(&r.id).is_ok())
+                .fold(0., fold_est)
+        } else {
+            rows.into_iter()
+                .fold(0., fold_est)
+        };
+
+        Ok(est)
     }
     
     pub fn inner(&self) -> &Ticket {&self.inner}
@@ -381,6 +409,15 @@ impl From<TicketRow> for Ticket {
             department_ids: row.department_ids.unwrap_or_default(),
         }
     }
+}
+
+#[derive(FromRow)]
+struct EstJoinRow {
+    id: i32,
+    capacity: i32,
+    queue_extended: Option<i64>,
+    ma_est_visit: f32,
+    ma_visit: f32,
 }
 
 #[cfg(test)]
