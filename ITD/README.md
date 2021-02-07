@@ -1,15 +1,40 @@
-# CLup application server
+# Integration and Testing Deliverable
 ## De Martini Luca - Duico Alessandro
 
-[Application Server](https://github.com/luca-de-martini/DeMartiniDuico-sw2/tree/main/ITD/backend)
+[Application Server source code](https://github.com/luca-de-martini/DeMartiniDuico-sw2/tree/main/ITD/backend)
 
-[Client Web Application](https://github.com/luca-de-martini/DeMartiniDuico-sw2/tree/main/ITD/frontend)
-
-TODO: link to code
+[Client Web Application source code](https://github.com/luca-de-martini/DeMartiniDuico-sw2/tree/main/ITD/frontend)
 
 ## Introduction
+Clup is a three-tier system, consisting of a Database (Postgres), the Clup binary (`ITD/backend`) and the Clup Webapp (`ITD/frontend`). A middleware (Redis) is employed for session storage.
+### Scope
+This document gives a concrete description of the Implementation and Testing procedure. 
+In particular, it covers:
+- the reasons for choosing those requirements that are implemented;
+- the adopted development technologies: languages, frameworks and API standards;
+- the structure of the source code;
+- how testing is performed;
+-  the prerequisites and instructions for building and installing.
 
 ## Implemented features
+
+Being a Proof-of-Concept, only the core features for generating tickets to line-up at a Shop were implemented, plus the monitoring functions available to the staff. 
+
+Referring to the DD, the following requirements are satisfied:
+
+- **[R1]** The system shall keep track of the list of Customers waiting to visit each Shop
+- **[R2] **The system shall allow customers to request the right to visit a shop as soon as possible
+- **[R3]** The system shall give Customers a Token associated with their position in the waiting line
+- **[R5]** The Staff shall be able to scan Customer generated Tokens using a textual input
+- **[R6]** Given a Token, the Staff application shall be able to verify its validity
+- **[R7]** Given a Token, the Staff application shall be able to verify its position in the waiting line
+- **[R8]** Given a Token, the Staff application shall be able to mark it as used and update the list of Customers currently inside the Shop
+- **[R12]** The  system  shall ask Customers  to  specify the approximate duration of their visit
+- **[R13]** The system shall automatically infer an estimate visit duration for returning customers
+- **[R14]** The system shall give Customers an estimate of the waiting time remaining before it’s their turn
+- **[R16]** The system shall be able to connect to a Maps service to show information about travel time
+- **[R17]** Customers shall be able to specify the categories of items they intend to buy
+- **[R18]** The system shall keep track of the number of customers visiting the Shop on a Department basis
 
 ## Adopted frameworks and languages
 
@@ -79,7 +104,16 @@ The code for the application server is contained in the `frontend` directory.
 
 ## Testing
 
-Testing has been done following the Design Documents guidelines. Unit tests are written alongside the code for the model using a bottom up approach. Integration tests are written in the `tests` directory of the backend and test the API via simulated requests
+Testing has been done following the Design Documents guidelines. Unit tests are written alongside the code for the model using a bottom up approach.  
+Integration tests are written in the `ITD/backend/tests` directory and test the API via simulated requests. The source code is self-explanatory, there is no need to explain them here but in a very concise way: 
+
+- `account_api_test.rs`verifies  the main steps of account creation
+
+- `get_ticket_test.rs` simulates the process of obtaining tickets
+
+- `full_enter_exit_test.rs` generates more complex multi-Customer situations, to check the constraints of the queue
+
+GitLab CI is used as a Continuous Integration platform.  This way, every commit triggers the execution of the workflow in `.github/rust-ci.yml`that broken commits made on feature branches were never merged into the main branch.
 
 ## Installation instructions
 
@@ -91,11 +125,9 @@ Testing has been done following the Design Documents guidelines. Unit tests are 
  + Set the `SESSION_KEY` environment variable ([see usage](#usage))
  + Run `docker-compose up`
 
-### Building and installing
+### Building and installing  - Backend
 
 #### Requirements
-
-##### Backend
 
  + **Rust** https://www.rust-lang.org/tools/install
 
@@ -105,62 +137,69 @@ Testing has been done following the Design Documents guidelines. Unit tests are 
 
  + **Redis** https://redis.io/
 
-  ##### Frontend
 
- + **Node.js** https://nodejs.org/en/download/
- + **Yarn** (or any other package manager for Node.js)  https://yarnpkg.com/getting-started/install
-
-#### Build
-##### Backend
-```
-cargo build
-```
-
-#### Test
-##### Backend
-```
-cargo test
-```
-
-#### Install
-##### Backend
-```
-cargo install
-```
-##### Frontend
-```
-yarn install
-```
-
-### Usage
-
+#### Environment variables
 Configuration for the main binary is supplied through environment variables. Example:
 ```
 DATABASE_URL="postgresql://user:pass@localhost:5432/clup_sqlx"
 REDIS_URL="127.0.0.1:6379"
 SESSION_KEY="0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f"
 API_URL="0.0.0.0:5000" # defaults to "0.0.0.0:5000"
-
-VUE_APP_API_BASE_URL="http://localhost:5000" # should point to API_URL
 ```
-
 When running the application server binary environment variable configurations will be read from a `.env` file, if present.
 
-#### Running
-##### Backend
+#### Working directory
+```
+cd ITD/backend
+```
+#### Build
+```
+cargo build
+```
+#### Test
+```
+cargo test
+```
+#### Install
+```
+cargo install
+```
+#### Run
 ```
 cargo run
 ```
-##### Frontend
+
+### Building and installing  - Frontend
+
+#### Requirements
+
+ + **Node.js** https://nodejs.org/en/download/
+ + **Yarn** (or any other package manager for Node.js)  https://yarnpkg.com/getting-started/install
+
+#### Environment variables
+```
+VUE_APP_API_BASE_URL="http://localhost:5000" # should point to API_URL
+```
+
+#### Working directory
+```
+cd ITD/frontend
+```
+
+#### Install
+```
+yarn install
+```
+
+#### Run
 ```
 yarn run serve
 ```
+This command will start a development web server that is not suited for production. 
 
-This command will start a development web server that is not suited for production. Alternatively you can run:
+Alternatively, you can run:
 
 ```bash
 yarn run build
 ```
-
 and use a web server (such as Nginx or Lighttpd) to serve the `dist` folder, which is done automatically when **Using docker-compose**.
-
