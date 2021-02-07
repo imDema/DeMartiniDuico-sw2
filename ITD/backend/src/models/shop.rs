@@ -1,7 +1,5 @@
 use serde::{Serialize, Deserialize};
-
 use chrono::prelude::*;
-
 use futures::StreamExt;
 
 use sqlx::{FromRow, PgPool, query};
@@ -31,7 +29,7 @@ pub struct Department {
 /// Response ready structure for department
 #[derive(Debug, Serialize, Deserialize, PartialEq)]
 pub struct DepartmentResponse {
-    uid: String,
+    pub(super) uid: String,
     description: String,
     capacity: i32,
 }
@@ -46,10 +44,11 @@ impl From<Department> for DepartmentResponse {
     }
 }
 
-#[derive(Serialize, Deserialize)]
+/// Response struct representing the current occupancy status of a department
+#[derive(Serialize, Deserialize, Debug)]
 pub struct DepartmentOccupancyResponse {
-    department: DepartmentResponse,
-    occupancy: i32,
+    pub department: DepartmentResponse,
+    pub occupancy: i32,
 }
 
 /// Opening time slot for a shop
@@ -91,23 +90,23 @@ impl<'a> PersistentShop<'a> {
         Ok(q.map(|q| Self {conn, inner: q}))
     }
 
-    /// Retieve information about current department occupancy
+    /// Retieve information about current per department occupancy
     pub async fn get_occupancy(conn: &'a PgPool, shop_id: i32) -> sqlx::Result<Vec<DepartmentOccupancyResponse>> {
         query!(r"SELECT
-            department.id as id,
-            description,
-            capacity,
-            count(ticket.id) as occupancy
-        FROM ticket, ticket_department, department
-        WHERE
-            ticket_department.ticket_id = ticket.id AND
-            ticket_department.department_id = department.id AND
-            ticket.shop_id = $1 AND
-            department.shop_id = $1 AND
-            ticket.exit IS NULL AND
-            ticket.entry IS NOT NULL
-        GROUP BY
-            department.id, description, capacity", shop_id)
+                    department.id as id,
+                    description,
+                    capacity,
+                    count(ticket.id) as occupancy
+                FROM department
+                    LEFT JOIN ticket_department ON ticket_department.department_id = department.id
+                    LEFT JOIN ticket 
+                        ON ticket_department.ticket_id = ticket.id AND
+                            ticket.entry IS NOT NULL AND
+                            ticket.exit IS NULL
+                WHERE
+                    department.shop_id = $1    
+                GROUP BY
+                department.id, description, capacity", shop_id)
             .fetch(conn)
             .fold(Ok(Vec::new()), |acc, r| async {
                 let mut acc = acc?;
@@ -193,4 +192,92 @@ impl<'a> PersistentShop<'a> {
 
     pub fn into_inner(self) -> Shop {self.inner}
     pub fn inner(&self) -> &Shop {&self.inner}
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use std::error::Error;
+
+    use crate::models::ticket::{EnterResult, PersistentTicket};
+    use crate::utils::tests::{db, del_customer, test_customer};
+    use crate::{ with_test_shop};
+
+    #[actix_rt::test]
+    async fn empty_deps_occupancy_test() -> Result<(), Box<dyn Error>> {
+        let conn = db().await;
+        with_test_shop!(&conn, s1 [d0, d1, d2] {
+            let res = PersistentShop::get_occupancy(&conn, s1)
+                .await
+                .unwrap();
+            assert_eq!(res.len(), 3);
+
+            let encoded: Vec<String> = vec![d0, d1, d2].into_iter().map(encode_serial).collect();
+            println!("res: {:?}\nenc: {:?}", &res, &encoded);
+
+            for r in res.iter() {
+                assert_eq!(r.occupancy, 0);
+                assert!(encoded.contains(&r.department.uid));
+            } 
+        });
+
+        Ok(())
+    }
+
+    #[actix_rt::test]
+    async fn deps_occupancy_test() -> Result<(), Box<dyn Error>> {
+        let conn = db().await;
+        
+        let id_c1 = test_customer(&conn).await?;
+        let id_c2 = test_customer(&conn).await?;
+
+        with_test_shop!(&conn, s1 [d0, d1] {
+            let d0e = encode_serial(d0);
+            let d1e = encode_serial(d1);
+
+            let t1 = PersistentTicket::try_new(&conn, id_c1, s1, vec![d0], 25).await?.unwrap();
+            let t2 = PersistentTicket::try_new(&conn, id_c2, s1, vec![d0, d1], 25).await?.unwrap();
+
+            assert_eq!(t1.try_enter().await.unwrap(), EnterResult::Entered);
+            
+            let res = PersistentShop::get_occupancy(&conn, s1).await.unwrap();
+            assert_eq!(res.len(), 2);
+            for r in res {
+                match r.department.uid {
+                    id if id == d0e => assert_eq!(r.occupancy, 1),
+                    id if id == d1e => assert_eq!(r.occupancy, 0),
+                    _ => panic!(),
+                }
+            }
+
+            assert_eq!(t2.try_enter().await.unwrap(), EnterResult::Entered);
+            
+            let res = PersistentShop::get_occupancy(&conn, s1).await.unwrap();
+            assert_eq!(res.len(), 2);
+            for r in res {
+                match r.department.uid {
+                    id if id == d0e => assert_eq!(r.occupancy, 2),
+                    id if id == d1e => assert_eq!(r.occupancy, 1),
+                    _ => panic!(),
+                }
+            }
+
+            assert_eq!(t1.exit().await.unwrap(), true);
+            
+            let res = PersistentShop::get_occupancy(&conn, s1).await.unwrap();
+            assert_eq!(res.len(), 2);
+            for r in res {
+                match r.department.uid {
+                    id if id == d0e => assert_eq!(r.occupancy, 1),
+                    id if id == d1e => assert_eq!(r.occupancy, 1),
+                    _ => panic!(),
+                }
+            }
+        });
+
+        del_customer(&conn, id_c1).await?;
+        del_customer(&conn, id_c2).await?;
+
+        Ok(())
+    }
 }
