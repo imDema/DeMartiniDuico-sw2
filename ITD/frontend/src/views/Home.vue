@@ -1,6 +1,6 @@
 <template>
   <div>
-  <nav-bar/>
+  <nav-bar @go-home="resetFormStep"/>
   <auth-modal @connection-failure="showFailedToConnectAlert"/>
   <router-view/>
   <b-alert
@@ -35,7 +35,23 @@ export default {
   methods: {
       showFailedToConnectAlert(){
         this.failedToConnectAlertCountdown = 3
+      },
+      resetFormStep(){
+        // if('booking_form' in this.$refs)
+        //   this.$refs.booking_form.
       }
+  },
+  created: function () {
+  this.$store.dispatch('fetchCustomerWhoami')
+    .then(data => {
+        let isAuthenticated = data.authenticated == true;
+        if(!isAuthenticated){
+          this.$bvModal.show('login-modal')
+        }
+    }).catch( (err) => {
+        this.$bvModal.show('login-modal')
+        console.log(err)
+    });
   },
 }
 

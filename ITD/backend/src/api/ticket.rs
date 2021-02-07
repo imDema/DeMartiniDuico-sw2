@@ -30,8 +30,8 @@ async fn ticket_new(conn: web::Data<PgPool>, shop_id: web::Path<String>, body: w
     let conn = conn.into_inner();
     let shop_id = shop_id.into_inner();
     let req = body.into_inner();
-    let uid = if let Some(uid) = session::get_account(&session) {
-        uid
+    let sess = if let Some(sess) = session::get_account(&session) {
+        sess
     } else {
         return HttpResponse::Forbidden().finish();
     };
@@ -40,7 +40,7 @@ async fn ticket_new(conn: web::Data<PgPool>, shop_id: web::Path<String>, body: w
         return HttpResponse::BadRequest().body("Must specify departments");
     }
 
-    match ticket_new_inner(&conn, uid, &shop_id, req).await {
+    match ticket_new_inner(&conn, sess.id, &shop_id, req).await {
         Ok(resp) => resp,
         Err(e) => {
             log::error!("{}", e);
@@ -59,7 +59,7 @@ async fn ticket_new_inner<'a>(conn: &'a PgPool, customer_id: i32, shop_id: &str,
 
     let ids = decode_serial_vec(req.department_ids)?;
 
-    let tick = PersistentTicket::new(&conn, customer_id, shop.inner().id, ids, req.est_minutes)
+    let tick = PersistentTicket::try_new(&conn, customer_id, shop.inner().id, ids, req.est_minutes)
         .await?;
 
     match tick {
@@ -72,6 +72,7 @@ async fn ticket_new_inner<'a>(conn: &'a PgPool, customer_id: i32, shop_id: &str,
     }
 }
 
+/// Retrieve information about the length of the queue for this shop
 #[get("/shop/{shop_id}/ticket/queue")]
 async fn ticket_queue(conn: web::Data<PgPool>, shop_id: web::Path<String>, session: Session) -> HttpResponse {
     let conn = conn.into_inner();
@@ -94,17 +95,14 @@ async fn ticket_queue(conn: web::Data<PgPool>, shop_id: web::Path<String>, sessi
     }
 }
 async fn ticket_queue_inner(conn: &PgPool, shop_id: i32) -> sqlx::Result<HttpResponse> {
-    let queue = PersistentTicket::queue(conn, shop_id).await?;
+    let people = PersistentTicket::queue(conn, shop_id).await?.len() as u32;
 
-    let (delta_t, people) = queue.into_iter()
-        .fold((Duration::zero(), 0), |(dt, p), ti| {
-            (dt + Duration::minutes(ti.est_minutes as i64), p + 1)
-        });
-
-    Ok(HttpResponse::Ok().json(TicketEstResponse {
-        people,
-        est: Utc::now() + delta_t
-    }))
+    PersistentTicket::est(conn, shop_id, None).await.map(|w|
+        HttpResponse::Ok().json(TicketEstResponse {
+            people,
+            est: Utc::now() + Duration::minutes((w * people as f32) as i64),
+        })
+    )
 }
 
 #[derive(Serialize, Deserialize)]
@@ -112,16 +110,17 @@ pub struct TokensResponse {
     pub tickets: Vec<TicketResponse>,
     pub bookings: Vec<()>,
 }
+/// List all owned active tokens
 #[get("/tokens")]
 async fn tokens(conn: web::Data<PgPool>, session: Session) -> HttpResponse {
     let conn = conn.into_inner();
-    let uid = if let Some(uid) = session::get_account(&session) {
-        uid
+    let sess = if let Some(sess) = session::get_account(&session) {
+        sess
     } else {
         return HttpResponse::Forbidden().finish();
     };
 
-    match tokens_inner(&conn, uid).await {
+    match tokens_inner(&conn, sess.id).await {
         Ok(resp) => resp,
         Err(e) => {
             log::error!("{}", e);
@@ -152,11 +151,12 @@ async fn tokens_inner(conn: &PgPool, uid: i32) -> sqlx::Result<HttpResponse> {
 struct TicketEstQuery {
     pub uid: String,
 }
-#[derive(Serialize, Debug)]
-struct TicketEstResponse {
+#[derive(Serialize, Deserialize, Debug)]
+pub struct TicketEstResponse {
     pub people: u32,
     pub est: DateTime<Utc>,
 }
+/// Get the estimate wait time for this ticket
 #[get("/ticket/est")]
 async fn ticket_est(conn: web::Data<PgPool>, query: web::Query<TicketEstQuery>, session: Session) -> HttpResponse {
     let conn = conn.into_inner();
@@ -168,8 +168,8 @@ async fn ticket_est(conn: web::Data<PgPool>, query: web::Query<TicketEstQuery>, 
         return HttpResponse::BadRequest().body("Invalid uid in query");
     };
 
-    if let Some(cid) = session::get_account(&session) {
-        match ticket_est_inner(&conn, cid, tid).await {
+    if let Some(sess) = session::get_account(&session) {
+        match ticket_est_inner(&conn, sess.id, tid).await {
             Ok(h) => h,
             Err(e) => {
                 log::error!("{}", e);
@@ -190,26 +190,16 @@ async fn ticket_est_inner(conn: &PgPool, cid: i32, tid: i32) -> sqlx::Result<Htt
         }
         let queue = PersistentTicket::queue(conn, ticket.shop_id).await?;
 
-        let mut delta_t = Duration::minutes(0);
-        let mut contained = false;
-        let mut people = 0;
-        for ti in queue.into_iter() {
-            if ti.id == tid {
-                contained = true;
-                break;
-            }
-            people += 1;
-            delta_t = delta_t + Duration::minutes(ti.est_minutes as i64);
-        }
+        let people = queue.into_iter()
+            .filter(|tick| tick.creation < ticket.creation)
+            .count() as u32;
 
-        if contained {
-            Ok(HttpResponse::Ok().json(TicketEstResponse {
+        PersistentTicket::est(conn, ticket.shop_id, Some(ticket)).await.map(|w|
+            HttpResponse::Ok().json(TicketEstResponse {
                 people,
-                est: Utc::now() + delta_t
-            }))
-        } else {
-            Ok(HttpResponse::BadRequest().body("Not the owner of the ticket"))
-        }
+                est: Utc::now() + Duration::minutes((w * people as f32) as i64),
+            })
+        )
     } else {
         Ok(HttpResponse::BadRequest().body("Ticket does not exist"))
     }
@@ -223,8 +213,8 @@ struct TicketCancelRequest {
 async fn ticket_cancel(conn: web::Data<PgPool>, body: web::Json<TicketCancelRequest>, session: Session) -> HttpResponse {
     let conn = conn.into_inner();
     let req = body.into_inner();
-    let uid = if let Some(uid) = session::get_account(&session) {
-        uid
+    let sess = if let Some(sess) = session::get_account(&session) {
+        sess
     } else {
         return HttpResponse::Forbidden().finish();
     };
@@ -237,7 +227,7 @@ async fn ticket_cancel(conn: web::Data<PgPool>, body: web::Json<TicketCancelRequ
     let t = PersistentTicket::get(&conn, tid).await;
 
     if let Ok(Some(ticket)) = t {
-        if ticket.inner().customer_id == uid {
+        if ticket.inner().customer_id == sess.id {
             if let Ok(_) = ticket.cancel().await {
                 return HttpResponse::Ok().finish()
             }

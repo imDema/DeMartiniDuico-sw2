@@ -1,7 +1,13 @@
 version: "3"
 services:
-  clup:
-    build: .
+  clup-frontend:
+    build: ./frontend
+    ports:
+      - "8080:80"
+    links:
+      - clup-backend
+  clup-backend:
+    build: ./backend
     ports:
       - "5000:5000"
     environment:

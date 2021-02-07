@@ -7,7 +7,11 @@ pub mod api;
 pub mod utils;
 pub mod migrations;
 
-
+/// ## Setup database schema
+/// + Try to connect to the supplied url
+/// + Create database if it doesn't exist
+/// + Create connection pool
+/// + Run migrations
 pub async fn setup_db(conn_url: &str) -> PgPool {
     log::info!("db_conn: {}", &conn_url);
     

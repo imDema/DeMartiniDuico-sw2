@@ -4,11 +4,20 @@
   <h2 class="my-2">{{store.name}}<b-button :href="maps_url" target="_blank" class="mx-2" variant="outline-secondary"><b-icon-map/>Open in Maps </b-button></h2>
   <span class="italic">{{store.description}}</span> 
   </header>
+    <b-button v-b-toggle.collapse-tt class="m-1">Show timetable<b-icon icon="chevron-down" /></b-button>
+    <b-collapse id="collapse-tt">
+      <b-card>
+        <weekly-schedule :weekly_schedule="store.weekly_schedule" />
+      </b-card>
+    </b-collapse>
   <b-form class="py-2" novalidate>
       <b-form-group id="input-group-categories" label="Departments:" v-if="'departments' in store && store.departments.length >=2">         
         <b-form-checkbox v-for="cat in store.departments" :key="cat.uid" :value="cat.uid" :checked="form.categories.indexOf(cat.uid)!==-1" v-model="form.categories">
           {{ cat.description }}
         </b-form-checkbox>
+      </b-form-group>
+      <b-form-group id="input-group-est" label="Duration of your visit (minutes):">         
+         <b-form-spinbutton id="sb-inline" v-model="form.est"  inline></b-form-spinbutton>
       </b-form-group>
     <b-form-group v-if="isBooking">
       <label for="example-datepicker">Choose a time:</label>
@@ -22,23 +31,41 @@
     </b-row>
     <b-tooltip target="booking-button" triggers="hover" placement="bottom">Booking is not available in this demo</b-tooltip>
   </b-form>
+          <b-alert
+          :show="submitFailedAlert.countdown"
+          dismissible
+          fade
+          class="position-fixed fixed-bottom m-0 rounded-0"
+          style="z-index: 2000;"
+          variant="danger"
+          @dismiss-count-down="submitFailedAlert.countdown=$event"
+        >
+          {{submitFailedAlert.message}}
+        </b-alert>
   </div>
 </template>
 
 <script>
 import Queue from "./Queue"
+import WeeklySchedule from './WeeklySchedule.vue'
   export default {
     components:{
-      Queue
+      Queue,
+      WeeklySchedule
     },
     data() {
       return {
         form: {
           step: 0,
           categories: [],
-          datetime: { date: null, time: null}
+          datetime: { date: null, time: null},
+          est: 15,
         },
         //store_info: {},
+        submitFailedAlert:{
+          countdown: 0,
+          message: "Failed to obtain a ticket.",
+        },
         show: true
       }
     },
@@ -104,14 +131,17 @@ import Queue from "./Queue"
           alert("Store data missing");
           return
         }
+        let categories;
         if(!this.form.categories || this.form.categories.length === 0){
-          this.form.categories = this.store.departments.map( d => d.uid);
+          categories = this.store.departments.map( d => d.uid);
+        }else{
+          categories = this.form.categories
         }
         let endpoint = "/shop/"+this.store.uid+"/ticket/new"
-        let est_minutes = 30
+        let est_minutes = this.form.est || 15
         this.$api.post(endpoint, {
           est_minutes: est_minutes,
-          department_ids: this.form.categories
+          department_ids: categories
         })
         .then(res => {
           if(res.status == '200'){
@@ -126,7 +156,12 @@ import Queue from "./Queue"
               }
             })
           }
-        }).catch( () => {}) //TODO
+        }).catch( (err) => {
+            if('response' in err)
+              this.showSubmitFailedAlert(err.response.data)
+            else
+              this.showSubmitFailedAlert("Failed to connect.")
+        }) //TODO
       },
       onSubmit(evt){
         evt.preventDefault()
@@ -134,6 +169,10 @@ import Queue from "./Queue"
       },
       submitBooking() {
         alert(JSON.stringify(this.form))
+      },
+      showSubmitFailedAlert(message){
+        this.submitFailedAlert.message = message
+        this.submitFailedAlert.countdown = 3
       },
       // onReset(evt) {
       //   evt.preventDefault()

@@ -1,13 +1,14 @@
 <template>
-  <b-navbar type="dark" toggleable="lg" variant="primary">
-  <b-navbar-brand to="/">
+  <b-navbar type="dark" toggleable="lg" :variant="staff?'info':'primary'">
+  <b-navbar-brand :to="staff?'/staff':'/'" @click="$emit('go-home')">
     <img id="logo" :src="require('../assets/logo-CLup-mini.png')" class="d-inline-block" alt="logo"/>
     CLup
   </b-navbar-brand>
   <b-navbar-nav class="ml-auto mr-2">
-    <b-nav-item to="/tokens">
+    <b-nav-item v-show="!staff" to="/tokens">
      <b-icon icon="upc-scan"/> My tokens
     </b-nav-item>
+    <b-nav-text v-show="staff" class="text-light">Staff services</b-nav-text>
   </b-navbar-nav>
   <b-navbar-toggle target="nav-collapse">
       <template #default="{ expanded }">
@@ -16,16 +17,16 @@
       </template>
   </b-navbar-toggle>
       <b-collapse id="nav-collapse" is-nav>
-      <b-navbar-nav v-if="!$store.state.email" class="ml-auto">
+      <b-navbar-nav v-if="!email" class="ml-auto">
         <b-nav-text class="text-light">Logged out</b-nav-text>
         <b-nav-item href="#" @click="displayLogin">
           <b-icon icon="lock"/>   
           Login
         </b-nav-item>
       </b-navbar-nav>
-      <b-navbar-nav v-if="$store.state.email" class="ml-auto">
+      <b-navbar-nav v-if="email" class="ml-auto">
         <!--<b-nav-item href="#" @click="displayLogin">Display login</b-nav-item>-->
-        <b-nav-text class="text-light">Logged in as <span class="bold">{{$store.state.email}}</span></b-nav-text>
+        <b-nav-text class="text-light">Logged in as <span class="bold">{{email}}</span></b-nav-text>
         <b-nav-item href="#" @click="logout">   
           <b-icon icon="power" aria-hidden="true"></b-icon> 
           Logout
@@ -37,8 +38,17 @@
 
 <script>
   export default {
+    props:{
+      staff: Boolean,
+    },
     computed:{
-
+      email(){
+        if(this.staff){
+            return this.$store.state.staff.email
+        }else{
+            return this.$store.state.customer.email
+        }
+      }
     },
     methods: {
       displayLogin(){
@@ -48,13 +58,18 @@
         //OPTIONAL 
         //show modal:
         //Are you sure you want to logout?
-        this.$api.get("/logout")
+        let endpoint = this.staff?"/staff/logout":"/logout" 
+        this.$api.get(endpoint)
         .then( res => {
           if(res.status == '200'){
-            this.$store.commit('logged_out')
-            this.$emit('logout')
-            this.$router.replace('/')
-            this.displayLogin()
+            if(this.staff){
+              this.$store.commit('staff_logged_out')
+            }else{
+              this.$store.commit('logged_out')
+            }
+              this.$emit('logout')
+              this.$router.replace(this.staff?'/staff':'/')
+              this.displayLogin()
           }
         })
         .catch( err => {

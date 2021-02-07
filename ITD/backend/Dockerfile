@@ -1,4 +1,4 @@
-from rust:1.49-slim as builder
+FROM rust:1.49-slim as builder
 WORKDIR /usr/clup
 COPY . .
 RUN cargo install --path .

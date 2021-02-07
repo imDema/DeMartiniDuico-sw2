@@ -6,7 +6,6 @@ use clup::api;
 
 use std::env;
 
-
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
     dotenv::dotenv().ok();
@@ -16,12 +15,11 @@ async fn main() -> std::io::Result<()> {
     let db_pool = clup::setup_db(&conn_url).await;
 
     let redis_url = env::var("REDIS_URL").expect("REDIS_URL environment variable must be set");
-    let session_key = env::var("SESSION_KEY").expect("SESSION_KEY environment variable must be set");
-    let key = hex::decode(session_key).expect("Invalid SESSION_KEY format. Expected hex");
+    let key = session_key();
 
     let api_url = env::var("API_URL").unwrap_or("0.0.0.0:5000".into());
     HttpServer::new(move || {
-        let cors = Cors::default() // Dev purposes TODO: check
+        let cors = Cors::default() // Dev purposes
             .allow_any_origin()
             .allow_any_method()
             .allow_any_header()
@@ -31,7 +29,8 @@ async fn main() -> std::io::Result<()> {
         .wrap(Logger::default())
         .wrap(RedisSession::new(&redis_url, &key)
                     .cookie_same_site(actix_redis::SameSite::Strict)
-                    .cookie_secure(true))
+                    .cookie_secure(true)
+                    .ttl(604800))
         .wrap(cors)
         .data(db_pool.clone())
         .configure(api::account::endpoints)
@@ -43,4 +42,15 @@ async fn main() -> std::io::Result<()> {
     .bind(api_url)?
     .run()
     .await
+}
+
+/// For testing purposes this provides a default, it shouldn't in production
+fn session_key() -> Vec<u8> {
+    match env::var("SESSION_KEY") {
+        Ok(a) if a.len() > 0 => hex::decode(a).expect("Invalid SESSION_KEY format. Expected hex"),
+        _ => {
+            println!("WARNING USING DEFAULT SESSION KEY, THIS IS ENABLED ONLY FOR TESTING PURPOSES, DO NOT USE IN PRODUCTION");
+            vec![0; 32]
+        }
+    }
 }

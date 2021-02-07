@@ -41,18 +41,6 @@
       ]
     }
   },
-  "0f429d2dc88c38ca9ac1626adb70f023e610bd02c66ba43874931bde34c34343": {
-    "query": "UPDATE ticket\n                SET\n                    exit = CURRENT_TIMESTAMP\n                WHERE id = $1",
-    "describe": {
-      "columns": [],
-      "parameters": {
-        "Left": [
-          "Int4"
-        ]
-      },
-      "nullable": []
-    }
-  },
   "192bbea17da9300e27f0e91881ecab1e12822fb0bd323ee435da970a6286be32": {
     "query": "SELECT email FROM customer WHERE email = $1",
     "describe": {
@@ -113,6 +101,20 @@
         false,
         false
       ]
+    }
+  },
+  "20e50bfe6a5fa861c2155ddfb3675e0a62521d434495cd1e1fd622330810d28d": {
+    "query": "UPDATE department\n            SET\n                ma_visit = ma_visit * (REAL '1' - $3) + $2 * $3\n            WHERE id = $1",
+    "describe": {
+      "columns": [],
+      "parameters": {
+        "Left": [
+          "Int4",
+          "Float4",
+          "Float4"
+        ]
+      },
+      "nullable": []
     }
   },
   "289a3f4a60e108cb16f78c1142a47f2fdf5bc84796be051ecd9480b0400fa6e1": {
@@ -198,6 +200,32 @@
         false,
         false,
         false
+      ]
+    }
+  },
+  "2d1574f8e81f58cd1747341a9778d2ab0b05b20d663ae91b57fd9a70de5ef4b4": {
+    "query": "SELECT entry, exit FROM ticket\n            WHERE id = $1",
+    "describe": {
+      "columns": [
+        {
+          "ordinal": 0,
+          "name": "entry",
+          "type_info": "Timestamp"
+        },
+        {
+          "ordinal": 1,
+          "name": "exit",
+          "type_info": "Timestamp"
+        }
+      ],
+      "parameters": {
+        "Left": [
+          "Int4"
+        ]
+      },
+      "nullable": [
+        true,
+        true
       ]
     }
   },
@@ -363,6 +391,38 @@
       ]
     }
   },
+  "3d1d849b6e18fe714f818fa7c96fbd6357f22e824d3416ccc83bac16cac4b8e8": {
+    "query": "SELECT ma_visit, ma_est_visit, capacity FROM department\n                WHERE id = $1",
+    "describe": {
+      "columns": [
+        {
+          "ordinal": 0,
+          "name": "ma_visit",
+          "type_info": "Float4"
+        },
+        {
+          "ordinal": 1,
+          "name": "ma_est_visit",
+          "type_info": "Float4"
+        },
+        {
+          "ordinal": 2,
+          "name": "capacity",
+          "type_info": "Int4"
+        }
+      ],
+      "parameters": {
+        "Left": [
+          "Int4"
+        ]
+      },
+      "nullable": [
+        false,
+        false,
+        false
+      ]
+    }
+  },
   "3d6d9e0ba5d87908da94a1bfc229e89509cbbf4ef2f38796e32ffb6a3e870f60": {
     "query": "INSERT INTO department ( shop_id, description, capacity)\n        VALUES ($1, 'Frutta', $2) RETURNING id",
     "describe": {
@@ -384,30 +444,6 @@
       ]
     }
   },
-  "528337ba48a2252b3bb60c5ad79e8dc96df8f8cd76561dc1f431c8381adb5ae3": {
-    "query": "SELECT id, customer_id FROM ticket",
-    "describe": {
-      "columns": [
-        {
-          "ordinal": 0,
-          "name": "id",
-          "type_info": "Int4"
-        },
-        {
-          "ordinal": 1,
-          "name": "customer_id",
-          "type_info": "Int4"
-        }
-      ],
-      "parameters": {
-        "Left": []
-      },
-      "nullable": [
-        false,
-        false
-      ]
-    }
-  },
   "5ea385f61e9806cf6c4e31a0478ea1c92b4008bb097190a4e68efbc3b5d91226": {
     "query": "DELETE FROM ticket WHERE id = $1",
     "describe": {
@@ -418,6 +454,74 @@
         ]
       },
       "nullable": []
+    }
+  },
+  "617b56ef2dbefa6577722c2fa1052184813a235a32e60065ac4c7eb29aa296ba": {
+    "query": "SELECT department.id as id, department.capacity as capacity, (count(ticket.id) >= department.capacity) as full FROM ticket, ticket_department, department\n                        WHERE\n                            ticket_department.ticket_id = ticket.id AND\n                            ticket_department.department_id = department.id AND\n                            ticket.shop_id = $1 AND\n                            department.shop_id = $1 AND\n                            ticket.entry IS NOT NULL AND\n                            ticket.exit IS NULL\n                        GROUP BY\n                            department.id, department.capacity",
+    "describe": {
+      "columns": [
+        {
+          "ordinal": 0,
+          "name": "id",
+          "type_info": "Int4"
+        },
+        {
+          "ordinal": 1,
+          "name": "capacity",
+          "type_info": "Int4"
+        },
+        {
+          "ordinal": 2,
+          "name": "full",
+          "type_info": "Bool"
+        }
+      ],
+      "parameters": {
+        "Left": [
+          "Int4"
+        ]
+      },
+      "nullable": [
+        false,
+        false,
+        null
+      ]
+    }
+  },
+  "7eca073a291fb99e4e9202fd2a53b7d35844a6dc575a42db7ecc99dc7b481372": {
+    "query": "UPDATE department\n            SET\n                ma_est_visit = ma_est_visit * (REAL '1' - $3) + $2 * $3\n            WHERE id = $1",
+    "describe": {
+      "columns": [],
+      "parameters": {
+        "Left": [
+          "Int4",
+          "Float4",
+          "Float4"
+        ]
+      },
+      "nullable": []
+    }
+  },
+  "81875885b57336507e2a7fd707504f6c1df06f16d4c7cb622639d5c8d714db80": {
+    "query": "SELECT count(*) as count FROM ticket\n            WHERE\n                shop_id = $1 AND\n                entry IS NULL AND exit IS NULL AND\n                id <> $2 AND creation < $3 AND\n                COALESCE(expiration > CURRENT_TIMESTAMP, TRUE)",
+    "describe": {
+      "columns": [
+        {
+          "ordinal": 0,
+          "name": "count",
+          "type_info": "Int8"
+        }
+      ],
+      "parameters": {
+        "Left": [
+          "Int4",
+          "Int4",
+          "Timestamp"
+        ]
+      },
+      "nullable": [
+        null
+      ]
     }
   },
   "81fe618d2bf0878dfc1bc7e3b90175ff522c5039ad3badb6667227b160a9529f": {
@@ -781,28 +885,6 @@
       ]
     }
   },
-  "acb2e1a98cd29b1972ff3f845bd7ca0c51f815c4fdb0ece58c0c4cd58826466f": {
-    "query": "SELECT count(*) as count FROM ticket\n            WHERE\n                shop_id = $1 AND\n                entry IS NULL AND exit IS NULL AND\n                id <> $2 AND creation < $3",
-    "describe": {
-      "columns": [
-        {
-          "ordinal": 0,
-          "name": "count",
-          "type_info": "Int8"
-        }
-      ],
-      "parameters": {
-        "Left": [
-          "Int4",
-          "Int4",
-          "Timestamp"
-        ]
-      },
-      "nullable": [
-        null
-      ]
-    }
-  },
   "ad8f0803506417958db559952955db55f81d2b804c3d68fce9929bc7ac52c81f": {
     "query": "SELECT id as uid, shop_id, description, capacity FROM department\n            WHERE shop_id = $1",
     "describe": {
@@ -959,32 +1041,6 @@
       ]
     }
   },
-  "be17c1830e88b6f4a34f162d3e93420d5b1ccefed65abdc32dd0c32f75130480": {
-    "query": "SELECT department.id as id, (count(ticket.id) >= department.capacity) as full FROM ticket, ticket_department, department\n                        WHERE\n                            ticket_department.ticket_id = ticket.id AND\n                            ticket_department.department_id = department.id AND\n                            ticket.shop_id = $1 AND\n                            department.shop_id = $1 AND\n                            ticket.entry IS NOT NULL AND\n                            ticket.exit IS NULL\n                        GROUP BY\n                            department.id, department.capacity",
-    "describe": {
-      "columns": [
-        {
-          "ordinal": 0,
-          "name": "id",
-          "type_info": "Int4"
-        },
-        {
-          "ordinal": 1,
-          "name": "full",
-          "type_info": "Bool"
-        }
-      ],
-      "parameters": {
-        "Left": [
-          "Int4"
-        ]
-      },
-      "nullable": [
-        false,
-        null
-      ]
-    }
-  },
   "be4b600a4bc6b3314305e99f22fdb3b01829fb527e09e1fd37e00c854626f6dd": {
     "query": "SELECT id, email, salt, digest, shop_id FROM staff WHERE id = $1",
     "describe": {
@@ -1029,6 +1085,18 @@
       ]
     }
   },
+  "be7f827de23ec7b97cd87f0b7a817edfbcfa994b2c7febc49df4e80c24f7b2a2": {
+    "query": "UPDATE ticket\n            SET\n                exit = CURRENT_TIMESTAMP\n            WHERE id = $1",
+    "describe": {
+      "columns": [],
+      "parameters": {
+        "Left": [
+          "Int4"
+        ]
+      },
+      "nullable": []
+    }
+  },
   "c04633a30ec2491c55b4f0b110b5392318c11a0ccc2789e36c7e12ad43431052": {
     "query": "SELECT id FROM shop",
     "describe": {
@@ -1043,6 +1111,32 @@
         "Left": []
       },
       "nullable": [
+        false
+      ]
+    }
+  },
+  "c2c09d1e1352a1c8193b590da18039110c53f700e570b657c6894eb261348095": {
+    "query": "SELECT department.id as id, department.capacity as capacity FROM ticket_department, department\n                    WHERE\n                        ticket_department.ticket_id = $1",
+    "describe": {
+      "columns": [
+        {
+          "ordinal": 0,
+          "name": "id",
+          "type_info": "Int4"
+        },
+        {
+          "ordinal": 1,
+          "name": "capacity",
+          "type_info": "Int4"
+        }
+      ],
+      "parameters": {
+        "Left": [
+          "Int4"
+        ]
+      },
+      "nullable": [
+        false,
         false
       ]
     }
@@ -1065,6 +1159,36 @@
         ]
       },
       "nullable": [
+        false
+      ]
+    }
+  },
+  "c633b9ab69e83646f8ba88b3a6f3398088cd2cbf5bb81b7ba3a7240ea9cc2374": {
+    "query": "SELECT id, customer_id, shop_id FROM ticket",
+    "describe": {
+      "columns": [
+        {
+          "ordinal": 0,
+          "name": "id",
+          "type_info": "Int4"
+        },
+        {
+          "ordinal": 1,
+          "name": "customer_id",
+          "type_info": "Int4"
+        },
+        {
+          "ordinal": 2,
+          "name": "shop_id",
+          "type_info": "Int4"
+        }
+      ],
+      "parameters": {
+        "Left": []
+      },
+      "nullable": [
+        false,
+        false,
         false
       ]
     }
@@ -1276,32 +1400,6 @@
         false,
         true,
         false
-      ]
-    }
-  },
-  "f37101ecc412f35e02e37c99189d5ebca392b46478956efc77963a37511811f2": {
-    "query": "SELECT entry IS NOT NULL as entered, exit IS NOT NULL as exited FROM ticket\n            WHERE id = $1",
-    "describe": {
-      "columns": [
-        {
-          "ordinal": 0,
-          "name": "entered",
-          "type_info": "Bool"
-        },
-        {
-          "ordinal": 1,
-          "name": "exited",
-          "type_info": "Bool"
-        }
-      ],
-      "parameters": {
-        "Left": [
-          "Int4"
-        ]
-      },
-      "nullable": [
-        null,
-        null
       ]
     }
   },

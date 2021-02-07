@@ -2,7 +2,7 @@
 <div class="my-2">
   <div class="border-bottom d-flex justify-content-between  pb-2">
     <div class="h4">{{modal_header}}</div>
-    <div class="d-flex flex-row justify-content-end align-items-center">
+    <div v-if="!staff" class="d-flex flex-row justify-content-end align-items-center">
       <div class="p-2">{{switch_text.text}}</div>
       <b-button variant="outline-primary" class="switch-action" @click="switchAction">{{switch_text.button}}</b-button>
     </div>
@@ -114,7 +114,8 @@
       propRegistration:{
         type: Boolean,
         default: false,
-      }
+      },
+      staff: Boolean,
     },
     data() {
       return {
@@ -156,6 +157,9 @@
     },
     methods: {
       switchAction(){
+        if(this.staff){
+          return
+        }
         //this.isRegistration = !this.isRegistration
         this.$emit('switch-action', !this.isRegistration)
         this.showOverlay = true
@@ -168,7 +172,12 @@
         this.isSubmitBusy = true;
         var wasRegistration = this.isRegistration;
         var email = this.form.email
-        let endpoint = this.isRegistration?"/register":"/login"
+        let endpoint;
+        if(this.staff){
+          endpoint = "/staff/login"
+        }else{
+          endpoint = this.isRegistration?"/register":"/login"
+        }
         this.$api.post(endpoint, {
           email: email,
           password: this.form.password,
@@ -177,19 +186,24 @@
         .then(res => {
           if(wasRegistration){
               let code = res.data;
-              console.log(code);
               //BEGIN temp validation
               let url = this.$api.defaults.baseURL+"/register/confirm?code=" 
               + encodeURIComponent(code);
               console.log(url);
+              alert("Open this url to confirm your registration: \n"+url);
               //END temp
               this.showSuccessfulRegistrationAlert();
               this.$emit('successful-registration');
           }else{
             //login
             //if(res.status == '200'){
-              this.$store.commit('logged_in')
-              this.$store.state.email = email
+              if(this.staff){
+                this.$store.commit('staff_logged_in')
+                this.$store.state.staff.email = email
+              }else{
+                this.$store.commit('logged_in')
+                this.$store.state.customer.email = email
+              }
               this.showSuccessfulLoginAlert()
               this.$emit('successful-login')
             //}

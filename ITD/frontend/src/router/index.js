@@ -3,6 +3,13 @@ import VueRouter from 'vue-router'
 import Home from '../views/Home.vue'
 import Search from '../views/Search.vue'
 import Tokens from '../views/Tokens.vue'
+import Staff from '../views/Staff.vue'
+import StaffHome from '../views/StaffHome.vue'
+import StaffTokens from '../views/StaffTokens.vue'
+// DEV
+import Dev from '../views/dev/Dev.vue'
+import DevIds from '../views/dev/DevIds.vue'
+import DevNewStaff from '../views/dev/DevNewStaff.vue'
 
 Vue.use(VueRouter)
 
@@ -25,12 +32,34 @@ const routes = [
   },
   {
     path: '/staff',
-    name: 'Staff',
-    // route level code-splitting
-    // this generates a separate chunk (about.[hash].js) for this route
-    // which is lazy-loaded when the route is visited.
-    component: () => import(/* webpackChunkName: "about" */ '../views/Staff.vue')
-  }
+    // lazy example
+    //component: () => import(/* webpackChunkName: "about" */ '../views/Staff.vue')
+    component: Staff,
+    children: [{
+        path: '',
+        component: StaffHome
+      },
+      {
+        path: 'tokens/:uid',
+        component: StaffTokens
+      },
+    ]
+  },
+  {
+    path: '/dev',
+    // lazy example
+    //component: () => import(/* webpackChunkName: "about" */ '../views/Staff.vue')
+    component: Dev,
+    children: [{
+        path: '',
+        component: DevIds
+      },
+      {
+        path: 'new_staff',
+        component: DevNewStaff
+      },
+    ]
+  },
 ]
 
 const router = new VueRouter({

@@ -63,7 +63,7 @@ export default {
   },
   computed:{
     isTicketSelected(){
-      return Object.keys(this.selectedTicket).length !== 0
+      return this.tickets.length>0 && Object.keys(this.selectedTicket).length !== 0
     },        
   },
   watch:{
