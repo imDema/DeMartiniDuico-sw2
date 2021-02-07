@@ -791,7 +791,14 @@ components:
       type: object
       properties:
         department:
-          $ref: "#/components/schemas/Department"
+          type: object
+          properties:
+            uid:
+              type: string
+            description:
+              type: string
+            capacity:
+              type: integer
         occupancy:
           type: integer
     Schedule:

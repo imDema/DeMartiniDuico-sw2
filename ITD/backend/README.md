@@ -7,6 +7,7 @@ Configuration for the main binary is supplied through envirnoment variables. Exa
 DATABASE_URL="postgresql://user:pass@localhost:5432/clup_sqlx"
 REDIS_URL="127.0.0.1:6379"
 SESSION_KEY="0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f"
+ENCODING_KEY="0f0f0f0f"
 API_URL="0.0.0.0:5000" # defaults to "0.0.0.0:5000"
 ```
 
@@ -16,7 +17,6 @@ To build and deploy using docker and docker compose
 ```
 docker-compose up -d
 ```
-Note: the `SESSION_KEY` variable must still be set
 
 ## Building and installing
 

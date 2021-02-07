@@ -1,0 +1,35 @@
+version: "3"
+services:
+  clup-frontend:
+    image: clup-frontend
+    ports:
+      - "8080:80"
+    links:
+      - clup-backend
+  clup-backend:
+    image: clup-backend
+    ports:
+      - "127.0.0.1:5000:5000"
+    environment:
+      DATABASE_URL: "postgresql://clup:postgres@postgres:5432/clup_sqlx"
+      REDIS_URL: "redis:6379"
+      SESSION_KEY: "${SESSION_KEY}"
+      ENCODING_KEY: "${ENCODING_KEY}"
+      RUST_LOG: "info"
+    depends_on:
+      - redis
+      - postgres
+    links:
+      - redis
+      - postgres
+  redis:
+    image: redis
+    ports:
+      - "6379:6379"
+  postgres:
+    image: postgres
+    ports: 
+      - "5432:5432"
+    environment:
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_USER: clup

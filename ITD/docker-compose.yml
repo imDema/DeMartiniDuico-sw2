@@ -9,11 +9,12 @@ services:
   clup-backend:
     build: ./backend
     ports:
-      - "5000:5000"
+      - "127.0.0.1:5000:5000"
     environment:
       DATABASE_URL: "postgresql://clup:postgres@postgres:5432/clup_sqlx"
       REDIS_URL: "redis:6379"
       SESSION_KEY: "${SESSION_KEY}"
+      ENCODING_KEY: "${ENCODING_KEY}"
       RUST_LOG: "info"
     depends_on:
       - redis

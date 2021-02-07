@@ -8,7 +8,6 @@ account & \makecell{\textbf{GET} \\ \texttt{/logout}}  & Log out and terminate s
 account & \makecell{\textbf{POST} \\ \texttt{/register}}  & Request creation of a new account \\\hline
 account & \makecell{\textbf{GET} \\ \texttt{/register/confirm}}  & Submit email confirmation \\\hline
 account & \makecell{\textbf{GET} \\ \texttt{/whoami}}  & Get customer authentication status \\\hline
-account & \makecell{\textbf{GET} \\ \texttt{/staff/whoami}}  & Get customer authentication status \\\hline
 booking & \makecell{\textbf{POST} \\ \texttt{/shop/\{shop\_id\}/booking/new}}  & Request a booking for a shop \\\hline
 booking & \makecell{\textbf{GET} \\ \texttt{/shop/\{shop\_id\}/booking/availability}}  & Get information about the time slot availability for bookings \\\hline
 manage & \makecell{\textbf{POST} \\ \texttt{/staff/manage/create-account/\{shop\_id\}}}  & Generate a temporary staff account for activation \\\hline
@@ -22,6 +21,7 @@ shop & \makecell{\textbf{GET} \\ \texttt{/shop/\{shop\_id\}}}  & Get available s
 staff & \makecell{\textbf{GET} \\ \texttt{/staff/shop/\{shop\_id\}/ticket/queue}}  & Get detailed information about the current queue status \\\hline
 staff & \makecell{\textbf{GET} \\ \texttt{/staff/shop/\{shop\_id\}/booking/list}}  & Get detailed information about the current and future bookings \\\hline
 staff & \makecell{\textbf{GET} \\ \texttt{/staff/shop/\{shop\_id\}/token/info}}  & Get token information and validity \\\hline
+staff & \makecell{\textbf{GET} \\ \texttt{/staff/shop/\{shop\_id\}/status}}  & Get token information and validity \\\hline
 staff & \makecell{\textbf{POST} \\ \texttt{/staff/shop/\{shop\_id\}/ticket/new-substitute}}  & Request creation of a substitute ticket \\\hline
 staff & \makecell{\textbf{POST} \\ \texttt{/staff/shop/\{shop\_id\}/token/log-entry}}  & Log entry, consume the token and update shop occupancy information \\\hline
 staff & \makecell{\textbf{POST} \\ \texttt{/staff/shop/\{shop\_id\}/token/log-exit}}  & Log exit, update shop occupancy information \\\hline
@@ -29,6 +29,7 @@ staff-account & \makecell{\textbf{POST} \\ \texttt{/staff/login}}  & Log in and 
 staff-account & \makecell{\textbf{POST} \\ \texttt{/staff/register}}  & Activate staff account and set password \\\hline
 ticket & \makecell{\textbf{GET} \\ \texttt{/ticket/est}}  & Get the estimated waiting time for a ticket \\\hline
 ticket & \makecell{\textbf{POST} \\ \texttt{/shop/\{shop\_id\}/ticket/new}}  & Request a ticket for a shop \\\hline
+ticket & \makecell{\textbf{POST} \\ \texttt{/ticket/cancel}}  & Cancel a ticket \\\hline
 ticket & \makecell{\textbf{GET} \\ \texttt{/shop/\{shop\_id\}/ticket/queue}}  & Get information about the queue status and approximate waiting time \\\hline
 token & \makecell{\textbf{GET} \\ \texttt{/tokens}}  & Get active tokens for the customer \\\hline
 \end{tabularx}
@@ -84,7 +85,7 @@ Parameters    & \everyrow{}\begin{tabu}{X|X}
 \end{tabu}\everyrow{\tabucline[0.5pt]-}\\
 Responses     & \everyrow{}\begin{tabu}{X[0.5]|X[3]|X[2]} 
 \textbf{Code} & \textbf{Description} & \textbf{Body} \\
-\hline \textbf{200} & successful operation &\\
+\hline \textbf{201} & successful operation &\\
 \hline \textbf{400} & Invalid code &\\
 \end{tabu}\everyrow{\tabucline[0.5pt]-} \\
 \end{tabu}
@@ -93,17 +94,6 @@ Responses     & \everyrow{}\begin{tabu}{X[0.5]|X[3]|X[2]}
 \tabulinesep=4pt\everyrow{\tabucline[0.5pt]-}
 \begin{tabu} to \textwidth {@{}|X|X[5]|} \hline
 \textbf{GET}  & \texttt{/whoami} \\
-Description   & Get customer authentication status  \\
-Responses     & \everyrow{}\begin{tabu}{X[0.5]|X[3]|X[2]} 
-\textbf{Code} & \textbf{Description} & \textbf{Body} \\
-\hline \textbf{200} & Ok &\texttt{\{authenticated: boolean, email: string,\}}\\
-\end{tabu}\everyrow{\tabucline[0.5pt]-} \\
-\end{tabu}
-\end{table}
-\begin{table}[H]
-\tabulinesep=4pt\everyrow{\tabucline[0.5pt]-}
-\begin{tabu} to \textwidth {@{}|X|X[5]|} \hline
-\textbf{GET}  & \texttt{/staff/whoami} \\
 Description   & Get customer authentication status  \\
 Responses     & \everyrow{}\begin{tabu}{X[0.5]|X[3]|X[2]} 
 \textbf{Code} & \textbf{Description} & \textbf{Body} \\
@@ -311,6 +301,22 @@ Responses     & \everyrow{}\begin{tabu}{X[0.5]|X[3]|X[2]}
 \begin{table}[H]
 \tabulinesep=4pt\everyrow{\tabucline[0.5pt]-}
 \begin{tabu} to \textwidth {@{}|X|X[5]|} \hline
+\textbf{GET}  & \texttt{/staff/shop/\{shop\_id\}/status} \\
+Description   & Get token information and validity  \\
+Parameters    & \everyrow{}\begin{tabu}{X|X}
+\textbf{Name} & \textbf{Type} \\
+\hline shop\_id & \texttt{string} \\
+\end{tabu}\everyrow{\tabucline[0.5pt]-}\\
+Responses     & \everyrow{}\begin{tabu}{X[0.5]|X[3]|X[2]} 
+\textbf{Code} & \textbf{Description} & \textbf{Body} \\
+\hline \textbf{200} & OK &\texttt{Array<DepartmentOccupancy>}\\
+\hline \textbf{400} & Ticket does not exist &\\
+\end{tabu}\everyrow{\tabucline[0.5pt]-} \\
+\end{tabu}
+\end{table}
+\begin{table}[H]
+\tabulinesep=4pt\everyrow{\tabucline[0.5pt]-}
+\begin{tabu} to \textwidth {@{}|X|X[5]|} \hline
 \textbf{POST}  & \texttt{/staff/shop/\{shop\_id\}/ticket/new-substitute} \\
 Description   & Request creation of a substitute ticket  \\
 Parameters    & \everyrow{}\begin{tabu}{X|X}
@@ -420,6 +426,19 @@ Responses     & \everyrow{}\begin{tabu}{X[0.5]|X[3]|X[2]}
 \begin{table}[H]
 \tabulinesep=4pt\everyrow{\tabucline[0.5pt]-}
 \begin{tabu} to \textwidth {@{}|X|X[5]|} \hline
+\textbf{POST}  & \texttt{/ticket/cancel} \\
+Description   & Cancel a ticket  \\
+Body & \texttt{\{uid: string,\}} \\
+Responses     & \everyrow{}\begin{tabu}{X[0.5]|X[3]|X[2]} 
+\textbf{Code} & \textbf{Description} & \textbf{Body} \\
+\hline \textbf{200} & OK &\\
+\hline \textbf{400} & Bad Request &\\
+\end{tabu}\everyrow{\tabucline[0.5pt]-} \\
+\end{tabu}
+\end{table}
+\begin{table}[H]
+\tabulinesep=4pt\everyrow{\tabucline[0.5pt]-}
+\begin{tabu} to \textwidth {@{}|X|X[5]|} \hline
 \textbf{GET}  & \texttt{/shop/\{shop\_id\}/ticket/queue} \\
 Description   & Get information about the queue status and approximate waiting time  \\
 Parameters    & \everyrow{}\begin{tabu}{X|X}
@@ -459,6 +478,18 @@ Responses     & \everyrow{}\begin{tabu}{X[0.5]|X[3]|X[2]}
     uid & \texttt{string} \\
 description & \texttt{string} \\
 capacity & \texttt{integer} \\
+\end{tabu}
+\end{table}
+
+
+    \begin{table}[H]
+    \centering
+    \textbf{DepartmentOccupancy}\\
+    \everyrow{\tabucline[0.5pt]-}
+    \begin{tabu} to 0.55\textwidth {|X|X|} \hline
+    Field & Type \\
+    department & department \\
+occupancy & \texttt{integer} \\
 \end{tabu}
 \end{table}
 
@@ -522,7 +553,7 @@ password & \texttt{string} \\
     \everyrow{\tabucline[0.5pt]-}
     \begin{tabu} to 0.55\textwidth {|X|X|} \hline
     Field & Type \\
-    shop\_id & \texttt{string} \\
+    est\_minutes & \texttt{integer} \\
 department\_ids & \texttt{Array<string>} \\
 \end{tabu}
 \end{table}
