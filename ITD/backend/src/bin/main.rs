@@ -28,8 +28,8 @@ async fn main() -> std::io::Result<()> {
         App::new()
         .wrap(Logger::default())
         .wrap(RedisSession::new(&redis_url, &key)
-                    .cookie_same_site(actix_redis::SameSite::Strict)
-                    .cookie_secure(true)
+                    .cookie_same_site(actix_redis::SameSite::Lax) // Dev purposes
+                    // .cookie_secure(true) // Commented out for the prototype, production would have secure cookies
                     .ttl(604800))
         .wrap(cors)
         .data(db_pool.clone())
