@@ -6,10 +6,14 @@ import Tokens from '../views/Tokens.vue'
 import Staff from '../views/Staff.vue'
 import StaffHome from '../views/StaffHome.vue'
 import StaffTokens from '../views/StaffTokens.vue'
+import StaffOccupancy from '../views/StaffOccupancy.vue'
+//import Confirm from '../views/Confirm.vue'
+
 // DEV
 import Dev from '../views/dev/Dev.vue'
 import DevIds from '../views/dev/DevIds.vue'
 import DevNewStaff from '../views/dev/DevNewStaff.vue'
+import DevSetup from '../views/dev/DevSetup.vue'
 
 Vue.use(VueRouter)
 
@@ -28,7 +32,12 @@ const routes = [
     {
       path: 'tokens/:uid',
       component: Tokens
-    },]
+    },
+    ]
+  },
+  {
+    path: '/confirm',
+    component: () => import( '../views/Confirm.vue'),
   },
   {
     path: '/staff',
@@ -43,6 +52,10 @@ const routes = [
         path: 'tokens/:uid',
         component: StaffTokens
       },
+      {
+        path: 'occupancy',
+        component: StaffOccupancy
+      }
     ]
   },
   {
@@ -58,6 +71,10 @@ const routes = [
         path: 'new_staff',
         component: DevNewStaff
       },
+      {
+        path: 'setup_env',
+        component: DevSetup
+      }
     ]
   },
 ]

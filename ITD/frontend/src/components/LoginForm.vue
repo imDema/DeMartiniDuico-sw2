@@ -187,8 +187,7 @@
           if(wasRegistration){
               let code = res.data;
               //BEGIN temp validation
-              let url = this.$api.defaults.baseURL+"/register/confirm?code=" 
-              + encodeURIComponent(code);
+              let url = window.location.origin + "/confirm?code="+ encodeURIComponent(code);
               console.log(url);
               alert("Open this url to confirm your registration: \n"+url);
               //END temp
