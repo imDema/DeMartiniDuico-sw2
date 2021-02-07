@@ -17,28 +17,38 @@
             :state="validation"
             ></b-form-input>
       </b-form-group>
- <!--       <b-overlay       
+    <b-button @click="showCameraStream=!showCameraStream" class="btn-block">Scan QR with camera <b-icon icon="camera" /></b-button>
+    <div v-if="showCameraStream" class="border border-secondary rounded m-2">
+      <qrcode-stream @decode="onDecode"></qrcode-stream>
+    </div>
+   <!--  <b-overlay       
         :show="isSubmitBusy"
         rounded
         opacity="0.3"
         spinner-small
         spinner-variant="primary"
         >
+      </b-overlay>-->
         <b-button type="submit" variant="primary" class="btn-block">Submit</b-button>
-      </b-overlay>
--->
+
     </b-form>
   </b-modal>
 </template>
 <script>
+import { QrcodeStream } from 'vue-qrcode-reader'
+
 export default {
     components:{
+        //QrcodeCapture,
+        QrcodeStream,
+        //QrcodeDropZone,
     },
     data() { 
         return {
             form: {
                 uid: ''
             },   
+            showCameraStream: false,
             //isSubmitBusy: false,
         }
     },
@@ -47,10 +57,20 @@ export default {
     computed:{
         validation() {
             var uid = this.form.uid
-            return uid.length >= 4
+            return this.validate(uid)
         },
     },
     methods: {
+        validate(uid){
+            return uid.length >= 4
+        },
+        onDecode(uid){
+            this.form.uid = uid
+            this.submit()
+        },
+        // onDetect(uid){
+        //     this.form.uid = uid
+        // },
         submit(){
             console.log('submit')
             let uid = this.form.uid;

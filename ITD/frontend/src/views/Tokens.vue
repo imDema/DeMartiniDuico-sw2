@@ -41,16 +41,19 @@
   </b-row>
 
   </div>
+  <q-r-modal ref="qrmodal" :value="this.selectedTicket.uid"/>
   </div>
 </template>
 
 <script>
 import TokenDisplay from '../components/TokenDisplay.vue'
+import QRModal from '../components/QRModal.vue'
 
 export default {
   name: 'App',
   components: {
-    TokenDisplay
+    TokenDisplay,
+    QRModal,
   },
   data() {
       return {
@@ -110,7 +113,7 @@ export default {
         //reset data
       },
       showQR(){
-        alert(this.selectedTicket.uid)
+        this.$refs.qrmodal.show()
       },
       onTicketClick(ticket){
         if(this.selectedTicket === ticket){

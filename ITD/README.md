@@ -28,6 +28,7 @@ Referring to the DD, the following requirements are satisfied:
 - **[R1]** The system shall keep track of the list of Customers waiting to visit each Shop
 - **[R2]** The system shall allow customers to request the right to visit a shop as soon as possible
 - **[R3]** The system shall give Customers a Token associated with their position in the waiting line
+- **[R4]** The Staff shall be able to scan Customer generated Tokens using a camera
 - **[R5]** The Staff shall be able to scan Customer generated Tokens using a textual input
 - **[R6]** Given a Token, the Staff application shall be able to verify its validity
 - **[R7]** Given a Token, the Staff application shall be able to verify its position in the waiting line
