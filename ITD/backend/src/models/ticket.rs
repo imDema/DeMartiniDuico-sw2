@@ -441,6 +441,8 @@ mod tests {
             let loaded = PersistentTicket::get(&conn, inserted.id).await?.map(PersistentTicket::into_inner);
             let loaded = loaded.unwrap();
             assert_eq!(&inserted, &loaded);
+        
+            del_customer(&conn, customer_id).await?;
         });
         Ok(())
     }
@@ -459,7 +461,8 @@ mod tests {
                 _ => panic!("Expected AlreadyExists"),
             }
             let _ = PersistentTicket::try_new(&conn, customer_id, s1, vec![d2], 25).await?.unwrap();
-    
+            
+            del_customer(&conn, customer_id).await?;
         });
         Ok(())
     }
@@ -493,6 +496,9 @@ mod tests {
                 .execute(&conn).await?;
 
         });
+
+        del_customer(&conn, id_c1).await?;
+        del_customer(&conn, id_c2).await?;
         Ok(())
     }
 
@@ -536,6 +542,11 @@ mod tests {
             assert_eq!(t3.try_enter().await.unwrap(), EnterResult::Expired);
 
         });
+
+        del_customer(&conn, id_c1).await?;
+        del_customer(&conn, id_c2).await?;
+        del_customer(&conn, id_c3).await?;
+
         Ok(())
     }
 }

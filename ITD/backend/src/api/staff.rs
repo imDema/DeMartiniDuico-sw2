@@ -112,6 +112,7 @@ async fn ticket_queue(conn: web::Data<PgPool>, shop_id: web::Path<String>, query
     }
 }
 
+/// Get current occupancy information
 #[get("/shop/{shop_id}/status")]
 async fn status(conn: web::Data<PgPool>, shop_id: web::Path<String>, session: Session) -> HttpResponse {
     let conn = conn.into_inner();

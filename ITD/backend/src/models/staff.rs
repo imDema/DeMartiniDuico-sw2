@@ -101,3 +101,34 @@ impl<'a> PersistentStaff<'a> {
     pub fn into_inner(self) -> Staff {self.inner}
     pub fn inner(&self) -> &Staff {&self.inner}
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::utils::tests::db;
+    use crate::with_test_shop;
+
+    #[actix_rt::test]
+    async fn create_staff_test() -> sqlx::Result<()> {
+
+        let conn = db().await;
+        with_test_shop!(&conn, s0 [_d0, _d1] {
+            let (email, password) = ("test-email123@mail.com", "securepassword");
+
+            let staff = PersistentStaff::create(&conn, email, password, s0)
+                .await?
+                .unwrap()
+                .into_inner();
+
+            let loaded = PersistentStaff::get(&conn, staff.account().id())
+                .await?
+                .unwrap()
+                .into_inner();
+
+            assert_eq!(email, loaded.account().email());
+            assert_eq!(s0, loaded.shop_id());
+        });
+
+        Ok(())
+    }
+}
