@@ -2,7 +2,8 @@
     <div>
     <nav class="m-4">
         <router-link to="/dev">Display Data</router-link> |
-        <router-link to="/dev/new_staff">New staff</router-link>
+        <router-link to="/dev/new_staff">New staff</router-link> |
+        <router-link to="/dev/setup_env">Setup the DB with mock data</router-link>
         <small class="mx-2">Only for testing purposes</small>
     </nav>
     <div class="container">

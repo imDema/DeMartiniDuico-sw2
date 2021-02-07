@@ -1,7 +1,7 @@
 DROP TABLE IF EXISTS staff;
 CREATE TABLE staff (
     id SERIAL PRIMARY KEY,
-    shop_id INT NOT NULL REFERENCES shop(id),
+    shop_id INT NOT NULL REFERENCES shop(id) ON DELETE CASCADE,
     email VARCHAR UNIQUE NOT NULL,
     salt BYTEA NOT NULL,
     digest BYTEA NOT NULL

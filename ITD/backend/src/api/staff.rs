@@ -1,5 +1,6 @@
 use crate::models::staff::PersistentStaff;
 use crate::models::ticket::{PersistentTicket, TicketResponse, EnterResult};
+use crate::models::shop::PersistentShop;
 use crate::utils::encoding::{decode_serial, encode_serial};
 use crate::utils::session;
 
@@ -17,6 +18,7 @@ pub fn endpoints(cfg: &mut web::ServiceConfig) {
     cfg.service(ticket_queue);
     cfg.service(ticket_skip);
     cfg.service(whoami);
+    cfg.service(status);
 }
 #[allow(dead_code)]
 #[derive(Deserialize, Serialize, Debug)]
@@ -108,6 +110,25 @@ async fn ticket_queue(conn: web::Data<PgPool>, shop_id: web::Path<String>, query
             HttpResponse::InternalServerError().finish()
         }
     }
+}
+
+/// Get current occupancy information
+#[get("/shop/{shop_id}/status")]
+async fn status(conn: web::Data<PgPool>, shop_id: web::Path<String>, session: Session) -> HttpResponse {
+    let conn = conn.into_inner();
+    let shop_id = if let Ok(s) = decode_serial(&shop_id.into_inner()) {
+        s
+    } else {
+        return HttpResponse::BadRequest().body("Invalid shop id format")
+    };
+    if let None = session::get_staff_account(&session) {
+        return HttpResponse::Forbidden().finish();
+    }
+
+    if let Ok(v) = PersistentShop::get_occupancy(&conn, shop_id).await {
+        return HttpResponse::Ok().json(v);
+    }
+    HttpResponse::BadRequest().finish()
 }
 
 #[derive(Serialize, Deserialize)]

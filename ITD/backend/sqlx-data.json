@@ -391,38 +391,6 @@
       ]
     }
   },
-  "3d1d849b6e18fe714f818fa7c96fbd6357f22e824d3416ccc83bac16cac4b8e8": {
-    "query": "SELECT ma_visit, ma_est_visit, capacity FROM department\n                WHERE id = $1",
-    "describe": {
-      "columns": [
-        {
-          "ordinal": 0,
-          "name": "ma_visit",
-          "type_info": "Float4"
-        },
-        {
-          "ordinal": 1,
-          "name": "ma_est_visit",
-          "type_info": "Float4"
-        },
-        {
-          "ordinal": 2,
-          "name": "capacity",
-          "type_info": "Int4"
-        }
-      ],
-      "parameters": {
-        "Left": [
-          "Int4"
-        ]
-      },
-      "nullable": [
-        false,
-        false,
-        false
-      ]
-    }
-  },
   "3d6d9e0ba5d87908da94a1bfc229e89509cbbf4ef2f38796e32ffb6a3e870f60": {
     "query": "INSERT INTO department ( shop_id, description, capacity)\n        VALUES ($1, 'Frutta', $2) RETURNING id",
     "describe": {
@@ -500,6 +468,51 @@
         ]
       },
       "nullable": []
+    }
+  },
+  "7f967289852a058eaa00d75303d8737859396b317239b1e968b321a6a40a1277": {
+    "query": "SELECT\n            department.id as id,\n            capacity as capacity,\n            count(ticket.id) as queue_extended,\n            ma_est_visit,\n            ma_visit\n        FROM ticket, ticket_department, department\n        WHERE\n            ticket_department.ticket_id = ticket.id AND\n            ticket_department.department_id = department.id AND\n            ticket.shop_id = $1 AND\n            department.shop_id = $1 AND\n            ticket.exit IS NULL AND\n            COALESCE(ticket.creation < $2, TRUE)\n        GROUP BY\n            department.id, capacity, ma_est_visit, ma_visit",
+    "describe": {
+      "columns": [
+        {
+          "ordinal": 0,
+          "name": "id",
+          "type_info": "Int4"
+        },
+        {
+          "ordinal": 1,
+          "name": "capacity",
+          "type_info": "Int4"
+        },
+        {
+          "ordinal": 2,
+          "name": "queue_extended",
+          "type_info": "Int8"
+        },
+        {
+          "ordinal": 3,
+          "name": "ma_est_visit",
+          "type_info": "Float4"
+        },
+        {
+          "ordinal": 4,
+          "name": "ma_visit",
+          "type_info": "Float4"
+        }
+      ],
+      "parameters": {
+        "Left": [
+          "Int4",
+          "Timestamp"
+        ]
+      },
+      "nullable": [
+        false,
+        false,
+        null,
+        false,
+        false
+      ]
     }
   },
   "81875885b57336507e2a7fd707504f6c1df06f16d4c7cb622639d5c8d714db80": {
@@ -722,6 +735,44 @@
         false,
         true,
         false
+      ]
+    }
+  },
+  "9d293cd726cf15ed628c46ea068a11fc7657dc9941caf873e4067dd91200d5c2": {
+    "query": "SELECT\n                    department.id as id,\n                    description,\n                    capacity,\n                    count(ticket.id) as occupancy\n                FROM department\n                    LEFT JOIN ticket_department ON ticket_department.department_id = department.id\n                    LEFT JOIN ticket \n                        ON ticket_department.ticket_id = ticket.id AND\n                            ticket.entry IS NOT NULL AND\n                            ticket.exit IS NULL\n                WHERE\n                    department.shop_id = $1    \n                GROUP BY\n                department.id, description, capacity",
+    "describe": {
+      "columns": [
+        {
+          "ordinal": 0,
+          "name": "id",
+          "type_info": "Int4"
+        },
+        {
+          "ordinal": 1,
+          "name": "description",
+          "type_info": "Varchar"
+        },
+        {
+          "ordinal": 2,
+          "name": "capacity",
+          "type_info": "Int4"
+        },
+        {
+          "ordinal": 3,
+          "name": "occupancy",
+          "type_info": "Int8"
+        }
+      ],
+      "parameters": {
+        "Left": [
+          "Int4"
+        ]
+      },
+      "nullable": [
+        false,
+        false,
+        false,
+        null
       ]
     }
   },
