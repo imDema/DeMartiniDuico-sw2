@@ -26,3 +26,25 @@
 | 2021-02-05 | 3h   | Ticket                  |
 | 2021-02-06 | 3h   | Documentation           |
 | 2021-02-07 | 7h   | Delivery & touch-up     |
+
+# Alessandro Duico
+
+| Date       | Time | Topic                   |
+| ---------- | ---- | ----------------------- |
+| 2020-12-27 | 3h   | Initialize Vue.js       |
+| 2021-01-18 | 5h   | Pick Vue.js packages    |
+| 2021-01-21 | 4h   | Login/Registration (PWA)|
+| 2021-01-22 | 6h   | Authentication (PWA)|
+| 2021-01-23 | 6h   | Implement ticket form (PWA)|
+| 2021-01-27 | 2h   | Implement Customer PWA  |
+| 2021-01-28 | 3h   | Implement Customer PWA  |
+| 2021-01-29 | 2h   | Queue Component (PWA)   |
+| 2021-01-30 | 6h   | Tokens Page (PWA)       |
+| 2021-01-31 | 2h   | Implement Customer PWA  |
+| 2021-02-01 | 3h   | Implement Customer PWA  |
+| 2021-02-02 | 3h   | Improve Tokens page (PWA)|
+| 2021-02-03 | 3h   | Improve Customer PWA  |
+| 2021-02-04 | 4h   | Improve Customer PWA  |
+| 2021-02-05 | 3h   | Implement Staff PWA     |
+| 2021-02-06 | 3h   | Implement Staff PWA     |
+| 2021-02-07 | 7h   | Delivery & touch-up     |
