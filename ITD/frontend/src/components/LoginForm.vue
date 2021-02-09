@@ -186,11 +186,15 @@
         .then(res => {
           if(wasRegistration){
               let code = res.data;
-              //BEGIN temp validation
               let url = window.location.origin + "/confirm?code="+ encodeURIComponent(code);
               console.log(url);
-              alert("Open this url to confirm your registration: \n"+url);
-              //END temp
+
+              this.$bvToast.toast(`Open this url to confirm your registration`, {
+                href: url,
+                title: 'Account confirmation',
+                noAutoHide: true
+              })
+
               this.showSuccessfulRegistrationAlert();
               this.$emit('successful-registration');
           }else{
