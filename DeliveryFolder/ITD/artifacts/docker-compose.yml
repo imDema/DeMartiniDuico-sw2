@@ -4,8 +4,12 @@ services:
     image: clup-frontend
     ports:
       - "8080:80"
+      - "8443:443"
     links:
       - clup-backend
+    volumes:
+      - "./nginx_ssl:/etc/ssl:ro"
+      - "./nginx.conf:/etc/nginx/nginx.conf:ro"
   clup-backend:
     image: clup-backend
     ports:

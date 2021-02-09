@@ -19,17 +19,17 @@ async fn main() -> std::io::Result<()> {
 
     let api_url = env::var("API_URL").unwrap_or("0.0.0.0:5000".into());
     HttpServer::new(move || {
-        let cors = Cors::default() // Dev purposes
+        let cors = Cors::default()
             .allow_any_origin()
             .allow_any_method()
             .allow_any_header()
-            .supports_credentials();
+            .supports_credentials(); // Dev purposes
 
         App::new()
         .wrap(Logger::default())
         .wrap(RedisSession::new(&redis_url, &key)
-                    .cookie_same_site(actix_redis::SameSite::Lax) // Dev purposes
-                    // .cookie_secure(true) // Commented out for the prototype, production would have secure cookies
+                    .cookie_same_site(actix_redis::SameSite::Strict)
+                    .cookie_secure(true)
                     .ttl(604800))
         .wrap(cors)
         .data(db_pool.clone())

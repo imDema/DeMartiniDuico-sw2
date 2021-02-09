@@ -9,6 +9,7 @@ services:
       - clup-backend
     volumes:
       - "./nginx_ssl:/etc/ssl:ro"
+      - "./nginx.conf:/etc/nginx/nginx.conf:ro"
   clup-backend:
     build: ./backend
     ports:
