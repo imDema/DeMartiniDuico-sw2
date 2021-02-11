@@ -47,10 +47,11 @@ pub async fn del_shop(conn: &PgPool, id: i32) -> sqlx::Result<()> {
 }
 
 pub async fn test_department(conn: &PgPool, shopid: i32, cap: i32) -> sqlx::Result<i32> {
+    let name = format!("Department_{:x}", thread_rng().next_u64());
     Ok(sqlx::query!(
         r"INSERT INTO department ( shop_id, description, capacity)
-        VALUES ($1, 'Frutta', $2) RETURNING id",
-        shopid, cap)
+        VALUES ($1, $2, $3) RETURNING id",
+        shopid, name, cap)
         .fetch_one(conn)
         .await?
         .id)

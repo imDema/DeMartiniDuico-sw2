@@ -1,3 +1,5 @@
+use std::error::Error;
+
 use actix_web::{HttpResponse, web, get, post};
 use sqlx::{PgPool, query};
 use serde::{Serialize, Deserialize};
@@ -62,83 +64,89 @@ async fn ids(conn: web::Data<PgPool>) -> HttpResponse {
 #[get("/setup_env")]
 async fn setup_env(conn: web::Data<PgPool>) -> HttpResponse {
     let conn = conn.into_inner();
-    
-    let shops = query!(r"INSERT INTO shop (id, name, description, image, location) VALUES
-        (1234111, 'Unes Milano', 'Unes via unes numero unes','test1.jpg','49.1234N,12.3456E'),
-        (1234222, 'Lidl Torino', 'Lidl via lidl numero lidl','test2.jpg','123.1234N,45.3456E'),
-        (1234333, 'Fruttivendolo da Attilio', 'Frutta e verdura','test3.jpg','2.1234S,23.3456W'),
-        (1234444, 'Casa dolce casa', 'Tutto per la casa','test4.jpg','46.1234S,23.3456W'),
-        (1234555, 'Green market sas', 'Frutta e verdura per tutti i gusti','test5.jpg','23.1234S,23.3456W'),
-        (1234666, 'ParmaTop Salumeria', 'La miglior mortadella di Parma','test6.jpg','5.1234S,123.3456E');")
-        .execute(conn.as_ref())
-        .await;
+
+    let res: Result<(), Box<dyn Error>> = async {
+        let mut tx = conn.begin().await?;
         
-    let departments = query!(r"INSERT INTO department (shop_id, description, capacity) VALUES
-        (1234111, 'Frutta', 20),
-        (1234111, 'Pane', 15),
-    
-        (1234222, 'Surgelati', 12),
-        (1234222, 'Carne', 20),
-        (1234222, 'Pane', 2),
-        
-        (1234333, 'all', 4),
-        
-        (1234444, 'Prodotti per il bagno', 12),
-        (1234444, 'Prodotti per la cucina', 20),
-        (1234444, 'Giardinaggio', 2),
+        query!(r"INSERT INTO shop (id, name, description, image, location) VALUES
+            (1234111, 'Unes Milano', 'Unes via unes numero unes','test1.jpg','49.1234N,12.3456E'),
+            (1234222, 'Lidl Torino', 'Lidl via lidl numero lidl','test2.jpg','123.1234N,45.3456E'),
+            (1234333, 'Fruttivendolo da Attilio', 'Frutta e verdura','test3.jpg','2.1234S,23.3456W'),
+            (1234444, 'Casa dolce casa', 'Tutto per la casa','test4.jpg','46.1234S,23.3456W'),
+            (1234555, 'Green market sas', 'Frutta e verdura per tutti i gusti','test5.jpg','23.1234S,23.3456W'),
+            (1234666, 'ParmaTop Salumeria', 'La miglior mortadella di Parma','test6.jpg','5.1234S,123.3456E');")
+            .execute(&mut tx)
+            .await?;
             
-        (1234555, 'Frutta', 12),
-        (1234555, 'Verdura', 20),
-        (1234555, 'Pane', 8),
-        (1234555, 'Latticini', 8),
+        query!(r"INSERT INTO department (shop_id, description, capacity) VALUES
+            (1234111, 'Frutta', 20),
+            (1234111, 'Pane', 15),
+        
+            (1234222, 'Surgelati', 12),
+            (1234222, 'Carne', 20),
+            (1234222, 'Pane', 2),
+            
+            (1234333, 'all', 4),
+            
+            (1234444, 'Prodotti per il bagno', 12),
+            (1234444, 'Prodotti per la cucina', 20),
+            (1234444, 'Giardinaggio', 2),
+                
+            (1234555, 'Frutta', 12),
+            (1234555, 'Verdura', 20),
+            (1234555, 'Pane', 8),
+            (1234555, 'Latticini', 8),
 
-        (1234666, 'Insaccati', 12),
-        (1234666, 'Carne', 20),
-        (1234666, 'Formaggi', 14);")
-        .execute(conn.as_ref())
-        .await;
+            (1234666, 'Insaccati', 12),
+            (1234666, 'Carne', 20),
+            (1234666, 'Formaggi', 14);")
+            .execute(&mut tx)
+            .await?;
 
-    let sched = query!(r"INSERT INTO schedule (shop_id, dow, open, close) VALUES
-        (1234111, 1, '09:00', '17:00'),
-        (1234111, 2, '09:00', '17:00'),
-        (1234111, 3, '09:00', '17:00'),
-        (1234111, 4, '09:00', '17:00'),
-        (1234111, 5, '09:00', '17:00'),
+        query!(r"INSERT INTO schedule (shop_id, dow, open, close) VALUES
+            (1234111, 1, '09:00', '17:00'),
+            (1234111, 2, '09:00', '17:00'),
+            (1234111, 3, '09:00', '17:00'),
+            (1234111, 4, '09:00', '17:00'),
+            (1234111, 5, '09:00', '17:00'),
 
-        (1234222, 1, '09:00', '17:00'),
-        (1234222, 2, '09:00', '17:00'),
-        (1234222, 3, '09:00', '17:00'),
-        (1234222, 4, '09:00', '17:00'),
-        (1234222, 5, '09:00', '17:00'),
+            (1234222, 1, '09:00', '17:00'),
+            (1234222, 2, '09:00', '17:00'),
+            (1234222, 3, '09:00', '17:00'),
+            (1234222, 4, '09:00', '17:00'),
+            (1234222, 5, '09:00', '17:00'),
 
-        (1234333, 1, '09:00', '17:00'),
-        (1234333, 2, '09:00', '17:00'),
-        (1234333, 3, '09:00', '17:00'),
-        (1234333, 4, '09:00', '17:00'),
-        (1234333, 5, '09:00', '17:00'),
+            (1234333, 1, '09:00', '17:00'),
+            (1234333, 2, '09:00', '17:00'),
+            (1234333, 3, '09:00', '17:00'),
+            (1234333, 4, '09:00', '17:00'),
+            (1234333, 5, '09:00', '17:00'),
 
-        (1234444, 1, '09:00', '17:00'),
-        (1234444, 2, '09:00', '17:00'),
-        (1234444, 3, '09:00', '17:00'),
-        (1234444, 4, '09:00', '17:00'),
-        (1234444, 5, '09:00', '17:00'),
+            (1234444, 1, '09:00', '17:00'),
+            (1234444, 2, '09:00', '17:00'),
+            (1234444, 3, '09:00', '17:00'),
+            (1234444, 4, '09:00', '17:00'),
+            (1234444, 5, '09:00', '17:00'),
 
-        (1234555, 1, '09:00', '17:00'),
-        (1234555, 2, '09:00', '17:00'),
-        (1234555, 3, '09:00', '17:00'),
-        (1234555, 4, '09:00', '17:00'),
-        (1234555, 5, '09:00', '17:00'),
+            (1234555, 1, '09:00', '17:00'),
+            (1234555, 2, '09:00', '17:00'),
+            (1234555, 3, '09:00', '17:00'),
+            (1234555, 4, '09:00', '17:00'),
+            (1234555, 5, '09:00', '17:00'),
 
-        (1234666, 1, '09:00', '17:00'),
-        (1234666, 2, '09:00', '17:00'),
-        (1234666, 3, '09:00', '17:00'),
-        (1234666, 4, '09:00', '17:00'),
-        (1234666, 5, '09:00', '17:00');")    
-        .execute(conn.as_ref())
-        .await;
-
-    match (shops, departments, sched) {
-        (Ok(_), Ok(_), Ok(_)) => HttpResponse::Ok().body("Success!"),
+            (1234666, 1, '09:00', '17:00'),
+            (1234666, 2, '09:00', '17:00'),
+            (1234666, 3, '09:00', '17:00'),
+            (1234666, 4, '09:00', '17:00'),
+            (1234666, 5, '09:00', '17:00');")    
+            .execute(&mut tx)
+            .await?;
+        tx.commit().await?;
+        Ok(())
+    }.await;
+    
+    match res {
+        Ok(_) => HttpResponse::Ok().body("Success!"),
         _ => HttpResponse::BadRequest().body("Some query failed")
     }
 }

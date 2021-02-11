@@ -15,6 +15,7 @@ CREATE TABLE department (
     capacity INTEGER NOT NULL,
     ma_visit REAL NOT NULL DEFAULT 15,
     ma_est_visit REAL NOT NULL DEFAULT 15,
+    UNIQUE (shop_id, description),
     CHECK (capacity >= 0)
 );
 
