@@ -40,6 +40,8 @@ Referring to the DD, the following requirements are satisfied:
 - **[R17]** Customers shall be able to specify the categories of items they intend to buy
 - **[R18]** The system shall keep track of the number of customers visiting the Shop on a Department basis
 
+> Note: the Progressive Web Application and the camera features only work with HTTPS
+
 ## Adopted frameworks and languages
 
 ### Rust language
@@ -244,7 +246,30 @@ yarn run build
 
 This will generate the static files for the web application that can then be served using a web server (such as Nginx or Lighttpd). The static files are generated and placed in the `dist` folder. The `docker-compose` method uses **Nginx** to serve the static pages and routes all `/api/` endpoints to the backend api.
 
-> Note: the Progressive Web Application and the camera features only work with HTTPS
+### Installing the Progressive Web Application and HTTPS support
+
+The Progressive Web Application can be installed by visiting the website, then depending on the mobile browser, a prompt to install as an application should appear, either visible or on in the three dots menu.
+
+This feature requires running the server with HTTPS properly configured. Since this requires a web domain and generating TLS certificates, the instructions vary widely depending on the web registrar and certificate authority.
+Because of this, we decided to include an example configuration in the `ssl-impl` branch to be modified according to the instructions provided by the registrar.
+
+We are hosting a test instance of the service with HTTPS at https://clup.live that can be used to test the PWA and the camera.
+
+### Endpoints
+
+#### Customer
+
+The Customer app is accessible at the `/` (root) of the Web App.
+
+#### Developer
+
+The installation will not populate the DB with test data. For testing purposes, mock data can be generated from the `/dev/` endpoint. In particular, `/dev/setup_env` creates some shops together with their departments and weekly schedules. The endpoint is accessible through a Progressive UI, that should be disabled in a production environment. 
+To generate new credentials for the Staff, `/dev/new_staff` can be used. 
+
+#### Staff
+
+The Staff Web App is mounted at `/staff`. It will ask for Login credentials that must be generated in the Dev endpoint (as explained above). Customer credentials will not work for the Staff login.
+
 
 ## Effort
 ### Luca De Martini
@@ -275,25 +300,27 @@ This will generate the static files for the web application that can then be ser
 | 2021-02-05 | 3h   | Ticket                  |
 | 2021-02-06 | 3h   | Documentation           |
 | 2021-02-07 | 7h   | Delivery & touch-up     |
+| **TOTAL**  | 67h  |                         |
 
 ### Alessandro Duico
 
-| Date       | Time | Topic                   |
-| ---------- | ---- | ----------------------- |
-| 2020-12-27 | 3h   | Initialize Vue.js       |
-| 2021-01-18 | 5h   | Pick Vue.js packages    |
-| 2021-01-21 | 4h   | Login/Registration (PWA)|
-| 2021-01-22 | 6h   | Authentication (PWA)|
-| 2021-01-23 | 6h   | Implement ticket form (PWA)|
-| 2021-01-27 | 2h   | Implement Customer PWA  |
-| 2021-01-28 | 3h   | Implement Customer PWA  |
-| 2021-01-29 | 2h   | Queue Component (PWA)   |
-| 2021-01-30 | 6h   | Tokens Page (PWA)       |
-| 2021-01-31 | 2h   | Implement Customer PWA  |
-| 2021-02-01 | 3h   | Implement Customer PWA  |
-| 2021-02-02 | 3h   | Improve Tokens page (PWA)|
-| 2021-02-03 | 3h   | Improve Customer PWA  |
-| 2021-02-04 | 4h   | Improve Customer PWA  |
-| 2021-02-05 | 3h   | Implement Staff PWA     |
-| 2021-02-06 | 3h   | Implement Staff PWA     |
-| 2021-02-07 | 7h   | Delivery & touch-up     |
+| Date       | Time | Topic                       |
+| ---------- | ---- | --------------------------- |
+| 2020-12-27 | 3h   | Initialize Vue.js           |
+| 2021-01-18 | 5h   | Pick Vue.js packages        |
+| 2021-01-21 | 4h   | Login/Registration (PWA)    |
+| 2021-01-22 | 6h   | Authentication (PWA)        |
+| 2021-01-23 | 6h   | Implement ticket form (PWA) |
+| 2021-01-27 | 2h   | Implement Customer PWA      |
+| 2021-01-28 | 3h   | Implement Customer PWA      |
+| 2021-01-29 | 2h   | Queue Component (PWA)       |
+| 2021-01-30 | 6h   | Tokens Page (PWA)           |
+| 2021-01-31 | 2h   | Implement Customer PWA      |
+| 2021-02-01 | 3h   | Implement Customer PWA      |
+| 2021-02-02 | 3h   | Improve Tokens page (PWA)   |
+| 2021-02-03 | 3h   | Improve Customer PWA        |
+| 2021-02-04 | 4h   | Improve Customer PWA        |
+| 2021-02-05 | 3h   | Implement Staff PWA         |
+| 2021-02-06 | 3h   | Implement Staff PWA         |
+| 2021-02-07 | 7h   | Delivery & touch-up         |
+| **TOTAL**  | 65h  |                             |
